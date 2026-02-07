@@ -1,6 +1,7 @@
 # AriPari.am Frontend
 
 ## Description
+Technologies: Vue.js + Vite, SCSS, Vue-Router
 
 ### Project Setup
 ```sh
@@ -14,9 +15,3 @@ npm run dev
 ```sh
 npm run build
 ```
-
-# TODO
-- мультиязычность
-- роутинг с id для танцев
-- fetch танцев с backend (ex: api/dance/id?lang=ru)
-- 
