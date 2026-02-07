@@ -1,4 +1,4 @@
-# AriPari.am Frontend
+# Ari Pari Frontend
 
 ## Description
 Technologies: Vue.js + Vite, SCSS, Vue-Router

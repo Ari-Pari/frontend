@@ -3,9 +3,9 @@
 <template>
 	<nav>
 		<RouterLink to="/"> Go to Home </RouterLink>
-		<RouterLink to="/dance/20"> Go to Dance </RouterLink>
-		<!-- <router-link :to="`/dance/${dance.slug}`">
-		{{ dance.name }}
+		<RouterLink to="/dances/20"> Go to Dance </RouterLink>
+		<!-- <router-link :to="`/dances/${dance.slug}`">
+		{{ dances.name }}
 		</router-link> -->
 		<RouterLink to="/about"> Go to About </RouterLink>
 	</nav>
