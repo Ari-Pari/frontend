@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-	Это about
+	Это home
 </template>
 
 <style lang="scss" scoped>
