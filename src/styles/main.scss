@@ -1,32 +1,12 @@
 // Fonts
-
-// Variables
-$fontFamily: "Arial";
-$fontSize: toRem(16);
-$mainColor: #000;
-$bgColor: #fff;
-$minWidth: 320;
-$maxWidth: 1920;
-$maxWidthContainer: 1400;
-$containerPadding: 16;
-// Breakpoints
-$containerWidth: $maxWidthContainer + $containerPadding;
-$pc: toEm($containerWidth);
-$tablet: toEm(991.98);
-$mobile: toEm(767.98);
-$mobileSmall: toEm(479.98);
-
-// Functions
-// translate PX to REM
-@function toRem($px, $current: 16) {
-	$result: math.div($px, $current) + rem;
-	@return $result;
-}
-// translate PX to EM
-@function toEm($px, $current: 16) {
-	$result: math.div($px, $current) + em;
-	@return $result;
-}
+// @font-face {
+// 	font-family: 'SF UI Text';
+// 	src: url('../../fonts/SFUIText-Regular.woff2') format('woff2'),
+// 		 url('../../fonts/SFUIText-Regular.woff') format('woff');
+// 	font-weight: normal;
+// 	font-style: normal;
+// 	font-display: swap;
+// }
 
 // Reset styles
 * {
@@ -46,7 +26,7 @@ $mobileSmall: toEm(479.98);
 body,
 html {
 	height: 100%;
-	min-width: $minWidth;
+	min-width: $minWidth + px;
 }
 body {
 	color: $mainColor;
@@ -104,12 +84,6 @@ h6 {
 	font-weight: inherit;
 	font-size: inherit;
 }
-.lock body {
-	overflow: hidden;
-	touch-action: none;
-	-ms-scroll-chaining: none;
-	overscroll-behavior: none;
-}
 
 // Settings
 body {
@@ -129,7 +103,7 @@ body {
 	@supports (overflow: clip) {
 		overflow: clip;
 	}
-	// Push footer
+	// Push footer to bottom
 	> main {
 		flex: 1 1 auto;
 	}
@@ -139,7 +113,7 @@ body {
 	}
 }
 [class*="__container"] {
-	max-width: $maxWidthContainer;
+	max-width: $maxWidthContainer + px;
 	margin: 0 auto;
-	padding: 0 $containerPadding;
+	padding: 0 $containerPadding + px;
 }
