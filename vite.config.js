@@ -39,6 +39,13 @@ export default defineConfig({
 				autoprefixer(),
 			],
 		},
+		preprocessorOptions: {
+			scss: {
+				additionalData: `
+				@use "sass:math";
+				@use "@/styles/_variables.scss" as *;`
+			}
+		}
 	},
 	resolve: {
 		alias: {
