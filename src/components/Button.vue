@@ -3,7 +3,9 @@
 </script>
 
 <template>
-	<button></button>
+	<button>
+		<slot />
+	</button>
 </template>
 
 <style lang="scss" scoped>
