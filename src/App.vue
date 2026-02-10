@@ -1,17 +1,16 @@
 <script setup>
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
-import Player from './components/Player.vue'
+import AudioPlayer from './components/AudioPlayer.vue'
 </script>
 
 <template>
-	<Header/>
+	<Header />
 	<main class="page">
-		<!-- <Player /> -->
+		<!-- <AudioPlayer /> -->
 		<RouterView />
 	</main>
-	<Footer/>
+	<Footer />
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

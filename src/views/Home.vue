@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { searchDances } from "@/services/fetch"
+import { searchDances } from "@/services/api"
 
 const { t, locale } = useI18n()
 
@@ -15,6 +15,7 @@ onMounted(async () => {
 		}
 	})
 	dances.value = responce.data
+	console.log(dances.value);
 	// const dances = await searchDances({
 	// 	body: {
 	// 		searchText: "string",
@@ -29,7 +30,6 @@ onMounted(async () => {
 	// 	}
 	// })
 })
-console.log(dances);
 watch(locale, () => {
 	// fetch data
 })

@@ -6,7 +6,9 @@ import Button from './Button.vue'
 const { t, locale } = useI18n()
 watch(locale, (newLocale) => {
 	document.documentElement.setAttribute('lang', newLocale)
+	localStorage.setItem('language', newLocale)
 })
+
 </script>
 
 <template>
@@ -21,12 +23,14 @@ watch(locale, (newLocale) => {
 						<RouterLink to="/about"> {{ t('aboutPageMenuItem') }} </RouterLink>
 					</li>
 				</ul>
-				<select class="menu__language" v-model="locale">
-					<option>hy</option>
-					<option>en</option>
-					<option>ru</option>
-				</select>
-				<Button />
+				<div class="menu__actions">
+					<select v-bind:aria-label="t('selectAriaLabel')" class="menu__language" v-model="locale">
+						<option>hy</option>
+						<option>en</option>
+						<option>ru</option>
+					</select>
+					<Button>Это кнопка</Button>
+				</div>
 			</nav>
 		</div>
 	</div>
@@ -34,13 +38,31 @@ watch(locale, (newLocale) => {
 
 <style lang="scss" scoped>
 .header {
+	background-color: #929292;
+	padding: toRem(30);
+	margin-bottom: toRem(30);
+
 	&__container {}
 
-	&__menu {}
 }
 
 .menu {
-	&__list {}
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	&__list {
+		display: flex;
+		align-items: center;
+		gap: toRem(20);
+		margin-right: toRem(30);
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: toRem(20);
+	}
 
 	&__item {
 		.router-link-exact-active {

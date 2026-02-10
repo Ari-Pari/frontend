@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { getDance } from "@/services/fetch"
+import { getDance } from "@/services/api"
 
 const props = defineProps({ id: String })
 
@@ -22,6 +22,7 @@ watch(locale, () => {
 <template>
 	<section class="dance">
 		<div class="dance__container">
+
 			<div v-if="dance">
 				This is {{ dance.title }}, number: {{ props.id }}
 			</div>

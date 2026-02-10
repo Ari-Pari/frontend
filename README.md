@@ -3,6 +3,10 @@
 ## Description
 Technologies: Vue.js + Vite, SCSS, Vue-Router
 
+### Create file .env and fill it with var
+```sh
+API_BASE_URL=example
+```
 ### Project Setup
 ```sh
 npm install
