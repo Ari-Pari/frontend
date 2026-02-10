@@ -1,19 +1,26 @@
 <script setup>
-defineProps({
-  id: String
+import { getDance } from "@/composables/fetch"
+import { ref, onMounted, computed } from "vue"
+import { useI18n } from "vue-i18n"
+
+const { locale } = useI18n()
+watch(locale, () => {
+	// fetch data
 })
-// import { useRoute } from 'vue-router'
 
-// const route = useRoute()
-// const id = route.params.id
+const props = defineProps({ id: String })
 
-// например запрос на backend
-// GET /api/dances/25
+// const dance = await getDance(props.id, lang = 'hy')
 </script>
 
 <template>
-	Это dance {{ id }}
+	<section class="dance">
+		<div class="dance__container">
+			<div v-if="dance">
+				This is {{ dance.name }}, number: {{ props.id }}
+			</div>
+		</div>
+	</section>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

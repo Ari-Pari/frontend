@@ -8,6 +8,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@vueuse/core": "^14.2.1",
 		"autoprefixer": "^10.4.24",
 		"postcss-sort-media-queries": "^5.2.0",
 		"vite-plugin-image-optimizer": "^2.0.3",
