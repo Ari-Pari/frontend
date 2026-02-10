@@ -1,14 +1,14 @@
 export default {
 	en: {
-		homePage: "Home",
-		aboutPage: "About",
+		homePageMenuItem: "Home",
+		aboutPageMenuItem: "About",
 	},
 	ru: {
-		homePage: "Главная",
-		aboutPage: "О нас",
+		homePageMenuItem: "Главная",
+		aboutPageMenuItem: "О нас",
 	},
   	hy: {
-		homePage: "Գլխավոր",
-		aboutPage: "Մեր մասին",
+		homePageMenuItem: "Գլխավոր",
+		aboutPageMenuItem: "Մեր մասին",
 	}
 }

@@ -1,12 +1,11 @@
 <script setup>
-import Button from './Button.vue'
-import { watch } from 'vue'
+import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
+import Button from './Button.vue'
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 watch(locale, (newLocale) => {
 	document.documentElement.setAttribute('lang', newLocale)
-	// fetch data
 })
 </script>
 
@@ -16,13 +15,13 @@ watch(locale, (newLocale) => {
 			<nav class="header__menu menu">
 				<ul class="menu__list">
 					<li class="menu__item">
-						<RouterLink to="/"> {{ $t('homePage') }}</RouterLink>
+						<RouterLink to="/"> {{ t('homePageMenuItem') }}</RouterLink>
 					</li>
 					<li class="menu__item">
-						<RouterLink to="/about"> {{ $t('aboutPage') }} </RouterLink>
+						<RouterLink to="/about"> {{ t('aboutPageMenuItem') }} </RouterLink>
 					</li>
 				</ul>
-				<select v-model="locale">
+				<select class="menu__language" v-model="locale">
 					<option>hy</option>
 					<option>en</option>
 					<option>ru</option>
@@ -47,6 +46,10 @@ watch(locale, (newLocale) => {
 		.router-link-exact-active {
 			color: red;
 		}
+	}
+
+	&__language {
+		// appearance: none;
 	}
 }
 </style>
