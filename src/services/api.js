@@ -1,86 +1,43 @@
-import { ref, onMounted } from "vue"
-
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL  // https://jsonplaceholder.typicode.com/posts
 export const userMainLanguage = localStorage.getItem('language')
 	|| (navigator.languages && navigator.languages[0])
 	|| navigator.language || 'hy';
 
-export async function useFetch(url, params = null) {
-	let data = null
-	let error = null
-	let loading = false
+export async function apiRequest(endpoint, options = {}) {
+	const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`
 
-	try {
-		loading = true
-		error = null
+	const defaultOptions = {
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+		},
+		...options
+	}
+	const response = await fetch(url, defaultOptions)
 
-		const response = await fetch(url, params)
-		if (!response.ok) {
-			throw new Error(`API error: ${response.status}`)
-		}
-
-		data = await response.json()
-	} catch (e) {
-		console.error("Loading error:", e)
-		error = e.message
-		throw e
-	} finally {
-		loading = false
+	if (!response.ok) {
+		const errorData = await response.json().catch(() => ({}))
+		throw new Error(`API error: ${response.status}`)
 	}
 
-	return { data, error, loading }
+	return response.json()
 }
 
-export async function getDance(id, lang = 'hy') {
-	return useFetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
-		method: "GET",
-		headers: {
-			"Accept": 'application/json',
-			"Content-type": 'application/json',
-		}
-	})
-}
-export async function searchDances({ lang = 'hy', page = 1, size = 10, body = {} } = {}) {
-	return useFetch(`https://jsonplaceholder.typicode.com/posts`)
+// For testing
+export const DanceService = {
+	getDance: (id, lang = userMainLanguage) => apiRequest(`https://jsonplaceholder.typicode.com/todos/${id}`),
+	searchDances: (params = {}) => apiRequest('https://jsonplaceholder.typicode.com/posts'),
 }
 
+// export const DanceService = {
+// 	getDance: (id, lang = userMainLanguage) => apiRequest(`/dances/${id}?lang=${lang}`),
+// 	getGenres: (lang = userMainLanguage) => apiRequest(`/genres/?lang=${lang}`),
+// 	getRegions: (lang = userMainLanguage) => apiRequest(`/regions/?lang=${lang}`),
 
-// export async function getDance(id, lang = 'hy') {
-// 	return useFetch(`${API_BASE_URL}/dances/${id}?lang=${lang}`, {
-// 		method: "GET",
-// 		headers: {
-// 			"Accept": 'application/json',
-// 			"Content-type": 'application/json',
-// 		}
-// 	})
-// }
-// export async function getGenres(lang = 'hy') {
-// 	return useFetch(`${API_BASE_URL}/genres/?lang=${lang}`, {
-// 		method: "GET",
-// 		headers: {
-// 			"Accept": 'application/json',
-// 			"Content-type": 'application/json',
-// 		}
-// 	})
-// }
-// export async function getRegions(lang = 'hy') {
-// 	return useFetch(`${API_BASE_URL}/regions/?lang=${lang}`, {
-// 		method: "GET",
-// 		headers: {
-// 			"Accept": 'application/json',
-// 			"Content-type": 'application/json',
-// 		}
-// 	})
-// }
-// export async function searchDances({ lang = 'hy', page = 1, size = 10, body = {} } = {}) {
-// 	return useFetch(`${API_BASE_URL}/search?lang=${lang}&page=${page}&size=${size}`, {
-// 		method: "POST",
-// 		headers: {
-// 			"Accept": 'application/json',
-// 			"Content-type": 'application/json',
-// 		},
-// 		body: JSON.stringify(body)
-// 	})
+// 	searchDances: (params = {}) => apiRequest(`/dances/search?lang=${params.lang}&page=${params.page}&size=${params.size}`, {
+// 		method: 'POST',
+// 		body: JSON.stringify(params.body || {})
+// 	}),
 // }
 
 // If we need to cancel request
