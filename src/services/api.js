@@ -1,7 +1,12 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL  // https://jsonplaceholder.typicode.com/posts
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const userMainLanguage = localStorage.getItem('language')
 	|| (navigator.languages && navigator.languages[0])
 	|| navigator.language || 'hy';
+
+
+// If we need to cancel request
+// const controller = new AbortController()
+// controller.abort()
 
 export async function apiRequest(endpoint, options = {}) {
 	const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`
@@ -24,28 +29,25 @@ export async function apiRequest(endpoint, options = {}) {
 }
 
 // For testing
-export const DanceService = {
-	getDance: (id, lang = userMainLanguage) => apiRequest(`https://jsonplaceholder.typicode.com/todos/${id}`),
-	searchDances: (params = {}) => apiRequest('https://jsonplaceholder.typicode.com/posts'),
-}
-
 // export const DanceService = {
-// 	getDance: (id, lang = userMainLanguage) => apiRequest(`/dances/${id}?lang=${lang}`),
-// 	getGenres: (lang = userMainLanguage) => apiRequest(`/genres/?lang=${lang}`),
-// 	getRegions: (lang = userMainLanguage) => apiRequest(`/regions/?lang=${lang}`),
-
-// 	searchDances: (params = {}) => apiRequest(`/dances/search?lang=${params.lang}&page=${params.page}&size=${params.size}`, {
-// 		method: 'POST',
-// 		body: JSON.stringify(params.body || {})
-// 	}),
+// 	getDance: (id, lang = userMainLanguage) => apiRequest(`https://jsonplaceholder.typicode.com/todos/${id}`),
+// 	searchDances: (params = {}) => apiRequest('https://jsonplaceholder.typicode.com/posts'),
 // }
 
-// If we need to cancel request
-// const controller = new AbortController()
-// controller.abort()
+export const DanceService = {
+	getDance: (id, lang = userMainLanguage) => apiRequest(`/dances/${id}?lang=${lang}`),
+	getGenres: (lang = userMainLanguage) => apiRequest(`/genres/?lang=${lang}`),
+	getRegions: (lang = userMainLanguage) => apiRequest(`/regions/?lang=${lang}`),
+
+	searchDances: (params = {}) => apiRequest(`/dances/search?lang=${params.lang}&page=${params.page}&size=${params.size}`, {
+		method: 'POST',
+		body: JSON.stringify(params.body || {})
+	}),
+}
+
 
 // local dances store
-/*export const dances = reactive([
+/*export const localDancesStore = [
 	{
 		"id": 1,
 		"name": "Кочари (Сасун)",
@@ -157,4 +159,4 @@ export const DanceService = {
 		"lessonVideos": [],
 		"performanceVideos": []
 	},
-])*/
+]*/

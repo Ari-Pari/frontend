@@ -25,7 +25,7 @@ watch(() => props.id, (id) => {
 	<section class="dance">
 		<div class="dance__container">
 			<div v-if="dance">
-				This is {{ dance.title }}, number: {{ props.id }}
+				This is {{ dance.name }}, number: {{ dance.id }}
 			</div>
 		</div>
 	</section>

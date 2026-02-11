@@ -7,13 +7,13 @@ import { useApi } from "@/composables/useApi"
 const { t, locale } = useI18n()
 
 const searchDancesBodyParams = ref({
-	searchText: "string",
+	searchText: "",
 	genres: [0],
 	regions: [0],
-	complexities: [5],
-	genders: ["male"],
-	paces: [3],
-	handshakes: ["FREE"],
+	complexities: [],
+	genders: [],
+	paces: [],
+	handshakes: [],
 	sortedBy: "createdBy",
 	sortType: "ASC"
 })
@@ -55,7 +55,7 @@ watch(locale, (newLocale) => {
 	<div class="dances">
 		<div class="dances__container">
 			<div v-for="dance in dances" class="dance-item">
-				<RouterLink :to="`/dance/${dance.id}`"> Go to Dance {{ dance.title }}</RouterLink>
+				<RouterLink :to="`/dance/${dance.id}`"> Go to Dance {{ dance.name }}</RouterLink>
 			</div>
 		</div>
 	</div>
