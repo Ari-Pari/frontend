@@ -1,12 +1,69 @@
 // Fonts
-// @font-face {
-// 	font-family: 'SF UI Text';
-// 	src: url('../../fonts/SFUIText-Regular.woff2') format('woff2'),
-// 		 url('../../fonts/SFUIText-Regular.woff') format('woff');
-// 	font-weight: normal;
-// 	font-style: normal;
-// 	font-display: swap;
-// }
+@font-face {
+	font-family: "Montserrat";
+	src:
+		url("../assets/fonts/Montserrat-Light.woff") format("woff"),
+		url("../assets/fonts/Montserrat-Light.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Montserrat";
+	src:
+		url("../assets/fonts/Montserrat-Regular.woff") format("woff"),
+		url("../assets/fonts/Montserrat-Regular.woff2") format("woff2");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Montserrat";
+	src:
+		url("../assets/fonts/Montserrat-Medium.woff") format("woff"),
+		url("../assets/fonts/Montserrat-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Montserrat";
+	src:
+		url("../assets/fonts/Montserrat-SemiBold.woff") format("woff"),
+		url("../assets/fonts/Montserrat-SemiBold.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "NotoSansArmenian";
+	src: url("../assets/fonts/NotoSansArmenian-Light.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "NotoSansArmenian";
+	src: url("../assets/fonts/NotoSansArmenian-Regular.woff2") format("woff2");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "NotoSansArmenian";
+	src: url("../assets/fonts/NotoSansArmenian-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "NotoSansArmenian";
+	src: url("../assets/fonts/NotoSansArmenian-SemiBold.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
 
 // Reset styles
 * {
@@ -41,6 +98,7 @@ body {
 	color: $mainColor;
 	line-height: 1;
 	font-size: $fontSize;
+	font-weight: 500;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	background-color: $bgColor;
@@ -70,6 +128,7 @@ button,
 option,
 select {
 	font-family: inherit;
+	font-weight: inherit;
 	cursor: pointer;
 }
 a {
@@ -124,4 +183,26 @@ body {
 	max-width: $maxWidthContainer + px;
 	margin: 0 auto;
 	padding: 0 $containerPadding + px;
+}
+
+// Common styles
+.button {
+	background: #fda01b;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+	width: toRem(250);
+	height: toRem(40);
+	padding: toRem(10) toRem(20);
+	font-size: toRem(20);
+	text-align: center;
+	color: #fff;
+	transition: all 0.3s;
+
+	@media (any-hover: hover) {
+		&:hover {
+			background: rgba(253, 160, 27, 0.8);
+		}
+	}
 }

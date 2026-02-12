@@ -12,6 +12,14 @@ const router = createRouter({
 		{ path: '/dance/:id', name: 'dance', component: Dance, props: true },
 		{ path: '/:pathMatch(.*)*', redirect: { name: 'home' } }
 	],
+	scrollBehavior(to) {
+		if (to.hash) {
+			return {
+				el: to.hash,
+				behavior: 'smooth'
+			}
+		}
+	}
 })
 
 export default router

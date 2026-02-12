@@ -12,13 +12,15 @@
 }
 
 // Variables
-$fontFamilyArmenian: "Arial";
-$fontFamily: "Arial";
+$fontFamilyArmenian: "NotoSansArmenian";
+$fontFamily: "Montserrat";
 $fontSize: toRem(16);
-$mainColor: #000;
+$mainColor: #1a1a1a;
 $bgColor: #fff;
+$orangeColor: #fda01b;
+$orangeHoverColor: #fda01bcc;
 $minWidth: 320;
-$maxWidthContainer: 1400;
+$maxWidthContainer: 1380;
 $containerPadding: 16;
 $containerWidth: $maxWidthContainer + $containerPadding;
 // Breakpoints
