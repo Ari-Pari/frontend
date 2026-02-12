@@ -26,6 +26,8 @@ onMounted(() => {
 		size: 10,
 		body: searchDancesBodyParams.value
 	})
+
+	console.log(dances);
 })
 watch(locale, (newLocale) => {
 	fetchDances({
@@ -35,6 +37,7 @@ watch(locale, (newLocale) => {
 		body: searchDancesBodyParams.value
 	})
 })
+
 // For filtering and sorting
 // watch(searchDancesBodyParams, () => {
 // 	fetchDances({
@@ -49,10 +52,20 @@ watch(locale, (newLocale) => {
 <template>
 	<div id="dancesBlock" class="dances">
 		<div class="dances__container">
-			привет
+			<div class="dances__actions">
+				Здесь будет фильтр и поиск
+			</div>
+			<div class="dances__body">
+				<div v-if="loading || !dances" v-for="n in 12" class="dance-item skeleton">
+					<div class="skeleton__image skeleton-anim"></div>
+					<div class="skeleton__title skeleton-anim"></div>
+					<div class="skeleton__descr skeleton-anim"></div>
+				</div>
+				<div v-else v-for="dance in dances" class="dance-item">
+					<RouterLink :to="`/dance/${dance.id}`"> Go to Dance {{ dance.name }}
 
-			<div v-for="dance in dances" class="dance-item">
-				<RouterLink :to="`/dance/${dance.id}`"> Go to Dance {{ dance.name }}</RouterLink>
+					</RouterLink>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -66,4 +79,60 @@ watch(locale, (newLocale) => {
 
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.dances {
+	padding-top: toRem(53);
+
+	&__actions {
+		margin-bottom: toRem(53);
+	}
+
+	&__body {
+		max-height: toRem(1291);
+		overflow-y: auto;
+		padding-bottom: toRem(53);
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: toRem(40) toRem(30);
+	}
+}
+
+.skeleton {
+	&__image {
+		width: 100%;
+		height: 225px;
+		margin-bottom: toRem(14);
+	}
+
+	&__title {
+		width: 80%;
+		height: 30px;
+		margin-bottom: toRem(10);
+	}
+
+	&__descr {
+		width: 60%;
+		height: 30px;
+	}
+}
+
+.skeleton-anim {
+	background: #eee;
+	animation: skeleton-loading 1.5s infinite linear;
+	border-radius: 14px;
+}
+
+@keyframes skeleton-loading {
+	0% {
+		background-color: #eee;
+	}
+
+	50% {
+		background-color: #ddd;
+	}
+
+	100% {
+		background-color: #eee;
+	}
+}
+</style>

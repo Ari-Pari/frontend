@@ -1,11 +1,11 @@
 <script setup></script>
 
 <template>
-	<div class="footer">
+	<footer class="footer">
 		<div class="footer__container">
 
 		</div>
-	</div>
+	</footer>
 </template>
 
 <style lang="scss" scoped>

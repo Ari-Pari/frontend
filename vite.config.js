@@ -12,15 +12,6 @@ export default defineConfig({
 		vue(),
 		vueDevTools(),
 		ViteImageOptimizer({
-			svg: {
-				plugins: [
-					'removeDoctype',
-					'removeXMLProcInst',
-					'minifyStyles',
-					'sortAttrs',
-					'sortDefsChildren',
-				],
-			},
 			png: {
 				quality: 70,
 			},

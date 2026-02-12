@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter, useRoute } from 'vue-router'
+import { headerScroll, menuInit } from "../services/utils"
 
 const router = useRouter()
 const route = useRoute()
@@ -11,13 +12,18 @@ const currentLang = computed(() => locale.value)
 
 const scrollToDance = async () => {
 	if (route.name != 'home') {
-		router.push('/#dancesElement')
+		await router.push('/#dancesBlock')
+	} else {
+		requestAnimationFrame(() => {
+			document.getElementById('dancesBlock')
+				?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+		})
 	}
-	requestAnimationFrame(() => {
-		document.getElementById('dancesBlock')
-			?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-	})
 }
+
+onMounted(() => {
+	headerScroll()
+})
 
 watch(locale, (newLocale) => {
 	document.documentElement.setAttribute('lang', newLocale)
@@ -26,16 +32,16 @@ watch(locale, (newLocale) => {
 </script>
 
 <template>
-	<div class="header">
+	<header data-scroll-show class="header">
 		<div class="header__container">
 			<div class="header__menu menu">
 				<div class="menu__left">
 					<RouterLink to="/" class="menu__logo"><img src="../assets/AriPari_logo.png" alt="logo"></RouterLink>
-					<button type="button" class="button">
+					<button type="button" class="menu__left-button button">
 						{{ t('supportButton') }}
 					</button>
 				</div>
-				<button type="button" class="menu__icon icon-menu"><span></span></button>
+				<button type="button" @click="menuInit" class="menu__icon icon-menu"><span></span></button>
 				<nav class="menu__body">
 					<ul class="menu__list">
 						<li class="menu__item">
@@ -63,7 +69,7 @@ watch(locale, (newLocale) => {
 				</nav>
 			</div>
 		</div>
-	</div>
+	</header>
 </template>
 
 <style lang="scss" scoped>
@@ -73,6 +79,27 @@ watch(locale, (newLocale) => {
 	z-index: 50;
 	width: 100%;
 	left: 0;
+	transition: all 0.5s;
+
+	@media (max-width:$pc) {
+		padding: 0 toRem(16);
+	}
+
+	@media (max-width:$tablet) {
+		top: 16px;
+	}
+
+	&._header-scroll {
+		top: -100%;
+	}
+
+	&._header-show {
+		top: 34px;
+
+		@media (max-width:$tablet) {
+			top: 16px;
+		}
+	}
 
 	&__container {
 		background-color: #fff;
@@ -91,6 +118,17 @@ watch(locale, (newLocale) => {
 		display: flex;
 		align-items: center;
 
+		&-button {
+			@media (max-width:$tablet) {
+				width: toRem(200);
+			}
+
+			@media (max-width:$mobileSmall) {
+				width: auto;
+				height: toRem(35);
+				font-size: toRem(16);
+			}
+		}
 	}
 
 	&__logo {
@@ -98,17 +136,42 @@ watch(locale, (newLocale) => {
 		height: 93px;
 		margin-right: toRem(9);
 
+		@media (max-width:$mobileSmall) {
+			width: 50px;
+			height: 50px;
+		}
+
 		img {
 			max-width: 100%;
 			max-height: 100%;
 		}
 	}
 
-	&__icon {}
-
 	&__body {
 		display: flex;
 		align-items: center;
+
+		@media (max-width: $tablet) {
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			right: -100%;
+			top: 0;
+			overflow: auto;
+			padding: toRem(75) toRem(16) toRem(30);
+			transition: right 0.3s;
+			background-color: #fff;
+			flex-direction: column;
+			justify-content: center;
+
+			.menu-open & {
+				right: 0;
+
+				&::before {
+					left: 0;
+				}
+			}
+		}
 	}
 
 	&__list {
@@ -117,6 +180,13 @@ watch(locale, (newLocale) => {
 		align-items: center;
 		gap: toRem(20);
 		margin-right: toRem(30);
+
+		@media (max-width:$tablet) {
+			flex-direction: column;
+			margin-bottom: toRem(40);
+			margin-right: 0;
+			gap: toRem(30);
+		}
 	}
 
 	&__item {
@@ -129,6 +199,10 @@ watch(locale, (newLocale) => {
 		transition: all 0.3s;
 		font-size: toRem(20);
 		color: #353535;
+
+		@media (max-width:$tablet) {
+			font-size: toRem(24);
+		}
 
 		@media (any-hover: hover) {
 			&:hover {
@@ -198,5 +272,62 @@ watch(locale, (newLocale) => {
 	}
 }
 
-.icon-menu {}
+.icon-menu {
+	display: none;
+
+	@media (max-width: $tablet) {
+		display: block;
+		position: relative;
+		width: toRem(30);
+		height: toRem(18);
+		z-index: 5;
+
+		@media (any-hover: none) {
+			cursor: default;
+		}
+
+		span,
+		&::before,
+		&::after {
+			content: "";
+			transition: all 0.3s ease 0s;
+			right: 0;
+			position: absolute;
+			width: 100%;
+			height: toRem(2);
+			background-color: $mainColor;
+		}
+
+		&::before {
+			top: 0;
+		}
+
+		&::after {
+			bottom: 0;
+		}
+
+		span {
+			top: calc(50% - toRem(1));
+		}
+
+		.menu-open & {
+			span {
+				width: 0;
+			}
+
+			&::before,
+			&::after {}
+
+			&::before {
+				top: calc(50% - toRem(1));
+				transform: rotate(-45deg);
+			}
+
+			&::after {
+				bottom: calc(50% - toRem(1));
+				transform: rotate(45deg);
+			}
+		}
+	}
+}
 </style>
