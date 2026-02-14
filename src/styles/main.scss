@@ -36,6 +36,42 @@
 	font-display: swap;
 }
 @font-face {
+	font-family: "Montserratarm";
+	src:
+		url("../assets/fonts/Montserratarm-Light.woff") format("woff"),
+		url("../assets/fonts/Montserratarm-Light.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Montserratarm";
+	src:
+		url("../assets/fonts/Montserratarm-Regular.woff") format("woff"),
+		url("../assets/fonts/Montserratarm-Regular.woff2") format("woff2");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Montserratarm";
+	src:
+		url("../assets/fonts/Montserratarm-Medium.woff") format("woff"),
+		url("../assets/fonts/Montserratarm-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Montserratarm";
+	src:
+		url("../assets/fonts/Montserratarm-SemiBold.woff") format("woff"),
+		url("../assets/fonts/Montserratarm-SemiBold.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
 	font-family: "NotoSansArmenian";
 	src: url("../assets/fonts/NotoSansArmenian-Light.woff2") format("woff2");
 	font-weight: 300;
@@ -56,7 +92,6 @@
 	font-style: normal;
 	font-display: swap;
 }
-
 @font-face {
 	font-family: "NotoSansArmenian";
 	src: url("../assets/fonts/NotoSansArmenian-SemiBold.woff2") format("woff2");
@@ -85,19 +120,11 @@ html {
 	height: 100%;
 	min-width: $minWidth + px;
 }
-html[lang="hy"] body {
-	font-family: $fontFamilyArmenian, Arial, Helvetica, sans-serif;
-}
-html[lang="en"] body {
-	font-family: $fontFamily, Arial, Helvetica, sans-serif;
-}
-html[lang="ru"] body {
-	font-family: $fontFamily, Arial, Helvetica, sans-serif;
-}
 body {
 	color: $mainColor;
 	line-height: 1;
 	font-size: $fontSize;
+	font-family: $fontFamily, Arial, Helvetica, sans-serif;
 	font-weight: 500;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -108,7 +135,9 @@ body {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-
+html[lang="hy"] body {
+	font-family: $fontFamilyArmenian, Arial, Helvetica, sans-serif;
+}
 button,
 input,
 textarea {
@@ -205,4 +234,10 @@ body {
 			background: rgba(253, 160, 27, 0.8);
 		}
 	}
+	&[disabled] {
+		opacity: 0.5;
+		cursor: default;
+	}
+}
+.input {
 }

@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter, useRoute } from 'vue-router'
-import { headerScroll, menuInit } from "../services/utils"
+import { headerScroll, menuInit, menuClose } from "../services/utils"
 
 const router = useRouter()
 const route = useRoute()
@@ -10,14 +10,13 @@ const { t, locale } = useI18n()
 
 const currentLang = computed(() => locale.value)
 
-const scrollToDance = async () => {
-	if (route.name != 'home') {
-		await router.push('/#dancesBlock')
-	} else {
+function scrollToDance() {
+	if (route.name == 'home') {
 		requestAnimationFrame(() => {
 			document.getElementById('dancesBlock')
 				?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 		})
+		menuClose()
 	}
 }
 
@@ -29,6 +28,9 @@ watch(locale, (newLocale) => {
 	document.documentElement.setAttribute('lang', newLocale)
 	localStorage.setItem('language', newLocale)
 })
+watch(route, () => {
+	menuClose()
+})
 </script>
 
 <template>
@@ -37,9 +39,9 @@ watch(locale, (newLocale) => {
 			<div class="header__menu menu">
 				<div class="menu__left">
 					<RouterLink to="/" class="menu__logo"><img src="../assets/AriPari_logo.png" alt="logo"></RouterLink>
-					<button type="button" class="menu__left-button button">
+					<RouterLink to="/about#supportBlock" class="menu__left-button button">
 						{{ t('supportButton') }}
-					</button>
+					</RouterLink>
 				</div>
 				<button type="button" @click="menuInit" class="menu__icon icon-menu"><span></span></button>
 				<nav class="menu__body">
@@ -52,8 +54,8 @@ watch(locale, (newLocale) => {
 						</li>
 					</ul>
 					<div class="menu__actions">
-						<button @click='scrollToDance' v-bind:aria-label="t('searchAriaLabel')"
-							class="menu__search-icon"></button>
+						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')"
+							class="menu__search-icon"></RouterLink>
 						<div class="menu__languages">
 							<input type="radio" id="lang-arm" class="menu__language-input" value="hy" v-model="locale" />
 							<label for="lang-arm" :class="{ active: currentLang === 'hy' }"
@@ -89,16 +91,16 @@ watch(locale, (newLocale) => {
 		top: 16px;
 	}
 
+	@media (max-width:$mobileSmall) {
+		top: 60px;
+	}
+
 	&._header-scroll {
 		top: -100%;
 	}
 
 	&._header-show {
-		top: 34px;
-
-		@media (max-width:$tablet) {
-			top: 16px;
-		}
+		top: 16px;
 	}
 
 	&__container {
@@ -125,8 +127,9 @@ watch(locale, (newLocale) => {
 
 			@media (max-width:$mobileSmall) {
 				width: auto;
-				height: toRem(35);
-				font-size: toRem(16);
+				height: toRem(30);
+				font-size: toRem(12);
+				border-radius: 10px;
 			}
 		}
 	}
@@ -139,6 +142,7 @@ watch(locale, (newLocale) => {
 		@media (max-width:$mobileSmall) {
 			width: 50px;
 			height: 50px;
+			margin: 0;
 		}
 
 		img {
@@ -227,11 +231,11 @@ watch(locale, (newLocale) => {
 		flex: 0 0 toRem(58);
 		border-radius: 50%;
 		transition: all 0.3s;
-		background: url('../assets/icons/search.svg') center no-repeat, #fff;
+		background: url('../assets/icons/search-hov.svg') center no-repeat, #fff;
 
 		@media (any-hover: hover) {
 			&:hover {
-				background: url('../assets/icons/search-hover.svg') center no-repeat, #ff8d10;
+				background: url('../assets/icons/search.svg') center no-repeat, #ff8d10;
 				border: 1.51px solid #ff8d10;
 			}
 		}
@@ -279,7 +283,7 @@ watch(locale, (newLocale) => {
 		display: block;
 		position: relative;
 		width: toRem(30);
-		height: toRem(18);
+		height: toRem(24);
 		z-index: 5;
 
 		@media (any-hover: none) {
@@ -295,7 +299,8 @@ watch(locale, (newLocale) => {
 			position: absolute;
 			width: 100%;
 			height: toRem(2);
-			background-color: $mainColor;
+			border-radius: 1px;
+			background-color: #fdb349;
 		}
 
 		&::before {
