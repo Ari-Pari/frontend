@@ -23,7 +23,6 @@ function handleEsc(e) {
 		isFilterOpen.value = false
 	}
 }
-
 // Filtering, sorting and searching
 const defaultDancesParams = {
 	searchText: "",
@@ -44,6 +43,8 @@ const searchDancesBodyParams = ref(
 const { data: dances, loading: dancesLoading, error: dancesError, execute: fetchDances } = useApi(DanceService.searchDances)
 const { data: dancesGenres, loading: dancesGenresLoading, error: dancesGenresError, execute: fetchGenres } = useApi(DanceService.getGenres)
 const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegionsError, execute: fetchRegions } = useApi(DanceService.getRegions)
+
+console.log(dancesError, dancesGenresError, dancesRegionsError);
 
 // Fetch data on loading
 onMounted(() => {
@@ -93,7 +94,7 @@ watch(searchDancesBodyParams, (newParams) => {
 	fetchDances({
 		lang: locale.value,
 		page: 1,
-		size: 10,
+		size: 12,
 		body: newParams
 	})
 }, { deep: true })
@@ -130,9 +131,10 @@ watch(searchDancesBodyParams, (newParams) => {
 						</div>
 					</div>
 					<div class="actions-dances__parametres">
-						<button type="button" class="actions-dances__filter-button" @click="isFilterOpen = !isFilterOpen"
-							:aria-label="t('filterAriaLabel')" :title="t('filterAriaLabel')" :class="{ open: isFilterOpen }"
-							ref="filterButtonRef">
+						<button type="button" class="actions-dances__filter-button active"
+							@click="isFilterOpen = !isFilterOpen" :aria-label="t('filterAriaLabel')"
+							:title="t('filterAriaLabel')" :class="{ open: isFilterOpen }" ref="filterButtonRef">
+							<span class="actions-dances__filter-button-counter">13</span>
 							<svg width="35" height="30" viewBox="0 0 35 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M1 2.52344H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
 								<path d="M1 14.5234H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
@@ -157,25 +159,34 @@ watch(searchDancesBodyParams, (newParams) => {
 				</div>
 				<div class="actions-dances__filters dances-filters" ref="filterBlockRef" :class="{ open: isFilterOpen }">
 					<div class="dances-filters__top">
-						<span class="dances-filters__top-icon">
-							<svg width="25" height="20" viewBox="0 0 25 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M0.688477 1.73438H23.3945" stroke="#FF7C01" stroke-width="1.37707"
-									stroke-linecap="round" />
-								<path d="M0.688721 10H23.3947" stroke="#FF7C01" stroke-width="1.37707" stroke-linecap="round" />
-								<path d="M0.688477 18.2617H23.3945" stroke="#FF7C01" stroke-width="1.37707"
-									stroke-linecap="round" />
-								<circle cx="18.2238" cy="1.73798" r="1.73798" fill="#FF7C01" />
-								<circle cx="4.0412" cy="9.9997" r="1.73798" fill="#FF7C01" />
-								<circle cx="15.0002" cy="18.2614" r="1.73798" fill="#FF7C01" />
-							</svg>
-						</span>
-						<div class="dances-filters__top-title">{{ t('filters') }}</div>
+						<div class="dances-filters__top-left">
+							<span class="dances-filters__top-icon">
+								<svg width="25" height="20" viewBox="0 0 25 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M0.688477 1.73438H23.3945" stroke="#FF7C01" stroke-width="1.37707"
+										stroke-linecap="round" />
+									<path d="M0.688721 10H23.3947" stroke="#FF7C01" stroke-width="1.37707"
+										stroke-linecap="round" />
+									<path d="M0.688477 18.2617H23.3945" stroke="#FF7C01" stroke-width="1.37707"
+										stroke-linecap="round" />
+									<circle cx="18.2238" cy="1.73798" r="1.73798" fill="#FF7C01" />
+									<circle cx="4.0412" cy="9.9997" r="1.73798" fill="#FF7C01" />
+									<circle cx="15.0002" cy="18.2614" r="1.73798" fill="#FF7C01" />
+								</svg>
+							</span>
+							<div class="dances-filters__top-title">{{ t('filters') }}</div>
+						</div>
+						<div class="dances-filters__current">
+							<button v-for="n in 5" :key="n" type="button" class="dances-filters__current-item">
+								Фильтр
+								<img src="../assets/icons/close.svg" alt="Close icon">
+							</button>
+						</div>
 					</div>
 					<div class="dances-filters__selectsblock">
 						<div class="dances-filters__select">
 							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.genres">
 								<option disabled value="">{{ t('genre') }}</option>
-								<option v-for="genre in dancesGenres" :key="genre.id">{{ genre.name }}</option>
+								<option v-for="genre in dancesGenres" :key="genre.id">{{ genre?.name }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
@@ -184,7 +195,7 @@ watch(searchDancesBodyParams, (newParams) => {
 						<div class="dances-filters__select">
 							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.regions">
 								<option disabled value="" selected>{{ t('region') }}</option>
-								<option v-for="region in dancesRegions" :key="region.id">{{ region.name }}</option>
+								<option v-for="region in dancesRegions" :key="region.id">{{ region?.name }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
@@ -264,20 +275,21 @@ watch(searchDancesBodyParams, (newParams) => {
 								<span v-for="region in dance.regions" class="dance-item__tags-item">{{ region?.name }}</span>
 							</div>
 							<ul class="dance-item__categories">
-								<li class="dance-item__categories-item">{{ t('genre') }}: <span>{{ dance?.genres.join(', ')
-								}}</span>
+								<li class="dance-item__categories-item">{{ t('genre') }}:
+									<span>{{ dance?.genres.join(', ') }}</span>
 								</li>
-								<li class="dance-item__categories-item">{{ t('complexity') }}: <span>{{ dance?.complexity
-								}}</span>
+								<li class="dance-item__categories-item">{{ t('complexity') }}:
+									<span>{{ dance?.complexity }}</span>
 								</li>
-								<li class="dance-item__categories-item">{{ t('tempo') }}: <span>{{ dance?.paces.join(', ')
-								}}</span>
+								<li class="dance-item__categories-item">{{ t('tempo') }}:
+									<span>{{ dance?.paces.join(', ') }}</span>
 								</li>
-								<li class="dance-item__categories-item">{{ t('gender') }}: <span>{{ dance?.gender }}</span></li>
-								<li class="dance-item__categories-item">{{ t('handshakes') }}: <span>{{
-									dance.handshakes.join(',')
-										}}
-									</span></li>
+								<li class="dance-item__categories-item">{{ t('gender') }}:
+									<span>{{ dance?.gender }}</span>
+								</li>
+								<li class="dance-item__categories-item">{{ t('handshakes') }}:
+									<span>{{ dance?.handshakes.join(',') }}</span>
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -500,6 +512,40 @@ watch(searchDancesBodyParams, (newParams) => {
 	&__filter-button {
 		margin-right: toRem(16);
 		margin-top: toRem(5);
+		position: relative;
+
+		&.active {
+			span {
+				opacity: 1;
+				visibility: visible;
+			}
+		}
+
+		span {
+			position: absolute;
+			width: toRem(20);
+			height: toRem(20);
+			top: -10px;
+			font-size: toRem(12);
+			right: -10px;
+			border-radius: 50%;
+			background-color: #c83f01;
+			color: #fff;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			opacity: 0;
+			visibility: hidden;
+			transition: all 0.3s;
+
+			@media (max-width:$mobileSmall) {
+				font-size: toRem(8);
+				width: toRem(14);
+				height: toRem(14);
+				top: -7px;
+				right: -7px;
+			}
+		}
 
 		svg {
 			width: toRem(35);
@@ -546,9 +592,10 @@ watch(searchDancesBodyParams, (newParams) => {
 
 		span {
 			position: absolute;
-			left: 31px;
+			left: 25px;
 			top: 50%;
 			transform: translate(0, -50%);
+			transform: translate(0px, -50%);
 			transition: all 0.3s;
 
 			@media (max-width:$tablet) {
@@ -588,7 +635,7 @@ watch(searchDancesBodyParams, (newParams) => {
 			border-radius: 60px !important;
 			height: toRem(60);
 			background: #fff;
-			padding: toRem(10) toRem(20) toRem(10) toRem(77);
+			padding: toRem(10) toRem(20) toRem(10) toRem(70);
 			font-weight: 500;
 			font-size: toRem(16);
 			outline: none;
@@ -645,12 +692,60 @@ watch(searchDancesBodyParams, (newParams) => {
 
 	&__top {
 		margin-bottom: toRem(40);
-		display: inline-flex;
-		align-items: center;
+		display: flex;
+		align-items: start;
 
 		@media (max-width:$mobile) {
 			margin-bottom: toRem(20);
 		}
+
+		@media (max-width:$mobileSmall) {
+			flex-direction: column;
+		}
+	}
+
+	&__current {
+		display: flex;
+		flex-wrap: wrap;
+		gap: toRem(7);
+		margin-left: toRem(20);
+
+		@media (max-width:$mobileSmall) {
+			margin: toRem(15) toRem(0) toRem(0) toRem(0);
+		}
+	}
+
+	&__current-item {
+		background-color: #c83f01;
+		color: #fff;
+		font-size: toRem(14);
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		gap: toRem(10);
+		padding: toRem(5) toRem(10);
+		border-radius: 50px;
+		transition: all 0.3s;
+
+		img {
+			width: toRem(15);
+			height: toRem(15);
+		}
+
+		@media (any-hover: hover) {
+			&:hover {
+				opacity: 0.8;
+			}
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(12);
+		}
+	}
+
+	&__top-left {
+		display: inline-flex;
+		align-items: center;
 	}
 
 	&__top-icon {
@@ -741,7 +836,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		width: 100%;
 		appearance: none;
 		font-weight: 500;
-		font-size: toRem(12);
+		font-size: toRem(16);
 		color: #c83f01;
 		line-height: 2;
 		outline: none;

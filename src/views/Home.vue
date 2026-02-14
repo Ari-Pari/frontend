@@ -6,8 +6,10 @@ import DancesForm from "@/components/DancesForm.vue"
 const { t, locale } = useI18n()
 
 const scrollToDance = () => {
-	document.getElementById('dancesBlock')
-		?.scrollIntoView({ behavior: 'smooth' })
+	requestAnimationFrame(() => {
+		document.getElementById('dancesBlock')
+			?.scrollIntoView({ behavior: 'smooth' })
+	})
 }
 </script>
 
@@ -133,7 +135,7 @@ const scrollToDance = () => {
 	}
 
 	&__container {
-		max-width: toRem(740);
+		max-width: toRem(800);
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -141,6 +143,10 @@ const scrollToDance = () => {
 
 		@media (max-width:$tablet) {
 			max-width: toRem(600);
+		}
+
+		@media (max-width:$mobile) {
+			max-width: toRem(500);
 		}
 
 		@media (max-width:$mobileSmall) {

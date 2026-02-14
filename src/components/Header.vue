@@ -14,7 +14,7 @@ function scrollToDance() {
 	if (route.name == 'home') {
 		requestAnimationFrame(() => {
 			document.getElementById('dancesBlock')
-				?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+				?.scrollIntoView({ behavior: 'smooth' })
 		})
 		menuClose()
 	}
@@ -26,7 +26,7 @@ onMounted(() => {
 
 watch(locale, (newLocale) => {
 	document.documentElement.setAttribute('lang', newLocale)
-	localStorage.setItem('language', newLocale)
+	localStorage.setItem('userLanguage', newLocale)
 })
 watch(route, () => {
 	menuClose()

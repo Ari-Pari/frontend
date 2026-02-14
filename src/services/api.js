@@ -1,8 +1,7 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-export const userMainLanguage = localStorage.getItem('language')
+export const userMainLanguage = localStorage.getItem('userLanguage')
 	|| (navigator.languages && navigator.languages[0])
 	|| navigator.language || 'hy';
-
 
 // If we need to cancel request
 // const controller = new AbortController()
@@ -28,17 +27,10 @@ export async function apiRequest(endpoint, options = {}) {
 	return response.json()
 }
 
-// For testing
-// export const DanceService = {
-// 	getDance: (id, lang = userMainLanguage) => apiRequest(`https://jsonplaceholder.typicode.com/todos/${id}`),
-// 	searchDances: (params = {}) => apiRequest('https://jsonplaceholder.typicode.com/posts'),
-// }
-
 export const DanceService = {
 	getDance: (id, lang = userMainLanguage) => apiRequest(`/dances/${id}?lang=${lang}`),
 	getGenres: (lang = userMainLanguage) => apiRequest(`/genres/?lang=${lang}`),
 	getRegions: (lang = userMainLanguage) => apiRequest(`/regions/?lang=${lang}`),
-
 	searchDances: (params = {}) => apiRequest(`/dances/search?lang=${params.lang}&page=${params.page}&size=${params.size}`, {
 		method: 'POST',
 		body: JSON.stringify(params.body || {})
