@@ -6,10 +6,10 @@ import { useApi } from "@/composables/useApi"
 
 const { t, locale } = useI18n()
 
+// Filter body opening
 const isFilterOpen = ref(false)
 const filterButtonRef = useTemplateRef('filterButtonRef')
 const filterBlockRef = useTemplateRef('filterBlockRef')
-
 function handleClickOutside(e) {
 	if (!isFilterOpen.value) return
 	const clickedInsideBlock = filterBlockRef.value?.contains(e.target)
@@ -24,7 +24,8 @@ function handleEsc(e) {
 	}
 }
 
-const searchDancesBodyParams = ref({
+// Filtering, sorting and searching
+const defaultDancesParams = {
 	searchText: "",
 	genres: [0],
 	regions: [0],
@@ -33,10 +34,18 @@ const searchDancesBodyParams = ref({
 	paces: [],
 	handshakes: [],
 	sortedBy: "createdBy",
-	sortType: "ASC"
-})
-const { data: dances, loading, error, execute: fetchDances } = useApi(DanceService.searchDances)
+	sortType: "sort-popular"
+}
+const savedDancesParams = sessionStorage.getItem('dancesFilter')
+const searchDancesBodyParams = ref(
+	savedDancesParams ? JSON.parse(savedDancesParams) : defaultDancesParams
+)
 
+const { data: dances, loading: dancesLoading, error: dancesError, execute: fetchDances } = useApi(DanceService.searchDances)
+const { data: dancesGenres, loading: dancesGenresLoading, error: dancesGenresError, execute: fetchGenres } = useApi(DanceService.getGenres)
+const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegionsError, execute: fetchRegions } = useApi(DanceService.getRegions)
+
+// Fetch data on loading
 onMounted(() => {
 	fetchDances({
 		lang: locale.value,
@@ -44,6 +53,8 @@ onMounted(() => {
 		size: 12,
 		body: searchDancesBodyParams.value
 	})
+	fetchRegions(locale.value)
+	fetchGenres(locale.value)
 	document.addEventListener('click', handleClickOutside)
 	document.addEventListener('keydown', handleEsc)
 })
@@ -51,6 +62,8 @@ onBeforeUnmount(() => {
 	document.removeEventListener('click', handleClickOutside)
 	document.removeEventListener('keydown', handleEsc)
 })
+
+// Fetch data on lang change
 watch(locale, (newLocale) => {
 	fetchDances({
 		lang: newLocale,
@@ -58,18 +71,33 @@ watch(locale, (newLocale) => {
 		size: 12,
 		body: searchDancesBodyParams.value
 	})
+	fetchRegions(newLocale)
+	fetchGenres(newLocale)
 })
 
-// For filtering and sorting
-// watch(searchDancesBodyParams, () => {
-// 	fetchDances({
-// 		lang: newLocale,
-// 		page: 1,
-// 		size: 10,
-// 		body: searchDancesParams.value
-// 	})
-// })
-// v-model='selected' для селекта
+// Debounce func for searching
+const debouncedSearchText = ref('')
+let debounceTimeout = null
+watch(debouncedSearchText, (newVal) => {
+	if (debounceTimeout) clearTimeout(debounceTimeout)
+	debounceTimeout = setTimeout(() => {
+		debouncedSearchText.value = newVal
+		searchDancesBodyParams.value.searchText = debouncedSearchText.value
+	}, 1000)
+})
+
+// Fetch data on params change (filtering, sorting and searching)
+watch(searchDancesBodyParams, (newParams) => {
+	const paramsToSafe = { ...newParams, searchText: "" }
+	sessionStorage.setItem('dancesFilter', JSON.stringify(paramsToSafe))
+	fetchDances({
+		lang: locale.value,
+		page: 1,
+		size: 10,
+		body: newParams
+	})
+}, { deep: true })
+
 </script>
 
 <template>
@@ -79,7 +107,7 @@ watch(locale, (newLocale) => {
 				<h2 class="actions-dances__title"> {{ t('danceEncyclopedia') }}</h2>
 				<div class="actions-dances__bottom">
 					<div class="actions-dances__sorting">
-						<div class="actions-dances__select">
+						<!-- <div class="actions-dances__select">
 							<select class="actions-dances__select-item">
 								<option disabled value="" selected>{{ t('cardViewText') }}</option>
 								<option value="base-view">{{ t('cardViewBase') }}</option>
@@ -88,10 +116,10 @@ watch(locale, (newLocale) => {
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
-						</div>
+						</div> -->
 						<div class="actions-dances__select">
-							<select class="actions-dances__select-item">
-								<option value="sort-popular" selected>{{ t('sortPopular') }}</option>
+							<select class="actions-dances__select-item" v-model="searchDancesBodyParams.sortType">
+								<option value="sort-popular">{{ t('sortPopular') }}</option>
 								<option value="sort-newest">{{ t('sortNew') }}</option>
 								<option value="sort-oldest">{{ t('sortOld') }}</option>
 								<option value="sort-alphabet">{{ t('sortAlphabet') }}</option>
@@ -123,7 +151,7 @@ watch(locale, (newLocale) => {
 								</svg>
 							</span>
 							<input type="text" name="search-input" :placeholder="t('searchByDances')"
-								class="actions-dances__search-input">
+								v-model="debouncedSearchText" class="actions-dances__search-input">
 						</div>
 					</div>
 				</div>
@@ -145,60 +173,70 @@ watch(locale, (newLocale) => {
 					</div>
 					<div class="dances-filters__selectsblock">
 						<div class="dances-filters__select">
-							<select class="dances-filters__select-item">
-								<option disabled value="" selected>{{ t('cardViewText') }}</option>
-								<option value="base-view">{{ t('cardViewBase') }}</option>
-								<option value="list-view">{{ t('cardViewList') }}</option>
+							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.genres">
+								<option disabled value="">{{ t('genre') }}</option>
+								<option v-for="genre in dancesGenres" :key="genre.id">{{ genre.name }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div>
 						<div class="dances-filters__select">
-							<select class="dances-filters__select-item">
-								<option disabled value="" selected>{{ t('cardViewText') }}</option>
-								<option value="base-view">{{ t('cardViewBase') }}</option>
-								<option value="list-view">{{ t('cardViewList') }}</option>
+							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.regions">
+								<option disabled value="" selected>{{ t('region') }}</option>
+								<option v-for="region in dancesRegions" :key="region.id">{{ region.name }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div>
 						<div class="dances-filters__select">
-							<select class="dances-filters__select-item">
-								<option disabled value="" selected>{{ t('cardViewText') }}</option>
-								<option value="base-view">{{ t('cardViewBase') }}</option>
-								<option value="list-view">{{ t('cardViewList') }}</option>
+							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.complexities">
+								<option disabled value="" selected>{{ t('complexity') }}</option>
+								<option value="1">{{ t('complexityType1') }}</option>
+								<option value="2">{{ t('complexityType2') }}</option>
+								<option value="3">{{ t('complexityType3') }}</option>
+								<option value="4">{{ t('complexityType4') }}</option>
+								<option value="5">{{ t('complexityType5') }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div>
 						<div class="dances-filters__select">
-							<select class="dances-filters__select-item">
-								<option disabled value="" selected>{{ t('cardViewText') }}</option>
-								<option value="base-view">{{ t('cardViewBase') }}</option>
-								<option value="list-view">{{ t('cardViewList') }}</option>
+							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.gender">
+								<option disabled value="" selected>{{ t('gender') }}</option>
+								<option value="male">{{ t('genderTypeMale') }}</option>
+								<option value="female">{{ t('genderTypeFemale') }}</option>
+								<option value="multi">{{ t('genderTypeMulti') }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div>
 						<div class="dances-filters__select">
-							<select class="dances-filters__select-item">
-								<option disabled value="" selected>{{ t('cardViewText') }}</option>
-								<option value="base-view">{{ t('cardViewBase') }}</option>
-								<option value="list-view">{{ t('cardViewList') }}</option>
+							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.paces">
+								<option disabled value="" selected>{{ t('tempo') }}</option>
+								<option value="1">{{ t('tempoSlow') }}</option>
+								<option value="2">{{ t('tempoMiddle') }}</option>
+								<option value="3">{{ t('tempoFast') }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div>
 						<div class="dances-filters__select">
-							<select class="dances-filters__select-item">
-								<option disabled value="" selected>{{ t('cardViewText') }}</option>
-								<option value="base-view">{{ t('cardViewBase') }}</option>
-								<option value="list-view">{{ t('cardViewList') }}</option>
+							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.handshakes">
+								<option disabled value="" selected>{{ t('handshakes') }}</option>
+								<option value="">{{ t('handshakesFree') }}</option>
+								<option value="">{{ t('handshakesPinky') }}</option>
+								<option value="">{{ t('handshakesCrossed') }}</option>
+								<option value="">{{ t('handshakesBack') }}</option>
+								<option value="">{{ t('handshakesBelt') }}</option>
+								<option value="">{{ t('handshakesShoulder') }}</option>
+								<option value="">{{ t('handshakesDagger') }}</option>
+								<option value="">{{ t('handshakesWhip') }}</option>
+								<option value="">{{ t('handshakesPalm') }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
@@ -220,24 +258,25 @@ watch(locale, (newLocale) => {
 						</RouterLink>
 						<div class="dance-item__texts">
 							<RouterLink :to="`/dance/${dance.id}`">
-								<h3 class="dance-item__title">{{ dance.name }}</h3>
+								<h3 class="dance-item__title">{{ dance?.name }}</h3>
 							</RouterLink>
 							<div class="dance-item__tags">
-								<span v-for="region in dance.regions" class="dance-item__tags-item">{{ region.name }}</span>
+								<span v-for="region in dance.regions" class="dance-item__tags-item">{{ region?.name }}</span>
 							</div>
 							<ul class="dance-item__categories">
-								<li class="dance-item__categories-item">{{ t('genre') }} <span>{{ dance.genres.join(', ')
+								<li class="dance-item__categories-item">{{ t('genre') }}: <span>{{ dance?.genres.join(', ')
 								}}</span>
 								</li>
-								<li class="dance-item__categories-item">{{ t('difficulty') }} <span>{{ dance.complexity
+								<li class="dance-item__categories-item">{{ t('complexity') }}: <span>{{ dance?.complexity
 								}}</span>
 								</li>
-								<li class="dance-item__categories-item">{{ t('tempo') }} <span>{{ dance.paces.join(', ')
+								<li class="dance-item__categories-item">{{ t('tempo') }}: <span>{{ dance?.paces.join(', ')
 								}}</span>
 								</li>
-								<li class="dance-item__categories-item">{{ t('gender') }} <span>{{ dance.gender }}</span></li>
-								<li class="dance-item__categories-item">{{ t('handhold') }} <span>{{ dance.handshakes.join(', ')
-								}}
+								<li class="dance-item__categories-item">{{ t('gender') }}: <span>{{ dance?.gender }}</span></li>
+								<li class="dance-item__categories-item">{{ t('handshakes') }}: <span>{{
+									dance.handshakes.join(',')
+										}}
 									</span></li>
 							</ul>
 						</div>
@@ -253,7 +292,7 @@ watch(locale, (newLocale) => {
 .dances {
 	scroll-margin-top: 70px;
 	padding-top: toRem(53);
-	background: url('../assets/home/dances-bg.svg') center/cover no-repeat, #fff;
+	background: #fff;
 
 	@media (max-width:$mobile) {
 		padding-top: toRem(50);
@@ -715,9 +754,9 @@ watch(locale, (newLocale) => {
 .dance-item {
 	display: flex;
 	flex-direction: column;
-	border: 1px solid #d9d9d9;
-	border-radius: 14px;
-	background-color: #fff;
+	// border: 1px solid #d9d9d9;
+	// border-radius: 14px;
+	// background-color: #fff;
 
 	@media (max-width:$mobileSmall) {
 		border-radius: 6px;
@@ -727,6 +766,7 @@ watch(locale, (newLocale) => {
 		width: 100%;
 		overflow: hidden;
 		border-radius: 14px;
+		margin-bottom: toRem(10);
 
 		@media (any-hover: hover) {
 			&:hover {
@@ -750,14 +790,14 @@ watch(locale, (newLocale) => {
 	}
 
 	&__texts {
-		background-color: #fff;
-		padding: toRem(17);
-		border-radius: 14px;
+		// background-color: #fff;
+		// padding: toRem(17);
+		// border-radius: 14px;
 
-		@media (max-width:$mobileSmall) {
-			border-radius: 6px;
-			padding: toRem(5);
-		}
+		// @media (max-width:$mobileSmall) {
+		// 	border-radius: 6px;
+		// 	padding: toRem(5);
+		// }
 	}
 
 	&__title {
