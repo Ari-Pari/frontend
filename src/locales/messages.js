@@ -65,6 +65,7 @@ export default {
 		genreMatchmakers: "Matchmakers",
 		genreLabor: "Labor",
 		genreAmulet: "Amulet",
+		resetButton: "Reset filters",
 	},
 	ru: {
 		homePageMenuItem: "Главная",
@@ -131,7 +132,8 @@ export default {
 		genreWedding: "Свадебный",
 		genreMatchmakers: "Танец сватов",
 		genreLabor: "Трудовой",
-		genreAmulet: "Чархапан (Оберегов)",
+		genreAmulet: "Чархапан",
+		resetButton: "Сбросить фильтры",
 	},
 	hy: {
 		homePageMenuItem: "Գլխավոր",
@@ -199,5 +201,6 @@ export default {
 		genreMatchmakers: "Հարսանիք կազմակերպողներ",
 		genreLabor: "Աշխատանքային",
 		genreAmulet: "Ամուլետ",
+		resetButton: "Հեռացնել ֆիլտրը",
 	}
 }

@@ -1,9 +1,8 @@
 <script setup>
 import { ref, watch, onMounted, useTemplateRef, onBeforeUnmount, computed, onUnmounted } from "vue"
 import { useI18n } from "vue-i18n"
-import { useInfiniteScroll } from '@vueuse/core'
 import { DanceService } from "@/services/api"
-import { refDebounced } from "@vueuse/core"
+import { refDebounced, useInfiniteScroll } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 
 const { t, locale } = useI18n()
@@ -25,6 +24,7 @@ function handleEsc(e) {
 		isFilterOpen.value = false
 	}
 }
+
 // Filtering, sorting and searching
 const defaultDancesParams = {
 	searchText: "",
@@ -41,38 +41,87 @@ const savedDancesParams = sessionStorage.getItem('dancesFilter')
 const searchDancesBodyParams = ref(
 	savedDancesParams ? JSON.parse(savedDancesParams) : defaultDancesParams
 )
-
+const allDances = ref([])
+const dancesPage = ref(1)
+const pageSize = 12
+const isFinished = ref(false)
 const { data: dances, loading: dancesLoading, error: dancesError, execute: fetchDances } = useApi(DanceService.searchDances)
 const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegionsError, execute: fetchRegions } = useApi(DanceService.getRegions)
 
+const loadDances = async (isFirstPage = false) => {
+	if (isFirstPage) {
+		dancesPage.value = 1
+		isFinished.value = false
+	}
+	const result = await fetchDances({
+		lang: locale.value,
+		page: dancesPage,
+		size: pageSize,
+		body: searchDancesBodyParams.value
+	})
+	if (result.length < pageSize) {
+		isFinished.value = true
+	}
+	if (isFirstPage) {
+		allDances.value = result || []
+	} else {
+		allDances.value.push(...(result || []))
+	}
+}
+// Infinite scroll for dance cards
+const dancesInner = useTemplateRef('dancesInner')
+useInfiniteScroll(dancesInner, () => {
+	if (!dancesLoading.value && !isFinished.value) {
+		dancesPage.value++
+		loadDances()
+	}
+}, {
+	distance: 50,
+	canLoadMore: () => {
+		if (isFinished.value) {
+			return false
+		} else {
+			return true
+		}
+	}
+})
+// Count function for filters number
+const filterCount = computed(() => {
+	let count = 0;
+	const params = searchDancesBodyParams.value
+	const filterKeys = ['genres', 'regions', 'complexities', 'genders', 'paces', 'handshakes'];
+	filterKeys.forEach(key => {
+		if (Array.isArray(params[key])) {
+			count += params[key].length; // Считаем количество выбранных элементов в массиве
+		}
+	})
+	return count
+})
+function resetFilters() {
+	const params = searchDancesBodyParams.value
+	const filterKeys = ['genres', 'regions', 'complexities', 'genders', 'paces', 'handshakes'];
+	filterKeys.forEach(key => {
+		if (Array.isArray(params[key])) {
+			params[key] = []; // Считаем количество выбранных элементов в массиве
+		}
+	})
+}
 // Debounce func for searching
 const searchText = ref('')
 const debouncedSearchText = refDebounced(searchText, 1000)
 watch(debouncedSearchText, (val) => {
 	searchDancesBodyParams.value.searchText = val.trim()
 })
-// Infinite scroll for dance cards
-const dancesInner = useTemplateRef('dancesInner')
-const dancesPage = ref(1)
-const { dancesCardsReset } = useInfiniteScroll(dancesInner, () => {
-	// fetch new data
-	dancesPage++
-}, {
-	distance: 10,
-	canLoadMore: () => {
-		// inidicate when there is no more content to load so onLoadMore stops triggering
-		// if (noMoreContent) return false
-	}
-})
 
 // Fetch data on loading
 onMounted(() => {
-	fetchDances({
-		lang: locale.value,
-		page: 1,
-		size: 12,
-		body: searchDancesBodyParams.value
-	})
+	// fetchDances({
+	// 	lang: locale.value,
+	// 	page: 1,
+	// 	size: 12,
+	// 	body: searchDancesBodyParams.value
+	// })
+	loadDances(true)
 	fetchRegions(locale.value)
 	document.addEventListener('click', handleClickOutside)
 	document.addEventListener('keydown', handleEsc)
@@ -83,23 +132,25 @@ onBeforeUnmount(() => {
 })
 // Fetch data on lang change
 watch(locale, (newLocale) => {
-	fetchDances({
-		lang: newLocale,
-		page: 1,
-		size: 12,
-		body: searchDancesBodyParams.value
-	})
+	// fetchDances({
+	// 	lang: newLocale,
+	// 	page: 1,
+	// 	size: 12,
+	// 	body: searchDancesBodyParams.value
+	// })
+	loadDances(true)
 	fetchRegions(newLocale)
 })
 // Fetch data on params change (filtering, sorting and searching)
 watch(searchDancesBodyParams, (newParams) => {
 	sessionStorage.setItem('dancesFilter', JSON.stringify({ ...newParams, searchText: "" })) // without search text
-	fetchDances({
-		lang: locale.value,
-		page: 1,
-		size: 12,
-		body: newParams // with search text
-	})
+	// fetchDances({
+	// 	lang: locale.value,
+	// 	page: 1,
+	// 	size: 12,
+	// 	body: newParams // with search text
+	// })
+	loadDances(true)
 }, { deep: true })
 
 </script>
@@ -145,7 +196,8 @@ watch(searchDancesBodyParams, (newParams) => {
 						<button type="button" class="actions-dances__filter-button active"
 							@click="isFilterOpen = !isFilterOpen" :aria-label="t('filterAriaLabel')"
 							:title="t('filterAriaLabel')" :class="{ open: isFilterOpen }" ref="filterButtonRef">
-							<span class="actions-dances__filter-button-counter">13</span>
+							<span v-show="filterCount > 0" class="actions-dances__filter-button-counter">{{ filterCount
+							}}</span>
 							<svg width="35" height="30" viewBox="0 0 35 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M1 2.52344H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
 								<path d="M1 14.5234H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
@@ -170,7 +222,7 @@ watch(searchDancesBodyParams, (newParams) => {
 				</div>
 				<div class="actions-dances__filters dances-filters" ref="filterBlockRef" :class="{ open: isFilterOpen }">
 					<div class="dances-filters__top">
-						<div class="dances-filters__top-left">
+						<div @click="isFilterOpen = !isFilterOpen" class="dances-filters__top-left">
 							<span class="dances-filters__top-icon">
 								<svg width="25" height="20" viewBox="0 0 25 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 									<path d="M0.688477 1.73438H23.3945" stroke="#FF7C01" stroke-width="1.37707"
@@ -186,12 +238,13 @@ watch(searchDancesBodyParams, (newParams) => {
 							</span>
 							<div class="dances-filters__top-title">{{ t('filters') }}</div>
 						</div>
-						<!-- <div class="dances-filters__current">
-							<button v-for="n in 5" :key="n" type="button" class="dances-filters__current-item">
-								Фильтр
+						<div class="dances-filters__current">
+							<button v-show="filterCount > 0" @click="resetFilters" type="button"
+								class="dances-filters__current-item">
+								{{ t('resetButton') }}
 								<img src="../assets/icons/close.svg" alt="Close icon">
 							</button>
-						</div> -->
+						</div>
 					</div>
 					<div class="dances-filters__checkboxes">
 						<div class="dances-filters__checkboxes-group">
@@ -201,77 +254,117 @@ watch(searchDancesBodyParams, (newParams) => {
 									v-for="genre in ['WAR', 'ROAD', 'CULT', 'LYRICAL', 'REVERSE', 'RITUAL', 'COMMUNITY', 'HUNTING', 'PILGRIMAGE', 'MEMORABLE', 'MEMORIAL', 'FUNERAL', 'FESTIVE', 'WEDDING', 'MATCHMAKERS', 'LABOR', 'AMULET']"
 									:key="genre">
 									<input type="checkbox" :value="genre" v-model="searchDancesBodyParams.genres">
-									{{ t('genre' + genre.charAt(0) + genre.slice(1).toLowerCase()) }}
+									<span> {{ t('genre' + genre.charAt(0) + genre.slice(1).toLowerCase()) }}</span>
 								</label>
 							</div>
 						</div>
 						<div class="dances-filters__checkboxes-group">
-							<h4 class="dances-filters__checkboxes-title">{{ t('genre') }}</h4>
+							<h4 class="dances-filters__checkboxes-title">{{ t('region') }}</h4>
 							<div class="dances-filters__checkbox">
 								<label v-for="region in dancesRegions" :key="region.id">
 									<input type="checkbox" :value="region.name" v-model="searchDancesBodyParams.regions">
-									{{ region?.name }}
+									<span>{{ region?.name }}</span>
 								</label>
 							</div>
 						</div>
 						<div class="dances-filters__checkboxes-group">
 							<h4 class="dances-filters__checkboxes-title">{{ t('complexity') }}</h4>
 							<div class="dances-filters__checkbox">
-								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="1">
-									{{ t('complexityType1') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="2">
-									{{ t('complexityType2') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="3">
-									{{ t('complexityType3') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="4">
-									{{ t('complexityType4') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="5">
-									{{ t('complexityType5') }}</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="1">
+									<span>{{ t('complexityType1') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="2">
+									<span>{{ t('complexityType2') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="3">
+									<span>{{ t('complexityType3') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="4">
+									<span>{{ t('complexityType4') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="5">
+									<span>{{ t('complexityType5') }}</span>
+								</label>
 							</div>
 						</div>
 						<div class="dances-filters__checkboxes-group">
 							<h4 class="dances-filters__checkboxes-title">{{ t('gender') }}</h4>
 							<div class="dances-filters__checkbox">
-								<label><input type="checkbox" v-model="searchDancesBodyParams.genders" value="male">
-									{{ t('genderTypeMale') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.genders" value="female">
-									{{ t('genderTypeFemale') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.genders" value="multi">
-									{{ t('genderTypeMulti') }}</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="male">
+									<span>{{ t('genderTypeMale') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="female">
+									<span>{{ t('genderTypeFemale') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="multi">
+									<span>{{ t('genderTypeMulti') }}</span>
+								</label>
 							</div>
 						</div>
 						<div class="dances-filters__checkboxes-group">
 							<h4 class="dances-filters__checkboxes-title">{{ t('tempo') }}</h4>
 							<div class="dances-filters__checkbox">
-								<label><input type="checkbox" v-model="searchDancesBodyParams.paces" :value="1">
-									{{ t('tempoSlow') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.paces" :value="2">
-									{{ t('tempoMiddle') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.paces" :value="3">
-									{{ t('tempoFast') }}</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.paces" :value="1">
+									<span>{{ t('tempoSlow') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.paces" :value="2">
+									<span>{{ t('tempoMiddle') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.paces" :value="3">
+									<span>{{ t('tempoFast') }}</span>
+								</label>
 							</div>
 						</div>
 						<div class="dances-filters__checkboxes-group">
 							<h4 class="dances-filters__checkboxes-title">{{ t('handshakes') }}</h4>
 							<div class="dances-filters__checkbox">
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="FREE">
-									{{ t('handshakesFree') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="LITTLE_FINGER">
-									{{ t('handshakesPinky') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="CROSSED">
-									{{ t('handshakesCrossed') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="PALM">
-									{{ t('handshakesPalm') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BACK">
-									{{ t('handshakesBack') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BELT">
-									{{ t('handshakesBelt') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="SHOULDER">
-									{{ t('handshakesShoulder') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="DAGGER">
-									{{ t('handshakesDagger') }}</label>
-								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="WHIP">
-									{{ t('handshakesWhip') }}</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="FREE">
+									<span>{{ t('handshakesFree') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="LITTLE_FINGER">
+									<span>{{ t('handshakesPinky') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="CROSSED">
+									<span>{{ t('handshakesCrossed') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="PALM">
+									<span>{{ t('handshakesPalm') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BACK">
+									<span>{{ t('handshakesBack') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BELT">
+									<span>{{ t('handshakesBelt') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="SHOULDER">
+									<span>{{ t('handshakesShoulder') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="DAGGER">
+									<span>{{ t('handshakesDagger') }}</span>
+								</label>
+								<label>
+									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="WHIP">
+									<span>{{ t('handshakesWhip') }}</span>
+								</label>
 							</div>
 						</div>
 					</div>
@@ -279,12 +372,12 @@ watch(searchDancesBodyParams, (newParams) => {
 			</div>
 			<div ref="dancesInner" class="dances__inner">
 				<div class="dances__body">
-					<div v-if="loading || !dances" v-for="n in 12" :key="n" class="dance-item skeleton">
+					<div v-if="dancesLoading || !dances" v-for="n in 12" :key="n" class="dance-item skeleton">
 						<div class="skeleton__image skeleton-anim"></div>
 						<div class="skeleton__title skeleton-anim"></div>
 						<div class="skeleton__descr skeleton-anim"></div>
 					</div>
-					<div v-else v-for="dance in dances" :key="dance.id" class="dance-item">
+					<div v-else v-for="dance in allDances" :key="dance.id" class="dance-item">
 						<RouterLink v-if="dance.photo_link" :to="`/dance/${dance.id}`" class="dance-item__image">
 							<img :src="dance.photo_link" alt="Dance image">
 						</RouterLink>
@@ -695,6 +788,8 @@ watch(searchDancesBodyParams, (newParams) => {
 	z-index: 5;
 	opacity: 0;
 	visibility: hidden;
+	overflow-y: auto;
+	max-height: 500px;
 
 	@media (max-width:$mobile) {
 		padding: toRem(20);
@@ -711,65 +806,60 @@ watch(searchDancesBodyParams, (newParams) => {
 	}
 
 	&__top {
-		margin-bottom: toRem(40);
+		margin-bottom: toRem(30);
 		display: flex;
-		align-items: start;
+		align-items: center;
+		height: toRem(25);
+	}
 
-		@media (max-width:$mobile) {
-			margin-bottom: toRem(20);
+	&__current {
+		margin-left: toRem(20);
+	}
+
+	&__current-item {
+		background-color: #c83f01;
+		color: #fff;
+		font-size: toRem(14);
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		gap: toRem(10);
+		padding: toRem(5) toRem(10);
+		border-radius: 50px;
+		transition: all 0.3s;
+		height: toRem(25);
+
+		img {
+			width: toRem(15);
+			height: toRem(15);
+		}
+
+		@media (any-hover: hover) {
+			&:hover {
+				opacity: 0.85;
+			}
 		}
 
 		@media (max-width:$mobileSmall) {
-			flex-direction: column;
+			font-size: toRem(12);
 		}
 	}
-
-	// &__current {
-	// 	display: flex;
-	// 	flex-wrap: wrap;
-	// 	gap: toRem(7);
-	// 	margin-left: toRem(20);
-
-	// 	@media (max-width:$mobileSmall) {
-	// 		margin: toRem(15) toRem(0) toRem(0) toRem(0);
-	// 	}
-	// }
-
-	// &__current-item {
-	// 	background-color: #c83f01;
-	// 	color: #fff;
-	// 	font-size: toRem(14);
-	// 	display: inline-flex;
-	// 	justify-content: center;
-	// 	align-items: center;
-	// 	gap: toRem(10);
-	// 	padding: toRem(5) toRem(10);
-	// 	border-radius: 50px;
-	// 	transition: all 0.3s;
-
-	// 	img {
-	// 		width: toRem(15);
-	// 		height: toRem(15);
-	// 	}
-
-	// 	@media (any-hover: hover) {
-	// 		&:hover {
-	// 			opacity: 0.8;
-	// 		}
-	// 	}
-
-	// 	@media (max-width:$mobileSmall) {
-	// 		font-size: toRem(12);
-	// 	}
-	// }
 
 	&__top-left {
 		display: inline-flex;
 		align-items: center;
+		cursor: pointer;
 	}
 
 	&__top-icon {
 		margin-right: toRem(10);
+		width: toRem(25);
+		height: toRem(20);
+
+		@media (max-width:$mobileSmall) {
+			width: toRem(20);
+			height: toRem(17);
+		}
 
 		svg {
 			width: toRem(25);
@@ -795,38 +885,121 @@ watch(searchDancesBodyParams, (newParams) => {
 	&__checkboxes {
 		display: flex;
 		flex-wrap: wrap;
-		gap: toRem(20);
+		gap: toRem(40);
 
 		@media (max-width:$mobile) {
-			gap: toRem(15);
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
 		}
 
-		@media (max-width:$mobileSmall) {
-			display: grid;
+		@media (max-width: toEm(630)) {
 			grid-template-columns: 1fr 1fr;
-			gap: toRem(10);
+		}
+
+		@media (max-width: toEm(460)) {
+			display: flex;
+			flex-direction: column;
+			gap: toRem(25);
 		}
 	}
 
 	&__checkboxes-group {}
 
-	&__checkboxes-title {}
+	&__checkboxes-title {
+		font-size: toRem(18);
+		margin-bottom: toRem(10);
+
+		@media (max-width:$mobile) {
+			font-size: toRem(16);
+			font-weight: 600;
+		}
+	}
 
 	&__checkbox {
 		display: flex;
 		flex-direction: column;
-		overflow-y: auto;
-		height: toRem(200);
+		// overflow-y: auto;
+		// max-height: toRem(200);
 
-		&:focus-within {
-			border: 2px solid #c83f01;
-		}
+		// @media (max-width:$mobileSmall) {
+		// 	max-height: toRem(150);
+		// }
 
 		label {
+			display: flex;
+			gap: toRem(15);
+			align-items: center;
 			font-weight: 500;
 			font-size: toRem(16);
-			color: #c83f01;
+			cursor: pointer;
+			white-space: nowrap;
+			line-height: 1.5;
+			transition: all 0.3s;
+
+			&:not(:last-child) {
+				margin-bottom: toRem(5);
+			}
+
+			@media (any-hover: hover) {
+				&:hover {
+					opacity: 0.7;
+				}
+			}
+
+			position: relative;
+
+			span {
+				display: block;
+				padding-right: toRem(25);
+				transition: color 0.3s;
+
+				&::before {
+					content: '';
+					position: absolute;
+					right: 0;
+					top: 50%;
+					transform: translate(0px, -50%);
+					width: toRem(14);
+					height: toRem(14);
+					border: 1px solid #c83f01;
+					background-color: #fff;
+					border-radius: 4px;
+					transition: border-color 0.3s;
+				}
+
+				&::after {
+					content: '';
+					position: absolute;
+					right: toRem(3);
+					top: 50%;
+					transform: translate(0px, -50%);
+					width: toRem(8);
+					height: toRem(8);
+					background-color: #c83f01;
+					border-radius: 2px;
+					transition: all 0.3s;
+					opacity: 0;
+					visibility: hidden;
+				}
+			}
+
+			input {
+				position: absolute;
+				width: 0;
+				height: 0;
+				opacity: 0;
+
+				&:checked+span {
+					color: #c83f01;
+
+					&::after {
+						opacity: 1;
+						visibility: visible;
+					}
+				}
+			}
 		}
+
 	}
 
 }
