@@ -3,7 +3,7 @@ import { useTemplateRef, onMounted } from 'vue';
 const audioPlayerRef = useTemplateRef('audio-player');
 
 onMounted(() => {
-	console.log(audioPlayerRef.value)
+	// console.log(audioPlayerRef.value)
 })
 // Получаем текущую страницу, если это не dance то добавляем класс
 </script>

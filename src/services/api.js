@@ -29,7 +29,6 @@ export async function apiRequest(endpoint, options = {}) {
 
 export const DanceService = {
 	getDance: (id, lang = userMainLanguage) => apiRequest(`/dances/${id}?lang=${lang}`),
-	getGenres: (lang = userMainLanguage) => apiRequest(`/genres/?lang=${lang}`),
 	getRegions: (lang = userMainLanguage) => apiRequest(`/regions/?lang=${lang}`),
 	searchDances: (params = {}) => apiRequest(`/dances/search?lang=${params.lang}&page=${params.page}&size=${params.size}`, {
 		method: 'POST',

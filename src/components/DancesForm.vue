@@ -1,7 +1,9 @@
 <script setup>
 import { ref, watch, onMounted, useTemplateRef, onBeforeUnmount, computed, onUnmounted } from "vue"
 import { useI18n } from "vue-i18n"
+import { useInfiniteScroll } from '@vueuse/core'
 import { DanceService } from "@/services/api"
+import { refDebounced } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 
 const { t, locale } = useI18n()
@@ -26,14 +28,14 @@ function handleEsc(e) {
 // Filtering, sorting and searching
 const defaultDancesParams = {
 	searchText: "",
-	genres: [0],
-	regions: [0],
-	complexities: [],
-	genders: [],
-	paces: [],
-	handshakes: [],
-	sortedBy: "createdBy",
-	sortType: "sort-popular"
+	genres: [], // String array
+	regions: [], // String array
+	complexities: [], // Number array
+	genders: [], // String array
+	paces: [], // Number array ([1, 2, 3])
+	handshakes: [], // String array
+	sortedBy: "createdBy", // Other values: "popularity", "alphabet"
+	sortType: "ASC" // Other value: DESC
 }
 const savedDancesParams = sessionStorage.getItem('dancesFilter')
 const searchDancesBodyParams = ref(
@@ -41,10 +43,27 @@ const searchDancesBodyParams = ref(
 )
 
 const { data: dances, loading: dancesLoading, error: dancesError, execute: fetchDances } = useApi(DanceService.searchDances)
-const { data: dancesGenres, loading: dancesGenresLoading, error: dancesGenresError, execute: fetchGenres } = useApi(DanceService.getGenres)
 const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegionsError, execute: fetchRegions } = useApi(DanceService.getRegions)
 
-console.log(dancesError, dancesGenresError, dancesRegionsError);
+// Debounce func for searching
+const searchText = ref('')
+const debouncedSearchText = refDebounced(searchText, 1000)
+watch(debouncedSearchText, (val) => {
+	searchDancesBodyParams.value.searchText = val.trim()
+})
+// Infinite scroll for dance cards
+const dancesInner = useTemplateRef('dancesInner')
+const dancesPage = ref(1)
+const { dancesCardsReset } = useInfiniteScroll(dancesInner, () => {
+	// fetch new data
+	dancesPage++
+}, {
+	distance: 10,
+	canLoadMore: () => {
+		// inidicate when there is no more content to load so onLoadMore stops triggering
+		// if (noMoreContent) return false
+	}
+})
 
 // Fetch data on loading
 onMounted(() => {
@@ -55,7 +74,6 @@ onMounted(() => {
 		body: searchDancesBodyParams.value
 	})
 	fetchRegions(locale.value)
-	fetchGenres(locale.value)
 	document.addEventListener('click', handleClickOutside)
 	document.addEventListener('keydown', handleEsc)
 })
@@ -63,7 +81,6 @@ onBeforeUnmount(() => {
 	document.removeEventListener('click', handleClickOutside)
 	document.removeEventListener('keydown', handleEsc)
 })
-
 // Fetch data on lang change
 watch(locale, (newLocale) => {
 	fetchDances({
@@ -73,29 +90,15 @@ watch(locale, (newLocale) => {
 		body: searchDancesBodyParams.value
 	})
 	fetchRegions(newLocale)
-	fetchGenres(newLocale)
 })
-
-// Debounce func for searching
-const debouncedSearchText = ref('')
-let debounceTimeout = null
-watch(debouncedSearchText, (newVal) => {
-	if (debounceTimeout) clearTimeout(debounceTimeout)
-	debounceTimeout = setTimeout(() => {
-		debouncedSearchText.value = newVal
-		searchDancesBodyParams.value.searchText = debouncedSearchText.value
-	}, 1000)
-})
-
 // Fetch data on params change (filtering, sorting and searching)
 watch(searchDancesBodyParams, (newParams) => {
-	const paramsToSafe = { ...newParams, searchText: "" }
-	sessionStorage.setItem('dancesFilter', JSON.stringify(paramsToSafe))
+	sessionStorage.setItem('dancesFilter', JSON.stringify({ ...newParams, searchText: "" })) // without search text
 	fetchDances({
 		lang: locale.value,
 		page: 1,
 		size: 12,
-		body: newParams
+		body: newParams // with search text
 	})
 }, { deep: true })
 
@@ -119,11 +122,19 @@ watch(searchDancesBodyParams, (newParams) => {
 							</span>
 						</div> -->
 						<div class="actions-dances__select">
+							<select class="actions-dances__select-item" v-model="searchDancesBodyParams.sortedBy">
+								<option value="popularity">{{ t('sortPopular') }}</option>
+								<option value="createdBy">{{ t('sortCreated') }}</option>
+								<option value="alphabet">{{ t('sortAlphabet') }}</option>
+							</select>
+							<span>
+								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
+							</span>
+						</div>
+						<div class="actions-dances__select">
 							<select class="actions-dances__select-item" v-model="searchDancesBodyParams.sortType">
-								<option value="sort-popular">{{ t('sortPopular') }}</option>
-								<option value="sort-newest">{{ t('sortNew') }}</option>
-								<option value="sort-oldest">{{ t('sortOld') }}</option>
-								<option value="sort-alphabet">{{ t('sortAlphabet') }}</option>
+								<option value="ASC">{{ t('sortByASC') }}</option>
+								<option value="DESC">{{ t('sortByDESC') }}</option>
 							</select>
 							<span>
 								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
@@ -152,8 +163,8 @@ watch(searchDancesBodyParams, (newParams) => {
 										fill="#989898" />
 								</svg>
 							</span>
-							<input type="text" name="search-input" :placeholder="t('searchByDances')"
-								v-model="debouncedSearchText" class="actions-dances__search-input">
+							<input type="text" name="search-input" :placeholder="t('searchByDances')" v-model="searchText"
+								class="actions-dances__search-input">
 						</div>
 					</div>
 				</div>
@@ -175,90 +186,100 @@ watch(searchDancesBodyParams, (newParams) => {
 							</span>
 							<div class="dances-filters__top-title">{{ t('filters') }}</div>
 						</div>
-						<div class="dances-filters__current">
+						<!-- <div class="dances-filters__current">
 							<button v-for="n in 5" :key="n" type="button" class="dances-filters__current-item">
 								Фильтр
 								<img src="../assets/icons/close.svg" alt="Close icon">
 							</button>
-						</div>
+						</div> -->
 					</div>
-					<div class="dances-filters__selectsblock">
-						<div class="dances-filters__select">
-							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.genres">
-								<option disabled value="">{{ t('genre') }}</option>
-								<option v-for="genre in dancesGenres" :key="genre.id">{{ genre?.name }}</option>
-							</select>
-							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
-							</span>
+					<div class="dances-filters__checkboxes">
+						<div class="dances-filters__checkboxes-group">
+							<h4 class="dances-filters__checkboxes-title">{{ t('genre') }}</h4>
+							<div class="dances-filters__checkbox">
+								<label
+									v-for="genre in ['WAR', 'ROAD', 'CULT', 'LYRICAL', 'REVERSE', 'RITUAL', 'COMMUNITY', 'HUNTING', 'PILGRIMAGE', 'MEMORABLE', 'MEMORIAL', 'FUNERAL', 'FESTIVE', 'WEDDING', 'MATCHMAKERS', 'LABOR', 'AMULET']"
+									:key="genre">
+									<input type="checkbox" :value="genre" v-model="searchDancesBodyParams.genres">
+									{{ t('genre' + genre.charAt(0) + genre.slice(1).toLowerCase()) }}
+								</label>
+							</div>
 						</div>
-						<div class="dances-filters__select">
-							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.regions">
-								<option disabled value="" selected>{{ t('region') }}</option>
-								<option v-for="region in dancesRegions" :key="region.id">{{ region?.name }}</option>
-							</select>
-							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
-							</span>
+						<div class="dances-filters__checkboxes-group">
+							<h4 class="dances-filters__checkboxes-title">{{ t('genre') }}</h4>
+							<div class="dances-filters__checkbox">
+								<label v-for="region in dancesRegions" :key="region.id">
+									<input type="checkbox" :value="region.name" v-model="searchDancesBodyParams.regions">
+									{{ region?.name }}
+								</label>
+							</div>
 						</div>
-						<div class="dances-filters__select">
-							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.complexities">
-								<option disabled value="" selected>{{ t('complexity') }}</option>
-								<option value="1">{{ t('complexityType1') }}</option>
-								<option value="2">{{ t('complexityType2') }}</option>
-								<option value="3">{{ t('complexityType3') }}</option>
-								<option value="4">{{ t('complexityType4') }}</option>
-								<option value="5">{{ t('complexityType5') }}</option>
-							</select>
-							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
-							</span>
+						<div class="dances-filters__checkboxes-group">
+							<h4 class="dances-filters__checkboxes-title">{{ t('complexity') }}</h4>
+							<div class="dances-filters__checkbox">
+								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="1">
+									{{ t('complexityType1') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="2">
+									{{ t('complexityType2') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="3">
+									{{ t('complexityType3') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="4">
+									{{ t('complexityType4') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="5">
+									{{ t('complexityType5') }}</label>
+							</div>
 						</div>
-						<div class="dances-filters__select">
-							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.gender">
-								<option disabled value="" selected>{{ t('gender') }}</option>
-								<option value="male">{{ t('genderTypeMale') }}</option>
-								<option value="female">{{ t('genderTypeFemale') }}</option>
-								<option value="multi">{{ t('genderTypeMulti') }}</option>
-							</select>
-							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
-							</span>
+						<div class="dances-filters__checkboxes-group">
+							<h4 class="dances-filters__checkboxes-title">{{ t('gender') }}</h4>
+							<div class="dances-filters__checkbox">
+								<label><input type="checkbox" v-model="searchDancesBodyParams.genders" value="male">
+									{{ t('genderTypeMale') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.genders" value="female">
+									{{ t('genderTypeFemale') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.genders" value="multi">
+									{{ t('genderTypeMulti') }}</label>
+							</div>
 						</div>
-						<div class="dances-filters__select">
-							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.paces">
-								<option disabled value="" selected>{{ t('tempo') }}</option>
-								<option value="1">{{ t('tempoSlow') }}</option>
-								<option value="2">{{ t('tempoMiddle') }}</option>
-								<option value="3">{{ t('tempoFast') }}</option>
-							</select>
-							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
-							</span>
+						<div class="dances-filters__checkboxes-group">
+							<h4 class="dances-filters__checkboxes-title">{{ t('tempo') }}</h4>
+							<div class="dances-filters__checkbox">
+								<label><input type="checkbox" v-model="searchDancesBodyParams.paces" :value="1">
+									{{ t('tempoSlow') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.paces" :value="2">
+									{{ t('tempoMiddle') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.paces" :value="3">
+									{{ t('tempoFast') }}</label>
+							</div>
 						</div>
-						<div class="dances-filters__select">
-							<select class="dances-filters__select-item" v-model="searchDancesBodyParams.handshakes">
-								<option disabled value="" selected>{{ t('handshakes') }}</option>
-								<option value="">{{ t('handshakesFree') }}</option>
-								<option value="">{{ t('handshakesPinky') }}</option>
-								<option value="">{{ t('handshakesCrossed') }}</option>
-								<option value="">{{ t('handshakesBack') }}</option>
-								<option value="">{{ t('handshakesBelt') }}</option>
-								<option value="">{{ t('handshakesShoulder') }}</option>
-								<option value="">{{ t('handshakesDagger') }}</option>
-								<option value="">{{ t('handshakesWhip') }}</option>
-								<option value="">{{ t('handshakesPalm') }}</option>
-							</select>
-							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
-							</span>
+						<div class="dances-filters__checkboxes-group">
+							<h4 class="dances-filters__checkboxes-title">{{ t('handshakes') }}</h4>
+							<div class="dances-filters__checkbox">
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="FREE">
+									{{ t('handshakesFree') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="LITTLE_FINGER">
+									{{ t('handshakesPinky') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="CROSSED">
+									{{ t('handshakesCrossed') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="PALM">
+									{{ t('handshakesPalm') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BACK">
+									{{ t('handshakesBack') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BELT">
+									{{ t('handshakesBelt') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="SHOULDER">
+									{{ t('handshakesShoulder') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="DAGGER">
+									{{ t('handshakesDagger') }}</label>
+								<label><input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="WHIP">
+									{{ t('handshakesWhip') }}</label>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="dances__inner">
+			<div ref="dancesInner" class="dances__inner">
 				<div class="dances__body">
-					<div v-if="loading || !dances" v-for="n in 4" :key="n" class="dance-item skeleton">
+					<div v-if="loading || !dances" v-for="n in 12" :key="n" class="dance-item skeleton">
 						<div class="skeleton__image skeleton-anim"></div>
 						<div class="skeleton__title skeleton-anim"></div>
 						<div class="skeleton__descr skeleton-anim"></div>
@@ -276,25 +297,24 @@ watch(searchDancesBodyParams, (newParams) => {
 							</div>
 							<ul class="dance-item__categories">
 								<li class="dance-item__categories-item">{{ t('genre') }}:
-									<span>{{ dance?.genres.join(', ') }}</span>
+									<span>{{ dance?.genres.join(', ').toLowerCase() }}</span>
 								</li>
 								<li class="dance-item__categories-item">{{ t('complexity') }}:
-									<span>{{ dance?.complexity }}</span>
+									<span>{{ dance?.complexity.join(', ').toLowerCase() }}</span>
 								</li>
 								<li class="dance-item__categories-item">{{ t('tempo') }}:
-									<span>{{ dance?.paces.join(', ') }}</span>
+									<span>{{ dance?.paces.join(', ').toLowerCase() }}</span>
 								</li>
 								<li class="dance-item__categories-item">{{ t('gender') }}:
-									<span>{{ dance?.gender }}</span>
+									<span>{{ dance?.gender.join(', ').toLowerCase() }}</span>
 								</li>
 								<li class="dance-item__categories-item">{{ t('handshakes') }}:
-									<span>{{ dance?.handshakes.join(',') }}</span>
+									<span>{{ dance?.handshakes.join(', ').toLowerCase() }}</span>
 								</li>
 							</ul>
 						</div>
 					</div>
 				</div>
-				<button type="button" class="dances__showmore-button button">{{ t('showMoreButton') }}</button>
 			</div>
 		</div>
 	</div>
@@ -704,44 +724,44 @@ watch(searchDancesBodyParams, (newParams) => {
 		}
 	}
 
-	&__current {
-		display: flex;
-		flex-wrap: wrap;
-		gap: toRem(7);
-		margin-left: toRem(20);
+	// &__current {
+	// 	display: flex;
+	// 	flex-wrap: wrap;
+	// 	gap: toRem(7);
+	// 	margin-left: toRem(20);
 
-		@media (max-width:$mobileSmall) {
-			margin: toRem(15) toRem(0) toRem(0) toRem(0);
-		}
-	}
+	// 	@media (max-width:$mobileSmall) {
+	// 		margin: toRem(15) toRem(0) toRem(0) toRem(0);
+	// 	}
+	// }
 
-	&__current-item {
-		background-color: #c83f01;
-		color: #fff;
-		font-size: toRem(14);
-		display: inline-flex;
-		justify-content: center;
-		align-items: center;
-		gap: toRem(10);
-		padding: toRem(5) toRem(10);
-		border-radius: 50px;
-		transition: all 0.3s;
+	// &__current-item {
+	// 	background-color: #c83f01;
+	// 	color: #fff;
+	// 	font-size: toRem(14);
+	// 	display: inline-flex;
+	// 	justify-content: center;
+	// 	align-items: center;
+	// 	gap: toRem(10);
+	// 	padding: toRem(5) toRem(10);
+	// 	border-radius: 50px;
+	// 	transition: all 0.3s;
 
-		img {
-			width: toRem(15);
-			height: toRem(15);
-		}
+	// 	img {
+	// 		width: toRem(15);
+	// 		height: toRem(15);
+	// 	}
 
-		@media (any-hover: hover) {
-			&:hover {
-				opacity: 0.8;
-			}
-		}
+	// 	@media (any-hover: hover) {
+	// 		&:hover {
+	// 			opacity: 0.8;
+	// 		}
+	// 	}
 
-		@media (max-width:$mobileSmall) {
-			font-size: toRem(12);
-		}
-	}
+	// 	@media (max-width:$mobileSmall) {
+	// 		font-size: toRem(12);
+	// 	}
+	// }
 
 	&__top-left {
 		display: inline-flex;
@@ -771,7 +791,8 @@ watch(searchDancesBodyParams, (newParams) => {
 		}
 	}
 
-	&__selectsblock {
+
+	&__checkboxes {
 		display: flex;
 		flex-wrap: wrap;
 		gap: toRem(20);
@@ -787,61 +808,25 @@ watch(searchDancesBodyParams, (newParams) => {
 		}
 	}
 
-	&__select {
-		position: relative;
-		padding-right: toRem(40);
-		padding-left: toRem(17);
-		border: 1px solid #c83f01;
-		border-radius: 50px;
-		width: 230px;
-		height: 40px;
+	&__checkboxes-group {}
+
+	&__checkboxes-title {}
+
+	&__checkbox {
 		display: flex;
-		align-items: center;
-
-		@media (max-width:$tablet) {
-			width: toRem(200);
-		}
-
-		@media (max-width:$mobile) {
-			font-size: toRem(18);
-		}
-
-		@media (max-width:$mobileSmall) {
-			font-size: toRem(16);
-			width: 100%;
-		}
+		flex-direction: column;
+		overflow-y: auto;
+		height: toRem(200);
 
 		&:focus-within {
 			border: 2px solid #c83f01;
 		}
 
-		span {
-			position: absolute;
-			right: 17px;
-			top: 50%;
-			transform: translate(0, -50%);
-			width: toRem(17);
-			height: toRem(10);
-			transition: all 0.3s;
-
-			img {
-				max-width: 100%;
-				max-height: 100%;
-			}
+		label {
+			font-weight: 500;
+			font-size: toRem(16);
+			color: #c83f01;
 		}
-	}
-
-	&__select-item {
-		align-self: stretch;
-		width: 100%;
-		appearance: none;
-		font-weight: 500;
-		font-size: toRem(16);
-		color: #c83f01;
-		line-height: 2;
-		outline: none;
-
-		background-color: transparent;
 	}
 
 }

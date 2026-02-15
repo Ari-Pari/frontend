@@ -54,7 +54,7 @@ watch(route, () => {
 						</li>
 					</ul>
 					<div class="menu__actions">
-						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')"
+						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')" :title="t('searchAriaLabel')"
 							class="menu__search-icon"></RouterLink>
 						<div class="menu__languages">
 							<input type="radio" id="lang-arm" class="menu__language-input" value="hy" v-model="locale" />
