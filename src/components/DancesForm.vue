@@ -48,7 +48,7 @@ const isFinished = ref(false)
 const { data: dances, loading: dancesLoading, error: dancesError, execute: fetchDances } = useApi(DanceService.searchDances)
 const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegionsError, execute: fetchRegions } = useApi(DanceService.getRegions)
 
-// Может быть не нужен async и await проверить
+// Добавить проверку на ошибки
 const loadDances = async (isFirstPage = false) => {
 	if (isFirstPage) {
 		dancesPage.value = 1
@@ -255,7 +255,7 @@ watch(searchDancesBodyParams, (newParams) => {
 								</label>
 							</div>
 						</div>
-						<div class="dances-filters__checkboxes-group">
+						<div v-if="dancesRegions" class="dances-filters__checkboxes-group">
 							<h4 class="dances-filters__checkboxes-title">{{ t('region') }}</h4>
 							<div class="dances-filters__checkbox">
 								<label v-for="region in dancesRegions" :key="region.id">
@@ -369,7 +369,7 @@ watch(searchDancesBodyParams, (newParams) => {
 			</div>
 			<div ref="dancesInner" class="dances__inner">
 				<div class="dances__body">
-					<div v-if="dancesLoading || !allDances.length" v-for="n in 12" :key="n" class="dance-item skeleton">
+					<div v-if="dancesLoading || dancesError" v-for="n in 12" :key="n" class="dance-item skeleton">
 						<div class="skeleton__image skeleton-anim"></div>
 						<div class="skeleton__title skeleton-anim"></div>
 						<div class="skeleton__descr skeleton-anim"></div>
@@ -750,6 +750,7 @@ watch(searchDancesBodyParams, (newParams) => {
 			font-size: toRem(16);
 			outline: none;
 			transition: all 0.3s;
+			line-height: 1;
 
 			@media (max-width:$tablet) {
 				padding: toRem(10) toRem(20) toRem(10) toRem(43);

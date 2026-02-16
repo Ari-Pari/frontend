@@ -43,7 +43,7 @@ watch(route, () => {
 						{{ t('supportButton') }}
 					</RouterLink>
 				</div>
-				<button type="button" @click="menuInit" class="menu__icon icon-menu"><span></span></button>
+				<button type="button" :title="t('menuIconSearchAriaLabel')" :aria-label="t('menuIconSearchAriaLabel')" @click="menuInit" class="menu__icon icon-menu"><span></span></button>
 				<nav class="menu__body">
 					<ul class="menu__list">
 						<li class="menu__item">
