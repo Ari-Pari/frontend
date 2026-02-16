@@ -18,7 +18,7 @@ const scrollToDance = () => {
 		<div class="first-screen__container">
 			<div class="first-screen__body">
 				<div class="first-screen__logo">
-					<img src="../assets/logo.svg" alt="logo">
+					<img src="@/assets/logo.svg" alt="logo">
 				</div>
 				<div class="first-screen__descr">{{ t('homeMainText') }}</div>
 			</div>
@@ -29,7 +29,7 @@ const scrollToDance = () => {
 	<div class="quote-block">
 		<div class="quote-block__container">
 			<div class="quote-block__image">
-				<img src="../assets/icons/sun.svg" alt="sun icon">
+				<img src="@/assets/icons/sun.svg" alt="sun icon">
 			</div>
 			<div class="quote-block__text">{{ t('quoteBlockText') }}</div>
 		</div>
@@ -39,10 +39,10 @@ const scrollToDance = () => {
 
 <style lang="scss" scoped>
 .first-screen {
-	background: url('../assets/home/first-screen-bg.svg') center/cover no-repeat, #fff;
+	background: url('@/assets/home/first-screen-bg.svg') center/cover no-repeat, #fff;
 
 	@media (max-width:$mobileSmall) {
-		background: url('../assets/home/first-screen-bg-mobile.svg') center/cover no-repeat, #fff;
+		background: url('@/assets/home/first-screen-bg-mobile.svg') center/cover no-repeat, #fff;
 	}
 
 	&__container {
@@ -126,12 +126,12 @@ const scrollToDance = () => {
 }
 
 .quote-block {
-	background: url('../assets/home/quote-block-bg.svg') center/cover no-repeat, #FE860A;
+	background: url('@/assets/home/quote-block-bg.svg') center/cover no-repeat, #FE860A;
 	padding: toRem(227) 0 toRem(305);
 
 	@media (max-width:$mobileSmall) {
 		padding: toRem(194) 0;
-		background: url('../assets/home/quote-block-bg-mobile.svg') center/cover no-repeat, #FE860A;
+		background: url('@/assets/home/quote-block-bg-mobile.svg') center/cover no-repeat, #FE860A;
 	}
 
 	&__container {

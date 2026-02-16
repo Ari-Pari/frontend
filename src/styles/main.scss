@@ -35,70 +35,6 @@
 	font-style: normal;
 	font-display: swap;
 }
-@font-face {
-	font-family: "Montserratarm";
-	src:
-		url("../assets/fonts/Montserratarm-Light.woff") format("woff"),
-		url("../assets/fonts/Montserratarm-Light.woff2") format("woff2");
-	font-weight: 300;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "Montserratarm";
-	src:
-		url("../assets/fonts/Montserratarm-Regular.woff") format("woff"),
-		url("../assets/fonts/Montserratarm-Regular.woff2") format("woff2");
-	font-weight: normal;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "Montserratarm";
-	src:
-		url("../assets/fonts/Montserratarm-Medium.woff") format("woff"),
-		url("../assets/fonts/Montserratarm-Medium.woff2") format("woff2");
-	font-weight: 500;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "Montserratarm";
-	src:
-		url("../assets/fonts/Montserratarm-SemiBold.woff") format("woff"),
-		url("../assets/fonts/Montserratarm-SemiBold.woff2") format("woff2");
-	font-weight: 600;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "NotoSansArmenian";
-	src: url("../assets/fonts/NotoSansArmenian-Light.woff2") format("woff2");
-	font-weight: 300;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "NotoSansArmenian";
-	src: url("../assets/fonts/NotoSansArmenian-Regular.woff2") format("woff2");
-	font-weight: normal;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "NotoSansArmenian";
-	src: url("../assets/fonts/NotoSansArmenian-Medium.woff2") format("woff2");
-	font-weight: 500;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: "NotoSansArmenian";
-	src: url("../assets/fonts/NotoSansArmenian-SemiBold.woff2") format("woff2");
-	font-weight: 600;
-	font-style: normal;
-	font-display: swap;
-}
 
 // Reset styles
 * {
@@ -238,6 +174,4 @@ body {
 		opacity: 0.5;
 		cursor: default;
 	}
-}
-.input {
 }

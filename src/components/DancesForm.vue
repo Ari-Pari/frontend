@@ -43,11 +43,12 @@ const searchDancesBodyParams = ref(
 )
 const allDances = ref([])
 const dancesPage = ref(1)
-const pageSize = 12
+const dancesPageSize = 12
 const isFinished = ref(false)
 const { data: dances, loading: dancesLoading, error: dancesError, execute: fetchDances } = useApi(DanceService.searchDances)
 const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegionsError, execute: fetchRegions } = useApi(DanceService.getRegions)
 
+// Может быть не нужен async и await проверить
 const loadDances = async (isFirstPage = false) => {
 	if (isFirstPage) {
 		dancesPage.value = 1
@@ -55,11 +56,12 @@ const loadDances = async (isFirstPage = false) => {
 	}
 	const result = await fetchDances({
 		lang: locale.value,
-		page: dancesPage,
-		size: pageSize,
+		page: dancesPage.value,
+		size: dancesPageSize,
 		body: searchDancesBodyParams.value
-	})
-	if (result.length < pageSize) {
+	}) || []
+
+	if (result.length < dancesPageSize) {
 		isFinished.value = true
 	}
 	if (isFirstPage) {
@@ -77,13 +79,7 @@ useInfiniteScroll(dancesInner, () => {
 	}
 }, {
 	distance: 50,
-	canLoadMore: () => {
-		if (isFinished.value) {
-			return false
-		} else {
-			return true
-		}
-	}
+	canLoadMore: () => !isFinished.value
 })
 // Count function for filters number
 const filterCount = computed(() => {
@@ -92,21 +88,22 @@ const filterCount = computed(() => {
 	const filterKeys = ['genres', 'regions', 'complexities', 'genders', 'paces', 'handshakes'];
 	filterKeys.forEach(key => {
 		if (Array.isArray(params[key])) {
-			count += params[key].length; // Считаем количество выбранных элементов в массиве
+			count += params[key].length;
 		}
 	})
 	return count
 })
+// Reset function for filters
 function resetFilters() {
 	const params = searchDancesBodyParams.value
 	const filterKeys = ['genres', 'regions', 'complexities', 'genders', 'paces', 'handshakes'];
 	filterKeys.forEach(key => {
 		if (Array.isArray(params[key])) {
-			params[key] = []; // Считаем количество выбранных элементов в массиве
+			params[key] = [];
 		}
 	})
 }
-// Debounce func for searching
+// Debounce function for searching
 const searchText = ref('')
 const debouncedSearchText = refDebounced(searchText, 1000)
 watch(debouncedSearchText, (val) => {
@@ -130,7 +127,7 @@ onBeforeUnmount(() => {
 	document.removeEventListener('click', handleClickOutside)
 	document.removeEventListener('keydown', handleEsc)
 })
-// Fetch data on lang change
+// Fetch data on langyage change
 watch(locale, (newLocale) => {
 	// fetchDances({
 	// 	lang: newLocale,
@@ -169,7 +166,7 @@ watch(searchDancesBodyParams, (newParams) => {
 								<option value="list-view">{{ t('cardViewList') }}</option>
 							</select>
 							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
+								<img src="@/assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div> -->
 						<div class="actions-dances__select">
@@ -179,7 +176,7 @@ watch(searchDancesBodyParams, (newParams) => {
 								<option value="alphabet">{{ t('sortAlphabet') }}</option>
 							</select>
 							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
+								<img src="@/assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div>
 						<div class="actions-dances__select">
@@ -188,7 +185,7 @@ watch(searchDancesBodyParams, (newParams) => {
 								<option value="DESC">{{ t('sortByDESC') }}</option>
 							</select>
 							<span>
-								<img src="../assets/icons/arrow-down.svg" alt="Arrow down icon">
+								<img src="@/assets/icons/arrow-down.svg" alt="Arrow down icon">
 							</span>
 						</div>
 					</div>
@@ -242,7 +239,7 @@ watch(searchDancesBodyParams, (newParams) => {
 							<button v-show="filterCount > 0" @click="resetFilters" type="button"
 								class="dances-filters__current-item">
 								{{ t('resetButton') }}
-								<img src="../assets/icons/close.svg" alt="Close icon">
+								<img src="@/assets/icons/close.svg" alt="Close icon">
 							</button>
 						</div>
 					</div>
@@ -262,7 +259,7 @@ watch(searchDancesBodyParams, (newParams) => {
 							<h4 class="dances-filters__checkboxes-title">{{ t('region') }}</h4>
 							<div class="dances-filters__checkbox">
 								<label v-for="region in dancesRegions" :key="region.id">
-									<input type="checkbox" :value="region.name" v-model="searchDancesBodyParams.regions">
+									<input type="checkbox" :value="region.id" v-model="searchDancesBodyParams.regions">
 									<span>{{ region?.name }}</span>
 								</label>
 							</div>
@@ -372,7 +369,7 @@ watch(searchDancesBodyParams, (newParams) => {
 			</div>
 			<div ref="dancesInner" class="dances__inner">
 				<div class="dances__body">
-					<div v-if="dancesLoading || !dances" v-for="n in 12" :key="n" class="dance-item skeleton">
+					<div v-if="dancesLoading || !allDances.length" v-for="n in 12" :key="n" class="dance-item skeleton">
 						<div class="skeleton__image skeleton-anim"></div>
 						<div class="skeleton__title skeleton-anim"></div>
 						<div class="skeleton__descr skeleton-anim"></div>

@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter, useRoute } from 'vue-router'
-import { headerScroll, menuInit, menuClose } from "../services/utils"
+import { headerScroll, menuInit, menuClose } from "@/services/utils"
 
 const router = useRouter()
 const route = useRoute()
@@ -38,7 +38,7 @@ watch(route, () => {
 		<div class="header__container">
 			<div class="header__menu menu">
 				<div class="menu__left">
-					<RouterLink to="/" class="menu__logo"><img src="../assets/AriPari_logo.png" alt="logo"></RouterLink>
+					<RouterLink to="/" class="menu__logo"><img src="@/assets/AriPari_logo.png" alt="logo"></RouterLink>
 					<RouterLink to="/about#supportBlock" class="menu__left-button button">
 						{{ t('supportButton') }}
 					</RouterLink>
@@ -231,11 +231,11 @@ watch(route, () => {
 		flex: 0 0 toRem(58);
 		border-radius: 50%;
 		transition: all 0.3s;
-		background: url('../assets/icons/search-hov.svg') center no-repeat, #fff;
+		background: url('@/assets/icons/search-hov.svg') center no-repeat, #fff;
 
 		@media (any-hover: hover) {
 			&:hover {
-				background: url('../assets/icons/search.svg') center no-repeat, #ff8d10;
+				background: url('@/assets/icons/search.svg') center no-repeat, #ff8d10;
 				border: 1.51px solid #ff8d10;
 			}
 		}
