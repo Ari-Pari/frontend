@@ -52,6 +52,33 @@ const { t, locale } = useI18n()
 			<a href="https://t.me/AriPariBot" target="_blank" class="about-bot__button button">{{ t('aboutText12') }}</a>
 		</div>
 	</section>
+	<div class="about-info">
+		<div class="about-info__container">
+			<div class="about-founder">
+				<div class="about-founder__body">
+					<div class="about-founder__top">
+						<div class="about-founder__image">
+							<img src="@/assets/about/avatar-hamazasp.png" alt="Founder image">
+						</div>
+						<div class="about-founder__texts">
+							<div class="about-founder__name">{{ t('aboutText21') }}</div>
+							<div class="about-founder__status">{{ t('aboutText13') }}</div>
+						</div>
+					</div>
+					<div class="about-founder__text">{{ t('aboutText14') }}</div>
+				</div>
+			</div>
+			<section class="about-support">
+				<h2 class="about-support__title about-title">{{ t('aboutText15') }}</h2>
+				<div class="about-support__text" v-html="t('aboutText16')"></div>
+			</section>
+			<section id="supportBlock" class="about-support">
+				<h2 class="about-support__title about-title">{{ t('aboutText17') }}</h2>
+				<div class="about-support__descr">{{ t('aboutText18') }}</div>
+				<div class="about-support__text">{{ t('aboutText19') }}</div>
+			</section>
+		</div>
+	</div>
 </template>
 
 <style lang="scss" scoped>
@@ -63,7 +90,7 @@ const { t, locale } = useI18n()
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	margin-bottom: toRem(48);
-	line-height: 1.1;
+	line-height: 1.2;
 
 	@media (max-width:$tablet) {
 		font-size: toRem(40);
@@ -192,7 +219,7 @@ const { t, locale } = useI18n()
 	&__card {
 		background: #fff;
 		border-radius: 20px;
-		border: 1px solid #fc860a;
+		border: 1px solid $orangeColor;
 		display: flex;
 		align-items: center;
 		padding: toRem(45) toRem(37);
@@ -395,7 +422,151 @@ const { t, locale } = useI18n()
 	}
 }
 
-.about-title {}
+.about-info {
+	&__container {}
+}
 
-.button {}
+.about-founder {
+	padding: toRem(153) 0 toRem(78);
+
+	@media (max-width:$mobile) {
+		padding: toRem(100) 0 toRem(60);
+	}
+
+	&__body {
+		border-radius: 20px;
+		background-color: #fff;
+		border: 1px solid $orangeColor;
+		max-width: toRem(903);
+		margin: 0 auto;
+		padding: 0 toRem(35) toRem(53);
+
+		@media (max-width:$mobileSmall) {
+			padding: 0 toRem(16) toRem(30);
+		}
+	}
+
+	&__top {
+		margin-bottom: toRem(30);
+		display: flex;
+		align-items: flex-end;
+		margin-top: toRem(-75);
+
+		@media (max-width:$mobile) {
+			margin-top: toRem(-40);
+		}
+	}
+
+	&__image {
+		margin-right: toRem(18);
+
+		img {
+			width: toRem(136);
+			height: toRem(136);
+
+			@media (max-width:$mobile) {
+				width: toRem(80);
+				height: toRem(80);
+			}
+		}
+	}
+
+	&__texts {
+		padding-bottom: toRem(20);
+
+		@media (max-width:$mobile) {
+			padding: 0;
+		}
+	}
+
+	&__name {
+		font-size: toRem(20);
+		line-height: 114%;
+		letter-spacing: -0.02em;
+		color: #1a1a1a;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(18);
+		}
+
+		@media (max-width: toEm(350)) {
+			font-size: toRem(15);
+		}
+	}
+
+	&__status {
+		font-size: toRem(11);
+		color: rgba(0, 0, 0, 0.5);
+	}
+
+	&__text {
+		font-size: toRem(20);
+		line-height: 114%;
+		letter-spacing: -0.02em;
+		color: #1a1a1a;
+		line-height: 1.3;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(18);
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(16);
+		}
+	}
+}
+
+.about-support {
+	padding-bottom: toRem(80);
+
+	@media (max-width:$mobile) {
+		padding-bottom: toRem(60);
+	}
+
+	&__title {}
+
+	&__text {
+		color: #000;
+		max-width: toRem(445);
+		font-size: toRem(19);
+		line-height: 1.3;
+		white-space: pre-line;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(18);
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(16);
+		}
+
+		:deep(a)  {
+			color: $orangeColor;
+			transition: all 0.3s;
+			@media (any-hover: hover){
+				&:hover{
+					color: $orangeHoverColor;
+				}
+			}
+		}
+	}
+
+	&__descr {
+		max-width: toRem(445);
+		font-size: toRem(26);
+		color: #000;
+		line-height: 1.3;
+		margin-bottom: toRem(37);
+		white-space: pre-line;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(22);
+			margin-bottom: toRem(20);
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(20);
+		}
+	}
+}
 </style>
