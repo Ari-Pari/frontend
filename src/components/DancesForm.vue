@@ -59,21 +59,23 @@ const loadDances = async (isFirstPage = false) => {
 		page: dancesPage.value,
 		size: dancesPageSize,
 		body: searchDancesBodyParams.value
-	}) || []
+	})
+
+	if (!result) return
 
 	if (result.length < dancesPageSize) {
 		isFinished.value = true
 	}
 	if (isFirstPage) {
-		allDances.value = result || []
+		allDances.value = result
 	} else {
-		allDances.value.push(...(result || []))
+		allDances.value.push(...result)
 	}
 }
 // Infinite scroll for dance cards
 const dancesInner = useTemplateRef('dancesInner')
 useInfiniteScroll(dancesInner, () => {
-	if (!dancesLoading.value && !isFinished.value) {
+	if (!dancesLoading.value && !isFinished.value && !dancesError.value) {
 		dancesPage.value++
 		loadDances()
 	}
@@ -112,14 +114,8 @@ watch(debouncedSearchText, (val) => {
 
 // Fetch data on loading
 onMounted(() => {
-	// fetchDances({
-	// 	lang: locale.value,
-	// 	page: 1,
-	// 	size: 12,
-	// 	body: searchDancesBodyParams.value
-	// })
-	loadDances(true)
 	fetchRegions(locale.value)
+	loadDances(true)
 	document.addEventListener('click', handleClickOutside)
 	document.addEventListener('keydown', handleEsc)
 })
@@ -129,24 +125,12 @@ onBeforeUnmount(() => {
 })
 // Fetch data on langyage change
 watch(locale, (newLocale) => {
-	// fetchDances({
-	// 	lang: newLocale,
-	// 	page: 1,
-	// 	size: 12,
-	// 	body: searchDancesBodyParams.value
-	// })
-	loadDances(true)
 	fetchRegions(newLocale)
+	loadDances(true)
 })
 // Fetch data on params change (filtering, sorting and searching)
 watch(searchDancesBodyParams, (newParams) => {
 	sessionStorage.setItem('dancesFilter', JSON.stringify({ ...newParams, searchText: "" })) // without search text
-	// fetchDances({
-	// 	lang: locale.value,
-	// 	page: 1,
-	// 	size: 12,
-	// 	body: newParams // with search text
-	// })
 	loadDances(true)
 }, { deep: true })
 
@@ -171,8 +155,8 @@ watch(searchDancesBodyParams, (newParams) => {
 						</div> -->
 						<div class="actions-dances__select">
 							<select class="actions-dances__select-item" v-model="searchDancesBodyParams.sortedBy">
-								<option value="popularity">{{ t('sortPopular') }}</option>
 								<option value="createdBy">{{ t('sortCreated') }}</option>
+								<option value="popularity">{{ t('sortPopular') }}</option>
 								<option value="alphabet">{{ t('sortAlphabet') }}</option>
 							</select>
 							<span>
@@ -426,7 +410,8 @@ watch(searchDancesBodyParams, (newParams) => {
 	}
 
 	&__inner {
-		max-height: toRem(1291);
+		//max-height: toRem(1291);
+		max-height: 1500px;
 		overflow-y: auto;
 		padding: 0 toRem(53) toRem(53);
 		display: flex;
@@ -437,7 +422,8 @@ watch(searchDancesBodyParams, (newParams) => {
 		}
 
 		@media (max-width:$mobileSmall) {
-			max-height: toRem(750);
+			max-height: 1300px;
+			//max-height: toRem(750);
 			padding: 0 0 toRem(25);
 		}
 	}
@@ -791,6 +777,7 @@ watch(searchDancesBodyParams, (newParams) => {
 
 	@media (max-width:$mobile) {
 		padding: toRem(20);
+		max-height: 350px;
 	}
 
 	@media (max-width:$mobileSmall) {

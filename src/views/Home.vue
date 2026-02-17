@@ -183,6 +183,8 @@ const scrollToDance = () => {
 		line-height: 105%;
 		text-align: center;
 		color: #fff;
+		white-space: pre-line;
+		line-height: 1.15;
 
 		@media (max-width:$tablet) {
 			font-size: toRem(50);
