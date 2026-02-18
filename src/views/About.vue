@@ -1,9 +1,19 @@
 <script setup>
-import { ref, watch, onMounted, computed } from "vue"
+import { ref } from "vue";
 import { useI18n } from "vue-i18n"
-
 const { t, locale } = useI18n()
 
+const copiedField = ref(null)
+
+function copyText(text, field) {
+	navigator.clipboard.writeText(text).then(() => {
+		copiedField.value = field
+
+		setTimeout(() => {
+			copiedField.value = null
+		}, 2000)
+	})
+}
 </script>
 
 <template>
@@ -76,6 +86,23 @@ const { t, locale } = useI18n()
 				<h2 class="about-support__title about-title">{{ t('aboutText17') }}</h2>
 				<div class="about-support__descr">{{ t('aboutText18') }}</div>
 				<div class="about-support__text">{{ t('aboutText19') }}</div>
+				<div class="about-support__bankcard bankcard-support">
+					<div class="bankcard-support__title">{{ t('bankCardSupportText') }}</div>
+					<div class="bankcard-support__row">
+						<span id="bankcard-name" class="bankcard-support__text">{{ t('bankCardName') }}</span>
+						<button @click="copyText(t('bankCardName'), 'name')" class="bankcard-support__button">
+							<img v-if="copiedField === 'name'" src="@/assets/icons/check.svg" alt="Check icon">
+							<img v-else src="@/assets/icons/copy.svg" alt="Copy icon">
+						</button>
+					</div>
+					<div class="bankcard-support__row">
+						<span id="bankcard-number" class="bankcard-support__text">220253350650000</span>
+						<button @click="copyText('220253350650000', 'number')" class="bankcard-support__button">
+							<img v-if="copiedField === 'number'" src="@/assets/icons/check.svg" alt="Check icon">
+							<img v-else src="@/assets/icons/copy.svg" alt="Copy icon">
+						</button>
+					</div>
+				</div>
 			</section>
 		</div>
 	</div>
@@ -128,6 +155,7 @@ const { t, locale } = useI18n()
 
 	&__body {
 		margin-right: toRem(78);
+		flex: 1 1 auto;
 
 		@media (max-width:$mobile) {
 			margin: toRem(0) toRem(0) toRem(50) toRem(0);
@@ -157,6 +185,7 @@ const { t, locale } = useI18n()
 		font-size: toRem(20);
 		color: #fff;
 		line-height: 1.3;
+		max-width: toRem(433);
 
 		@media (max-width:$tablet) {
 			font-size: toRem(18);
@@ -326,6 +355,7 @@ const { t, locale } = useI18n()
 		font-size: toRem(59);
 		margin-bottom: toRem(41);
 		line-height: 1.1;
+		white-space: pre-line;
 
 		@media (max-width:$tablet) {
 			font-size: toRem(40);
@@ -578,6 +608,103 @@ const { t, locale } = useI18n()
 
 		@media (max-width:$mobileSmall) {
 			font-size: toRem(20);
+		}
+	}
+}
+
+
+.bankcard-support {
+	background: #fff;
+	border-radius: 20px;
+	border: 2px solid $orangeColor;
+	padding: toRem(32) toRem(40) toRem(16);
+	margin-top: toRem(32);
+	max-width: toRem(622);
+
+	@media (max-width:$mobile) {
+		padding: toRem(32) toRem(16);
+	}
+
+	@media (max-width:$mobileSmall) {
+		padding: toRem(16);
+	}
+
+	&__title {
+		line-height: 1.3;
+		margin-bottom: toRem(30);
+		font-size: toRem(26);
+		color: #000;
+		text-align: center;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(22);
+			margin-bottom: toRem(20);
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(20);
+		}
+
+		@media (max-width: toEm(371)) {
+			max-width: toRem(235);
+			margin: 0 auto toRem(20);
+		}
+	}
+
+	&__row {
+		background: #fff;
+		border-radius: 20px;
+		border: 2px solid $orangeColor;
+		padding: toRem(14) toRem(22);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		&:not(:last-child) {
+			margin-bottom: toRem(12);
+		}
+
+		@media (max-width:$mobile) {
+			padding: toRem(12) toRem(18);
+		}
+
+		@media (max-width:$mobileSmall) {
+			padding: toRem(10);
+		}
+
+	}
+
+	&__text {
+		font-weight: 400;
+		font-size: toRem(26);
+		color: #000;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(22);
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(18);
+		}
+	}
+
+	&__button {
+		img {
+			width: toRem(41.5);
+			height: toRem(41.5);
+
+			@media (max-width:$mobileSmall) {
+				width: toRem(26);
+				height: toRem(26);
+			}
+		}
+
+		transition: all 0.3s;
+
+		@media (any-hover: hover) {
+			&:hover {
+				opacity: 0.8;
+			}
 		}
 	}
 }

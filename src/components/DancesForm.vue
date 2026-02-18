@@ -423,7 +423,7 @@ watch(searchDancesBodyParams, (newParams) => {
 			padding: 0 0 toRem(53);
 		}
 
-		@media (max-width:$mobileSmall) {
+		@media (max-width:toEm(530)) {
 			max-height: 1300px;
 			//max-height: toRem(750);
 			padding: 0 0 toRem(25);
@@ -439,27 +439,31 @@ watch(searchDancesBodyParams, (newParams) => {
 			gap: toRem(30);
 		}
 
-		@media (max-width:$mobile) {
+		@media (max-width: toEm(805)) {
 			grid-template-columns: 1fr 1fr;
 			gap: toRem(30) toRem(25);
 		}
 
-		@media (max-width:$mobileSmall) {
+		@media (max-width:toEm(530)) {
 			gap: toRem(30) toRem(19);
 		}
-	}
 
-	&__showmore-button {
-		margin-top: toRem(50);
-		align-self: center;
-
-		@media (max-width:$mobileSmall) {
-			margin-top: toRem(20);
-			font-size: toRem(16);
-			height: toRem(30);
-			width: toRem(200);
+		@media (max-width: toEm(370)) {
+			gap: toRem(30) toRem(10);
 		}
 	}
+
+	// &__showmore-button {
+	// 	margin-top: toRem(50);
+	// 	align-self: center;
+
+	// 	@media (max-width:$mobileSmall) {
+	// 		margin-top: toRem(20);
+	// 		font-size: toRem(16);
+	// 		height: toRem(30);
+	// 		width: toRem(200);
+	// 	}
+	// }
 }
 
 .actions-dances {
@@ -829,6 +833,10 @@ watch(searchDancesBodyParams, (newParams) => {
 		@media (max-width:$mobileSmall) {
 			font-size: toRem(12);
 		}
+
+		@media (max-width: toEm(350)) {
+			font-size: toRem(9);
+		}
 	}
 
 	&__top-left {
@@ -1054,7 +1062,7 @@ watch(searchDancesBodyParams, (newParams) => {
 	// border-radius: 14px;
 	// background-color: #fff;
 
-	@media (max-width:$mobileSmall) {
+	@media (max-width:toEm(530)) {
 		border-radius: 6px;
 	}
 
@@ -1080,7 +1088,7 @@ watch(searchDancesBodyParams, (newParams) => {
 			object-fit: cover;
 		}
 
-		@media (max-width:$mobileSmall) {
+		@media (max-width:toEm(530)) {
 			border-radius: 6px;
 		}
 	}
@@ -1103,7 +1111,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		margin-bottom: toRem(9);
 		line-height: 1.3;
 
-		@media (max-width:$mobileSmall) {
+		@media (max-width:toEm(530)) {
 			font-size: toRem(16);
 			margin-bottom: toRem(5);
 		}
@@ -1121,7 +1129,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		flex-wrap: wrap;
 		gap: toRem(10);
 
-		@media (max-width:$mobileSmall) {
+		@media (max-width:toEm(530)) {
 			margin-bottom: toRem(5);
 		}
 	}
@@ -1138,7 +1146,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		text-align: center;
 		color: #c83f01;
 
-		@media (max-width:$mobileSmall) {
+		@media (max-width:toEm(530)) {
 			min-height: toRem(16);
 			font-size: toRem(10);
 			padding: 0 toRem(9.5);
@@ -1149,6 +1157,10 @@ watch(searchDancesBodyParams, (newParams) => {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: toRem(5) toRem(20);
+
+		@media (max-width: toEm(370)) {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	&__categories-item {
@@ -1157,7 +1169,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		font-weight: 700;
 		line-height: 1.3;
 
-		@media (max-width:$mobileSmall) {
+		@media (max-width:toEm(530)) {
 			font-size: toRem(10);
 		}
 

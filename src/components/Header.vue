@@ -158,17 +158,17 @@ watch(route, () => {
 
 		@media (max-width: $tablet) {
 			position: fixed;
-			width: calc(100% - 36px);
+			width: calc(100% - 32px);
 			height: calc(100% - 120px);
 			right: -100%;
 			top: 110px;
-			overflow: auto;
+			overflow-y: auto;
 			padding: toRem(75) toRem(16) toRem(30);
 			transition: right 0.3s;
 			background-color: #fff;
 			flex-direction: column;
 			justify-content: center;
-			border-radius: 30px;
+			border-radius: 20px;
 			border: 1.51px solid #eaeaea;
 
 			@media (max-width:$mobileSmall) {

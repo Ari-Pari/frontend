@@ -87,7 +87,11 @@ export default {
 		aboutText18: "AriPari exists thanks to volunteers.",
 		aboutText19: "This is a movement created by love, energy, and the contribution of the community.\n\nEvery participant is part of preserving Armenian dance.",
 		aboutText20: "Become a volunteer",
-		aboutText21: "Hamazasp Aslanyan"
+		aboutText21: "Hamazasp Aslanyan",
+		footerContacts: "Contacts",
+		footerLinks: "Links",
+		bankCardName: "Արի Պարի ՀԿ",
+		bankCardSupportText: "To Support Us (Acba Bank):",
 	},
 	ru: {
 		homePageMenuItem: "Главная",
@@ -177,7 +181,11 @@ export default {
 		aboutText18: "AriPari существует \nблагодаря волонтёрам.",
 		aboutText19: "Это движение, созданное любовью, энергией и вкладом сообщества.\n\nКаждый участник — часть сохранения армянского танца.",
 		aboutText20: "Стать волонтёром",
-		aboutText21: "Амазасп Асланян"
+		aboutText21: "Амазасп Асланян",
+		footerContacts: "Контакты",
+		footerLinks: "Ссылки",
+		bankCardName: "Արի Պարի ՀԿ",
+		bankCardSupportText: "Для поддержки (Акба Банк):",
 	},
 	hy: {
 		homePageMenuItem: "Գլխավոր",
@@ -253,7 +261,7 @@ export default {
 		aboutText4: "հանրային պարային միջոցառումներ",
 		aboutText5: "տարածքներ, որտեղ յուրաքանչյուրն կարող է պարել",
 		aboutText6: "Այս տարիների ընթացքում նախաձեռնությանը մասնակցել են տասնյակ հազարավոր մարդիկ՝ դառնալով հայկական պարի կենդանի կրողներ։\n\nՊարը դադարում է լինել միայն բեմ — \nայն դառնում է կյանքի մաս։",
-		aboutText7: "Պահպանելով ժառանգությունը՝ ստեղծում ենք ապագան",
+		aboutText7: "Պահպանելով ժառանգությունը՝ \n ստեղծում ենք ապագան",
 		aboutText8: "Տարիների ընթացքում մենք ստեղծել ենք «Պարադարան»՝ հայկական պարի հանրագիտարան։",
 		aboutText9: "հավաքագրվել են \nավանդական պարերը",
 		aboutText10: "արձանագրվել են \nշարժումներն ու ձևերը",
@@ -268,5 +276,9 @@ export default {
 		aboutText19: "Սա շարժում է, որը ստեղծվել է սիրով, էներգիայով և համայնքի ներդրմամբ։\n\nՅուրաքանչյուր մասնակից հայկական պարի պահպանման մի մասն է։",
 		aboutText20: "Դառնալ կամավոր",
 		aboutText21: "Համազասպ Ասլանյան",
+		bankCardName: "Արի Պարի ՀԿ",
+		bankCardSupportText: "Աջակցելու համար (Ակբա բանկ)՝",
+		footerContacts: "Կոնտակտներ",
+		footerLinks: "Հղումներ",
 	}
 }
