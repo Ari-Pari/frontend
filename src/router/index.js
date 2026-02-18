@@ -9,7 +9,7 @@ const router = createRouter({
 	routes: [
 		{ path: '/', name: "home", component: Home },
 		{ path: '/about', name: "about", component: About },
-		{ path: '/dance/:id', name: 'dance', component: Dance, props: true },
+		{ path: '/dances/:id', name: 'dance', component: Dance, props: true },
 		{ path: '/:pathMatch(.*)*', redirect: { name: 'home' } }
 	],
 	scrollBehavior(to) {

@@ -22,8 +22,7 @@ const scrollToDance = () => {
 				</div>
 				<div class="first-screen__descr">{{ t('homeMainText') }}</div>
 			</div>
-			<button type="button" @click='scrollToDance' class="first-screen__button button">{{ t('findDance')
-			}}</button>
+			<button type="button" @click='scrollToDance' class="first-screen__button button">{{ t('findDance')}}</button>
 		</div>
 	</section>
 	<div class="quote-block">

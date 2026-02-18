@@ -43,7 +43,8 @@ watch(route, () => {
 						{{ t('supportButton') }}
 					</RouterLink>
 				</div>
-				<button type="button" :title="t('menuIconSearchAriaLabel')" :aria-label="t('menuIconSearchAriaLabel')" @click="menuInit" class="menu__icon icon-menu"><span></span></button>
+				<button type="button" :title="t('menuIconSearchAriaLabel')" :aria-label="t('menuIconSearchAriaLabel')"
+					@click="menuInit" class="menu__icon icon-menu"><span></span></button>
 				<nav class="menu__body">
 					<ul class="menu__list">
 						<li class="menu__item">
@@ -54,8 +55,8 @@ watch(route, () => {
 						</li>
 					</ul>
 					<div class="menu__actions">
-						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')" :title="t('searchAriaLabel')"
-							class="menu__search-icon"></RouterLink>
+						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')"
+							:title="t('searchAriaLabel')" class="menu__search-icon"></RouterLink>
 						<div class="menu__languages">
 							<input type="radio" id="lang-arm" class="menu__language-input" value="hy" v-model="locale" />
 							<label for="lang-arm" :class="{ active: currentLang === 'hy' }"
@@ -157,23 +158,31 @@ watch(route, () => {
 
 		@media (max-width: $tablet) {
 			position: fixed;
-			width: 100%;
-			height: 100%;
+			width: calc(100% - 36px);
+			height: calc(100% - 120px);
 			right: -100%;
-			top: 0;
+			top: 110px;
 			overflow: auto;
 			padding: toRem(75) toRem(16) toRem(30);
 			transition: right 0.3s;
 			background-color: #fff;
 			flex-direction: column;
 			justify-content: center;
+			border-radius: 30px;
+			border: 1.51px solid #eaeaea;
+
+			@media (max-width:$mobileSmall) {
+				top: 120px;
+				height: calc(100% - 130px);
+
+				._header-scroll & {
+					top: 80px;
+					height: calc(100% - 90px);
+				}
+			}
 
 			.menu-open & {
-				right: 0;
-
-				&::before {
-					left: 0;
-				}
+				right: 16px;
 			}
 		}
 	}
@@ -190,6 +199,7 @@ watch(route, () => {
 			margin-bottom: toRem(40);
 			margin-right: 0;
 			gap: toRem(30);
+			align-items: flex-start;
 		}
 	}
 

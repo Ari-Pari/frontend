@@ -181,10 +181,16 @@ const { t, locale } = useI18n()
 }
 
 .about-history {
-	// background: url('@/assets/about/first-screen-bg.svg') center/cover no-repeat, #fff;
+	@media (max-width:$tablet) and (min-width: $mobile) {
+		background: url('@/assets/about/decor-1.svg') right top / cover no-repeat, #fff;
+	}
+
+	@media (min-width:$mobile) {
+		background: url('@/assets/about/decor-1.svg') center/cover no-repeat, #fff;
+	}
 
 	// @media (max-width:$mobileSmall) {
-	// 	background: url('@/assets/about/first-screen-bg-mobile.svg') center/cover no-repeat, #fff;
+	// 	background: url('@/assets/about/decor-1.svg') center/cover no-repeat, #fff;
 	// }
 	padding: toRem(60) 0 toRem(200);
 
@@ -423,6 +429,10 @@ const { t, locale } = useI18n()
 }
 
 .about-info {
+	@media (min-width:$mobile) {
+		background: url('@/assets/about/decor-2.svg') center/cover no-repeat, #fff;
+	}
+
 	&__container {}
 }
 
@@ -484,6 +494,7 @@ const { t, locale } = useI18n()
 		line-height: 114%;
 		letter-spacing: -0.02em;
 		color: #1a1a1a;
+		line-height: 1.3;
 
 		@media (max-width:$mobile) {
 			font-size: toRem(18);
@@ -540,11 +551,12 @@ const { t, locale } = useI18n()
 			font-size: toRem(16);
 		}
 
-		:deep(a)  {
+		:deep(a) {
 			color: $orangeColor;
 			transition: all 0.3s;
-			@media (any-hover: hover){
-				&:hover{
+
+			@media (any-hover: hover) {
+				&:hover {
 					color: $orangeHoverColor;
 				}
 			}
