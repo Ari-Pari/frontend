@@ -1,22 +1,56 @@
 <script setup>
-import { ref, useTemplateRef, onMounted } from 'vue';
-const audioPlayerRef = useTemplateRef('audio-player');
+import { ref, watch, nextTick, useTemplateRef, onMounted } from 'vue';
+import { usePlayer } from '@/composables/usePlayer';
+import { useRoute } from "vue-router"
 
-// const tracks = ref([
-// 	{ id: 1, link: '/src/assets/music/2009.mp3' },
-// 	{ id: 2, link: '/src/assets/music/Small worlds.mp3' }
-// ])
-// let current = ref(tracks.value[0].link)
-// onMounted(() => {
-// 	console.log(audioPlayerRef.value)
-// })
-// Получаем текущую страницу, если это не dance то добавляем класс
+const audioPlayerRef = useTemplateRef('audio-player')
+const route = useRoute()
+const { currentTrack,
+	playlist,
+	isPlaying,
+	setTrack,
+	setPlaylist,
+	togglePlay,
+	showPlaylist,
+	nextTrack,
+	prevTrack } = usePlayer();
+
+watch(currentTrack, async (newTrack) => {
+	if (isPlaying.value) {
+		if (!newTrack) return;
+		await nextTick();
+		if (audioPlayerRef.value) {
+			audioPlayerRef.value.play();
+		}
+	}
+});
+watch(isPlaying, (shouldPlay) => {
+	if (!audioPlayerRef.value) return;
+
+	if (shouldPlay) {
+		audioPlayerRef.value.play();
+	} else {
+		audioPlayerRef.value.pause();
+	}
+});
+
 </script>
 
 <template>
-	<audio ref="audio-player" class="audio-player" controls :src="current"></audio>
+	<audio ref="audio-player" class="audio-player" controls :class="route.meta.playerStyle" @play="togglePlay(true)"
+		@pause="togglePlay(false)" @ended="nextTrack" :src="currentTrack?.link"></audio>
 </template>
 
 <style lang="scss" scoped>
-.player {}
+.audio-player {
+	position: absolute;
+	// opacity: 0;
+	// visibility: hidden;
+}
+
+.dance-page-audio-player {
+	position: absolute;
+	top: 520px;
+	right: 16px;
+}
 </style>

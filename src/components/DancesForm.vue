@@ -241,13 +241,15 @@ watch(searchDancesBodyParams, (newParams) => {
 								</label>
 							</div>
 						</details>
-						<details v-if="dancesRegions" class="dances-filters__checkboxes-group">
+						<details class="dances-filters__checkboxes-group">
 							<summary class="dances-filters__checkboxes-title spollers-title">{{ t('region') }}</summary>
 							<div class="dances-filters__checkbox">
-								<label v-for="region in dancesRegions" :key="region.id">
-									<input type="checkbox" :value="region.id" v-model="searchDancesBodyParams.regions">
-									<span>{{ region?.name }}</span>
-								</label>
+								<template v-if="dancesRegions">
+									<label v-for="region in dancesRegions" :key="region.id">
+										<input type="checkbox" :value="region?.id" v-model="searchDancesBodyParams.regions">
+										<span>{{ region?.name }}</span>
+									</label>
+								</template>
 							</div>
 						</details>
 						<details class="dances-filters__checkboxes-group">
@@ -369,7 +371,8 @@ watch(searchDancesBodyParams, (newParams) => {
 								<h3 class="dance-item__title">{{ dance?.name }}</h3>
 							</RouterLink>
 							<div class="dance-item__tags">
-								<span v-for="region in dance.regions" class="dance-item__tags-item">{{ region?.name }}</span>
+								<span v-for="region in dance.regions" :key="region?.id" class="dance-item__tags-item">{{
+									region?.name }}</span>
 							</div>
 							<ul class="dance-item__categories">
 								<li class="dance-item__categories-item">{{ t('genre') }}:

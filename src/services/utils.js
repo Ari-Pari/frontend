@@ -92,28 +92,22 @@ export function headerScroll() {
 export function spollers() {
 	const spollersArray = document.querySelectorAll('[data-spollers]');
 	if (spollersArray.length > 0) {
-		// Подія кліку
 		document.addEventListener("click", setSpollerAction);
-		// Отримання звичайних слойлерів
 		const spollersRegular = Array.from(spollersArray).filter(function (item, index, self) {
 			return !item.dataset.spollers.split(",")[0];
 		});
-		// Ініціалізація звичайних слойлерів
 		if (spollersRegular.length) {
 			initSpollers(spollersRegular);
 		}
-		// Отримання слойлерів з медіа-запитами
 		let mdQueriesArray = dataMediaQueries(spollersArray, "spollers");
 		if (mdQueriesArray && mdQueriesArray.length) {
 			mdQueriesArray.forEach(mdQueriesItem => {
-				// Подія
 				mdQueriesItem.matchMedia.addEventListener("change", function () {
 					initSpollers(mdQueriesItem.itemsArray, mdQueriesItem.matchMedia);
 				});
 				initSpollers(mdQueriesItem.itemsArray, mdQueriesItem.matchMedia);
 			});
 		}
-		// Ініціалізація
 		function initSpollers(spollersArray, matchMedia = false) {
 			spollersArray.forEach(spollersBlock => {
 				spollersBlock = matchMedia ? spollersBlock.item : spollersBlock;
@@ -126,11 +120,9 @@ export function spollers() {
 				}
 			});
 		}
-		// Робота з контентом
 		function initSpollerBody(spollersBlock, hideSpollerBody = true) {
 			let spollerItems = spollersBlock.querySelectorAll('details');
 			if (spollerItems.length) {
-				//spollerItems = Array.from(spollerItems).filter(item => item.closest('[data-spollers]') === spollersBlock);
 				spollerItems.forEach(spollerItem => {
 					let spollerTitle = spollerItem.querySelector('summary');
 					if (hideSpollerBody) {
@@ -189,7 +181,6 @@ export function spollers() {
 					}
 				}
 			}
-			// Закриття при кліку поза спойлером
 			if (!el.closest('[data-spollers]')) {
 				const spollersClose = document.querySelectorAll('[data-spoller-close]');
 				if (spollersClose.length) {
@@ -219,13 +210,11 @@ export function spollers() {
 	}
 }
 function dataMediaQueries(array, dataSetValue) {
-	// Отримання об'єктів з медіа-запитами
 	const media = Array.from(array).filter(function (item, index, self) {
 		if (item.dataset[dataSetValue]) {
 			return item.dataset[dataSetValue].split(",")[0];
 		}
 	});
-	// Ініціалізація об'єктів з медіа-запитами
 	if (media.length) {
 		const breakpointsArray = [];
 		media.forEach(item => {
@@ -237,7 +226,6 @@ function dataMediaQueries(array, dataSetValue) {
 			breakpoint.item = item;
 			breakpointsArray.push(breakpoint);
 		});
-		// Отримуємо унікальні брейкпоінти
 		let mdQueries = breakpointsArray.map(function (item) {
 			return '(' + item.type + "-width: " + item.value + "px)," + item.value + ',' + item.type;
 		});
@@ -245,13 +233,11 @@ function dataMediaQueries(array, dataSetValue) {
 		const mdQueriesArray = [];
 
 		if (mdQueries.length) {
-			// Працюємо з кожним брейкпоінтом
 			mdQueries.forEach(breakpoint => {
 				const paramsArray = breakpoint.split(",");
 				const mediaBreakpoint = paramsArray[1];
 				const mediaType = paramsArray[2];
 				const matchMedia = window.matchMedia(paramsArray[0]);
-				// Об'єкти з потрібними умовами
 				const itemsArray = breakpointsArray.filter(function (item) {
 					if (item.value === mediaBreakpoint && item.type === mediaType) {
 						return true;
@@ -265,7 +251,7 @@ function dataMediaQueries(array, dataSetValue) {
 			return mdQueriesArray;
 		}
 	}
-} 
+}
 let _slideUp = (target, duration = 500, showmore = 0) => {
 	if (!target.classList.contains('_slide')) {
 		target.classList.add('_slide');
@@ -290,7 +276,6 @@ let _slideUp = (target, duration = 500, showmore = 0) => {
 			target.style.removeProperty('transition-duration');
 			target.style.removeProperty('transition-property');
 			target.classList.remove('_slide');
-			// Створюємо подію 
 			document.dispatchEvent(new CustomEvent("slideUpDone", {
 				detail: {
 					target: target
@@ -325,7 +310,6 @@ let _slideDown = (target, duration = 500, showmore = 0) => {
 			target.style.removeProperty('transition-duration');
 			target.style.removeProperty('transition-property');
 			target.classList.remove('_slide');
-			// Створюємо подію
 			document.dispatchEvent(new CustomEvent("slideDownDone", {
 				detail: {
 					target: target
@@ -345,4 +329,28 @@ function uniqArray(array) {
 	return array.filter(function (item, index, self) {
 		return self.indexOf(item) === index;
 	});
+}
+
+export function scrollToBlock(scrollToBlockId) {
+	requestAnimationFrame(() => {
+		document.getElementById(scrollToBlockId)
+			?.scrollIntoView({ behavior: 'smooth' })
+	})
+}
+
+export function getYoutubeId(url) {
+	const parsed = new URL(url)
+	// youtube.com/watch?v=
+	if (parsed.searchParams.get('v')) {
+		return parsed.searchParams.get('v')
+	}
+	// youtu.be/ID
+	if (parsed.hostname === 'youtu.be') {
+		return parsed.pathname.slice(1)
+	}
+	// youtube.com/embed/ID
+	if (parsed.pathname.includes('/embed/')) {
+		return parsed.pathname.split('/embed/')[1]
+	}
+	return null
 }

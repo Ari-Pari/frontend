@@ -2,18 +2,8 @@
 import { ref } from "vue";
 import { useI18n } from "vue-i18n"
 const { t, locale } = useI18n()
-
-const copiedField = ref(null)
-
-function copyText(text, field) {
-	navigator.clipboard.writeText(text).then(() => {
-		copiedField.value = field
-
-		setTimeout(() => {
-			copiedField.value = null
-		}, 2000)
-	})
-}
+import { useClipboard } from "@/composables/useClipboard"
+const { copiedField, copyText } = useClipboard()
 </script>
 
 <template>
@@ -616,7 +606,7 @@ function copyText(text, field) {
 .bankcard-support {
 	background: #fff;
 	border-radius: 20px;
-	border: 2px solid $orangeColor;
+	border: 2px dashed $orangeColor;
 	padding: toRem(32) toRem(40) toRem(16);
 	margin-top: toRem(32);
 	max-width: toRem(622);
@@ -654,7 +644,7 @@ function copyText(text, field) {
 	&__row {
 		background: #fff;
 		border-radius: 20px;
-		border: 2px solid $orangeColor;
+		border: 1.5px solid $orangeColor;
 		padding: toRem(14) toRem(22);
 		display: flex;
 		align-items: center;

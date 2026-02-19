@@ -92,6 +92,9 @@ export default {
 		footerLinks: "Links",
 		bankCardName: "Արի Պարի ՀԿ",
 		bankCardSupportText: "To Support Us (Acba Bank):",
+		shareBtn: "Share",
+		shareBtnCopy: "Link copied",
+		danceParametres: "Parametres",
 	},
 	ru: {
 		homePageMenuItem: "Главная",
@@ -186,6 +189,9 @@ export default {
 		footerLinks: "Ссылки",
 		bankCardName: "Արի Պարի ՀԿ",
 		bankCardSupportText: "Для поддержки (Акба Банк):",
+		shareBtn: "Поделиться",
+		shareBtnCopy: "Ссылка скопирована",
+		danceParametres: "Параметры",
 	},
 	hy: {
 		homePageMenuItem: "Գլխավոր",
@@ -280,5 +286,8 @@ export default {
 		bankCardSupportText: "Աջակցելու համար (Ակբա բանկ)՝",
 		footerContacts: "Կոնտակտներ",
 		footerLinks: "Հղումներ",
+		shareBtn: "Կիսվել",
+		shareBtnCopy: "Հղումը պատճենված է",
+		danceParametres: "Ընտրանքներ",
 	}
 }

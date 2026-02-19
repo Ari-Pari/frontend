@@ -1,16 +1,8 @@
 <script setup>
-import { ref, useTemplateRef, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import DancesForm from "@/components/DancesForm.vue"
-
+import { scrollToBlock } from "@/services/utils";
 const { t, locale } = useI18n()
-
-const scrollToDance = () => {
-	requestAnimationFrame(() => {
-		document.getElementById('dancesBlock')
-			?.scrollIntoView({ behavior: 'smooth' })
-	})
-}
 </script>
 
 <template>
@@ -22,7 +14,8 @@ const scrollToDance = () => {
 				</div>
 				<div class="first-screen__descr">{{ t('homeMainText') }}</div>
 			</div>
-			<button type="button" @click='scrollToDance' class="first-screen__button button">{{ t('findDance')}}</button>
+			<button type="button" @click="scrollToBlock('dancesBlock')" class="first-screen__button button">{{
+				t('findDance') }}</button>
 		</div>
 	</section>
 	<div class="quote-block">
@@ -85,6 +78,7 @@ const scrollToDance = () => {
 
 		img {
 			max-width: 100%;
+
 		}
 	}
 
@@ -173,6 +167,17 @@ const scrollToDance = () => {
 		img {
 			max-width: 100%;
 			max-height: 100%;
+			animation: rotateSun 25s linear infinite;
+		}
+	}
+
+	@keyframes rotateSun {
+		from {
+			transform: rotate(0deg);
+		}
+
+		to {
+			transform: rotate(360deg);
 		}
 	}
 

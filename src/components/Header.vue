@@ -4,7 +4,6 @@ import { useI18n } from "vue-i18n"
 import { useRouter, useRoute } from 'vue-router'
 import { headerScroll, menuInit, menuClose } from "@/services/utils"
 
-const router = useRouter()
 const route = useRoute()
 const { t, locale } = useI18n()
 
@@ -84,10 +83,6 @@ watch(route, () => {
 	left: 0;
 	transition: all 0.5s;
 
-	@media (max-width:$pc) {
-		padding: 0 toRem(16);
-	}
-
 	@media (max-width:$tablet) {
 		top: 16px;
 	}
@@ -104,11 +99,7 @@ watch(route, () => {
 		top: 16px;
 	}
 
-	&__container {
-		background-color: #fff;
-		border: 1.51px solid #eaeaea;
-		border-radius: 60px;
-	}
+	&__container {}
 }
 
 .menu {
@@ -116,6 +107,10 @@ watch(route, () => {
 	align-items: center;
 	justify-content: space-between;
 	max-height: 82px;
+	background-color: #fff;
+	border: 1.51px solid #eaeaea;
+	border-radius: 60px;
+	padding-right: toRem(24);
 
 	&__left {
 		display: flex;
