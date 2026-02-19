@@ -13,7 +13,11 @@ const { currentTrack,
 	togglePlay,
 	showPlaylist,
 	nextTrack,
-	prevTrack } = usePlayer();
+	prevTrack,
+	updateDuration,
+	updateCurrentTime,
+	currentTime,
+	duration } = usePlayer();
 
 watch(currentTrack, async (newTrack) => {
 	if (isPlaying.value) {
@@ -33,12 +37,28 @@ watch(isPlaying, (shouldPlay) => {
 		audioPlayerRef.value.pause();
 	}
 });
+watch(currentTime, (newTime) => {
+	if (audioPlayerRef.value) {
+		const diff = Math.abs(audioPlayerRef.value.currentTime - newTime);
+		if (diff > 0.5) {
+			audioPlayerRef.value.currentTime = newTime;
+		}
+	}
+});
+const onMetadataLoaded = () => {
+	updateDuration(audioPlayerRef.value.duration);
+};
 
+const onTimeUpdate = () => {
+	updateCurrentTime(audioPlayerRef.value.currentTime);
+};
 </script>
 
 <template>
 	<audio ref="audio-player" class="audio-player" controls :class="route.meta.playerStyle" @play="togglePlay(true)"
-		@pause="togglePlay(false)" @ended="nextTrack" :src="currentTrack?.link"></audio>
+		@pause="togglePlay(false)" @ended="nextTrack" @loadedmetadata="onMetadataLoaded" @timeupdate="onTimeUpdate"
+		:src="currentTrack?.link">
+	</audio>
 </template>
 
 <style lang="scss" scoped>
@@ -49,8 +69,5 @@ watch(isPlaying, (shouldPlay) => {
 }
 
 .dance-page-audio-player {
-	position: absolute;
-	top: 520px;
-	right: 16px;
 }
 </style>

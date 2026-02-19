@@ -3,26 +3,24 @@ import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { DanceService } from "@/services/api"
 import { useApi } from "@/composables/useApi"
-import { usePlayer } from '@/composables/usePlayer';
 import { useClipboard } from "@/composables/useClipboard";
 import { getYoutubeId } from '@/services/utils'
 import LiteYouTubeEmbed from 'vue-lite-youtube-embed'
 import 'vue-lite-youtube-embed/style.css'
+import AudioPlayerControls from "@/components/AudioPlayerControls.vue";
+import { usePlayer } from '@/composables/usePlayer';
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/css';
 
+const modules = [Navigation, Pagination, Scrollbar, A11y];
 const props = defineProps({ id: String })
 const { t, locale } = useI18n()
 const { data: dance, loading, error, execute: fetchDance } = useApi(DanceService.getDance)
-const { currentTrack,
-	playlist,
-	isPlaying,
-	setTrack,
-	setPlaylist,
-	togglePlay,
-	showPlaylist,
-	nextTrack,
-	prevTrack } = usePlayer();
 const { copiedField, copyText } = useClipboard()
+const { setPlaylist, showPlaylist } = usePlayer();
 const fullUrl = ref('')
+
 // Fetch data on loading
 onMounted(() => {
 	fetchDance(props.id, locale.value)
@@ -32,7 +30,7 @@ onMounted(() => {
 watch(dance, (newDanceValue) => {
 	if (newDanceValue && newDanceValue.songs) {
 		setPlaylist(newDanceValue.songs)
-		showPlaylist()
+		showPlaylist() // console log songs
 	}
 })
 // Fetch data on langyage change
@@ -59,103 +57,131 @@ watch(() => props.id, (id) => {
 				<div class="skeleton__descr skeleton-anim"></div>
 			</div>
 			<div class="dance__body" v-else>
-				<section class="dance-top">
-					<div class="dance-top__left">
-						<div class="dance-top__left-inner">
-							<div v-if="dance?.regions" class="dance-top__categories">
-								<div v-for="region in dance?.regions" :key="region?.id" class="dance-top__category">{{
-									region?.name
-								}}</div>
+				<div class="dance__inner">
+					<section class="dance-top dance-card-template">
+						<div class="dance-top__left">
+							<div class="dance-top__left-inner">
+								<div v-if="dance?.regions" class="dance-top__categories">
+									<div v-for="region in dance?.regions" :key="region?.id" class="dance-top__category">{{
+										region?.name
+									}}</div>
+								</div>
+								<h1 class="dance-top__title">{{ dance?.name }}</h1>
+								<button @click="copyText(fullUrl, 'share')" class="dance-top__copy-button button">
+									{{ copiedField === 'share' ? t('shareBtnCopy') : t('shareBtn') }}
+								</button>
 							</div>
-							<h1 class="dance-top__title">{{ dance?.name }}</h1>
-							<button @click="copyText(fullUrl, 'share')" class="dance-top__copy-button button">
-								{{ copiedField === 'share' ? t('shareBtnCopy') : t('shareBtn') }}
-							</button>
 						</div>
-					</div>
-					<div class="dance-top__image">
-						<img :src="dance?.photo_link" alt="Dance image">
-					</div>
-				</section>
-				<section class="dance-parametres">
-					<h2 class="dance-parametres__title">{{ t('danceParametres') }}</h2>
-					<ul class="dance-parametres__list">
-						<li class="dance-parametres__item">{{ t('genre') }}:
-							<span>{{ dance?.genres.join(', ').toLowerCase() }}</span>
-						</li>
-						<li class="dance-parametres__item">{{ t('complexity') }}:
-							<span>{{ dance?.complexity.join(', ').toLowerCase() }}</span>
-						</li>
-						<li class="dance-parametres__item">{{ t('tempo') }}:
-							<span>{{ dance?.paces.join(', ').toLowerCase() }}</span>
-						</li>
-						<li class="dance-parametres__item">{{ t('gender') }}:
-							<span>{{ dance?.gender.join(', ').toLowerCase() }}</span>
-						</li>
-						<li class="dance-parametres__item">{{ t('handshakes') }}:
-							<span>{{ dance?.handshakes.join(', ').toLowerCase() }}</span>
-						</li>
-					</ul>
-				</section>
-				<div class="dance-audio">
-					<div class="dance-audio__player">
-						<div class="controls">
-							<button @click="prevTrack">⏮</button>
-							<button @click="togglePlay(!isPlaying)">
-								{{ isPlaying ? 'Pause' : 'Play' }}
-							</button>
-							<button @click="nextTrack">⏭</button>
+						<div class="dance-top__image">
+							<img :src="dance?.photo_link" alt="Dance image">
 						</div>
-						<div class="dance-audio__info">
-							<div class="dance-audio__title">{{ currentTrack?.name }}</div>
-							<div class="dance-audio__singer">{{ currentTrack?.ensembles[0].name }}</div>
-						</div>
+					</section>
+					<section class="dance-parametres dance-card-template">
+						<h2 class="dance-parametres__title">{{ t('danceParametres') }}</h2>
+						<ul class="dance-parametres__list">
+							<li class="dance-parametres__item">{{ t('genre') }}:
+								<span>{{ dance?.genres.join(', ').toLowerCase() }}</span>
+							</li>
+							<li class="dance-parametres__item">{{ t('complexity') }}:
+								<span>{{ dance?.complexity.join(', ').toLowerCase() }}</span>
+							</li>
+							<li class="dance-parametres__item">{{ t('tempo') }}:
+								<span>{{ dance?.paces.join(', ').toLowerCase() }}</span>
+							</li>
+							<li class="dance-parametres__item">{{ t('gender') }}:
+								<span>{{ dance?.gender.join(', ').toLowerCase() }}</span>
+							</li>
+							<li class="dance-parametres__item">{{ t('handshakes') }}:
+								<span>{{ dance?.handshakes.join(', ').toLowerCase() }}</span>
+							</li>
+						</ul>
+					</section>
+					<div class="dance-audio dance-card-template">
+						<AudioPlayerControls />
 					</div>
 				</div>
-				<ul style="margin-top: 100px; border-top: 2px solid #000; padding-top: 20px;">
-					<template v-if="dance?.sourceVideos">
-						<template v-for="sourceVideo in dance?.sourceVideos" :key="sourceVideo?.id">
-							<LiteYouTubeEmbed :id="getYoutubeId(sourceVideo.link)" :title="sourceVideo.name" />
-						</template>
-					</template>
-					<li>{{ dance?.id }}</li>
-					<li>{{ dance?.complexity.join(', ') }}</li>
-					<li>{{ dance?.name }}</li>
-					<li>{{ dance?.photo_link }}</li>
-					<li>{{ dance?.gender.join(', ') }}</li>
-					<li>{{ dance?.paces.join(', ') }}</li>
-					<li>{{ dance?.genres.join(', ') }}</li>
-					<li>{{ dance?.handshakes.join(', ') }}</li>
-					<li v-for="song in dance?.songs" :key="song?.id">{{ song }}</li>
-					<li v-for="sourceVideo in dance?.sourceVideos" :key="sourceVideo?.id">{{ sourceVideo }}</li>
-					<li v-for="performanceVideo in dance?.performanceVideos" :key="performanceVideo?.id">{{ performanceVideo
-					}}</li>
-					<li v-for="lessonVideo in dance?.lessonVideos" :key="lessonVideo?.id">{{ lessonVideo }}</li>
-				</ul>
+				<div class="dance-video">
+					<swiper :modules="modules" :slides-per-view="1" :space-between="20" navigation
+						:pagination="{ clickable: true }">
+						<swiper-slide class="dance-video__slide">
+							<template v-if="dance?.sourceVideos">
+								<template v-for="sourceVideo in dance?.sourceVideos" :key="sourceVideo?.id">
+									<div class="dance-video__iframe">
+										<LiteYouTubeEmbed :id="getYoutubeId(sourceVideo.link)" :title="sourceVideo.name" />
+									</div>
+									<div class="dance-video__title">{{ sourceVideo.name }}</div>
+								</template>
+							</template>
+						</swiper-slide>
+						<swiper-slide class="dance-video__slide">
+							<template v-if="dance?.performanceVideos">
+								<template v-for="performanceVideo in dance?.performanceVideos" :key="performanceVideo?.id">
+									<div class="dance-video__iframe">
+										<LiteYouTubeEmbed :id="getYoutubeId(performanceVideo.link)"
+											:title="performanceVideo.name" />
+									</div>
+									<div class="dance-video__title">{{ performanceVideo.name }}</div>
+								</template>
+							</template>
+						</swiper-slide>
+						<swiper-slide class="dance-video__slide">
+							<template v-if="dance?.lessonVideos">
+								<template v-for="lessonVideo in dance?.lessonVideos" :key="lessonVideo?.id">
+									<div class="dance-video__iframe">
+										<LiteYouTubeEmbed :id="getYoutubeId(lessonVideo.link)" :title="lessonVideo.name" />
+									</div>
+									<div class="dance-video__title">{{ lessonVideo.name }}</div>
+								</template>
+							</template>
+						</swiper-slide>
+					</swiper>
+				</div>
 			</div>
 		</div>
 	</section>
 </template>
 
 <style lang="scss" scoped>
-.dance {
-	padding: toRem(137) 0 toRem(80);
-
-	&__body {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-	}
-}
-
-.dance-top {
-	margin-bottom: toRem(20);
+.dance-card-template {
 	border-radius: 20px;
 	border: 2px solid $orangeColor;
 	background: #fff;
 	padding: toRem(32);
-	grid-column: span 2 / span 2;
+
+	@media (max-width:$mobile) {
+		padding: toRem(20) toRem(16);
+	}
+}
+
+.dance {
+	padding: toRem(137) 0 toRem(80);
+
+	&__body {}
+
+	&__inner {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: toRem(20);
+
+		@media (max-width:$mobile) {
+			grid-template-columns: 1fr;
+		}
+	}
+}
+
+.dance-top {
 	display: flex;
 	max-width: 76%;
+
+	@media (min-width:$mobile) {
+		grid-column: span 2 / span 2;
+	}
+
+	@media (max-width:$mobile) {
+		flex-direction: column;
+		max-width: 100%;
+		margin-bottom: toRem(70);
+	}
 
 	&__left {
 		flex: 1 1 auto;
@@ -168,6 +194,10 @@ watch(() => props.id, (id) => {
 		align-items: flex-start;
 		max-width: toRem(600);
 		height: 100%;
+
+		@media (max-width:$mobile) {
+			max-width: 100%;
+		}
 	}
 
 	&__categories {
@@ -175,6 +205,14 @@ watch(() => props.id, (id) => {
 		display: flex;
 		flex-wrap: wrap;
 		gap: toRem(15);
+
+		@media (max-width:$tablet) {
+			margin-bottom: toRem(30);
+		}
+
+		@media (max-width:$mobileSmall) {
+			margin-bottom: toRem(20);
+		}
 	}
 
 	&__category {
@@ -196,6 +234,20 @@ watch(() => props.id, (id) => {
 		line-height: 105%;
 		color: #1a1a1a;
 		margin-bottom: toRem(40);
+
+		@media (max-width:$tablet) {
+			font-size: toRem(50);
+			margin-bottom: toRem(30);
+		}
+
+		@media (max-width:$mobile) {
+			font-size: toRem(40);
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(30);
+			margin-bottom: toRem(20);
+		}
 	}
 
 	&__image {
@@ -205,24 +257,40 @@ watch(() => props.id, (id) => {
 		border-radius: 20px;
 		overflow: hidden;
 		margin-right: -39%;
+		margin-left: 20px;
 
 		img {
 			width: 100%;
 			height: 100%;
 			object-fit: cover;
 		}
+
+		@media (max-width:$tablet) {
+			flex: 0 0 70%;
+		}
+
+		@media (max-width:$mobile) {
+			flex: 0 1 auto;
+			margin: 30px 0 -100px 0;
+			align-self: stretch;
+		}
+
+		@media (max-width:$mobileSmall) {
+			margin-top: toRem(20);
+		}
 	}
 
 	&__copy-button {
 		width: auto;
 		min-width: toRem(250);
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(16);
+		}
 	}
 }
 
 .dance-parametres {
-	margin-bottom: toRem(50);
-	border-radius: 20px;
-	border: 2px solid $orangeColor;
 	padding: toRem(16) toRem(32);
 	min-height: toRem(300);
 	background: url('@/assets/dance/decor-1.svg') center/cover no-repeat, #fff;
@@ -235,6 +303,19 @@ watch(() => props.id, (id) => {
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		margin-bottom: toRem(30);
+
+		@media (max-width:$tablet) {
+			font-size: toRem(46);
+			margin-bottom: toRem(20);
+		}
+
+		@media (max-width:$mobile) {
+			font-size: toRem(36);
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(26);
+		}
 	}
 
 	&__list {
@@ -253,8 +334,39 @@ watch(() => props.id, (id) => {
 		font-weight: 600;
 		line-height: 1.3;
 
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(16);
+		}
+
 		span {
 			font-weight: 500;
+		}
+	}
+}
+
+.dance-video {
+	position: relative;
+	margin-top: toRem(50);
+	padding: 0;
+
+	&__slide {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__iframe {
+		border-radius: 20px !important;
+		overflow: hidden;
+	}
+
+	&__title {
+		font-size: toRem(22);
+		color: #1b1919;
+		margin-top: toRem(10);
+		padding-bottom: toRem(30);
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(18);
 		}
 	}
 }
@@ -322,18 +434,89 @@ watch(() => props.id, (id) => {
 		}
 	}
 }
+</style>
 
-@keyframes skeleton-loading {
-	0% {
-		background-color: #eee;
+<!-- styles for swiper without scope-->
+<style lang="scss">
+.swiper {
+	position: static;
+}
+
+.swiper-button-prev {
+	left: 0;
+
+	svg {
+		transform: rotate(-180deg) !important;
+	}
+}
+
+.swiper-button-next {
+	right: 0;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+	z-index: 2;
+	position: absolute;
+	bottom: 0;
+	border-radius: 50%;
+	background-color: $orangeColor;
+	width: toRem(40);
+	height: toRem(40);
+	display: inline-flex;
+	cursor: pointer;
+	justify-content: center;
+	align-items: center;
+	transition: all 0.3s;
+
+	svg {
+		width: toRem(13);
+		height: toRem(22);
+
+		path {
+			fill: #fff;
+			transition: all 0.3s;
+		}
 	}
 
-	50% {
-		background-color: #ddd;
+	@media (any-hover: hover) {
+		&:hover {
+			background-color: $orangeHoverColor;
+		}
 	}
+}
 
-	100% {
-		background-color: #eee;
+.swiper-button-disabled {
+	cursor: default;
+	opacity: 0.7;
+
+	@media (any-hover: hover) {
+		&:hover {
+			background-color: $orangeColor;
+		}
 	}
+}
+
+.swiper-pagination {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: toRem(5);
+	margin-bottom: toRem(15);
+}
+
+.swiper-pagination-bullet {
+	width: toRem(12);
+	cursor: pointer;
+	height: toRem(12);
+	border-radius: 50%;
+	border: 1px solid $orangeColor;
+	background-color: #fff;
+	transition: all 0.3s;
+}
+
+.swiper-pagination-bullet-active {
+	background-color: $orangeColor;
 }
 </style>

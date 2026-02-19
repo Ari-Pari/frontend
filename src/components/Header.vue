@@ -3,7 +3,7 @@ import { ref, watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRouter, useRoute } from 'vue-router'
 import { headerScroll, menuInit, menuClose } from "@/services/utils"
-
+import AudioPlayerControls from "./AudioPlayerControls.vue"
 const route = useRoute()
 const { t, locale } = useI18n()
 
@@ -53,6 +53,7 @@ watch(route, () => {
 							<RouterLink class="menu__link" to="/about"> {{ t('aboutPageMenuItem') }} </RouterLink>
 						</li>
 					</ul>
+					<AudioPlayerControls />
 					<div class="menu__actions">
 						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')"
 							:title="t('searchAriaLabel')" class="menu__search-icon"></RouterLink>

@@ -5,12 +5,16 @@ const state = reactive({
 	playlist: [],
 	globalPlaylist: [],
 	isPlaying: false,
+	duration: 0,
+	currentTime: 0,
 })
 
 export function usePlayer() {
 	const currentTrack = computed(() => state.currentTrack)
 	const playlist = computed(() => state.playlist)
 	const isPlaying = computed(() => state.isPlaying)
+	const duration = computed(() => state.duration);
+	const currentTime = computed(() => state.currentTime);
 
 	const setTrack = (song) => {
 		state.currentTrack = song.link
@@ -44,7 +48,15 @@ export function usePlayer() {
 	const showPlaylist = () => {
 		console.log("Playlist:", state.playlist)
 	}
-
+	const seekTime = (time) => {
+		state.currentTime = time
+	}
+	const updateDuration = (time) => {
+		state.duration = time
+	}
+	const updateCurrentTime = (time) => {
+		state.currentTime = time
+	}
 	return {
 		currentTrack,
 		playlist,
@@ -54,6 +66,11 @@ export function usePlayer() {
 		togglePlay,
 		showPlaylist,
 		nextTrack,
-		prevTrack
+		prevTrack,
+		duration,
+		currentTime,
+		seekTime,
+		updateDuration, 
+		updateCurrentTime
 	};
 }

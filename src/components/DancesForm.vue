@@ -1225,18 +1225,4 @@ watch(searchDancesBodyParams, (newParams) => {
 		}
 	}
 }
-
-@keyframes skeleton-loading {
-	0% {
-		background-color: #eee;
-	}
-
-	50% {
-		background-color: #ddd;
-	}
-
-	100% {
-		background-color: #eee;
-	}
-}
 </style>
