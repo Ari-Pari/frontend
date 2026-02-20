@@ -41,6 +41,7 @@ watch(route, () => {
 					<RouterLink to="/about#supportBlock" class="menu__left-button button">
 						{{ t('supportButton') }}
 					</RouterLink>
+					<AudioPlayerControls />
 				</div>
 				<button type="button" :title="t('menuIconSearchAriaLabel')" :aria-label="t('menuIconSearchAriaLabel')"
 					@click="menuInit" class="menu__icon icon-menu"><span></span></button>
@@ -53,7 +54,6 @@ watch(route, () => {
 							<RouterLink class="menu__link" to="/about"> {{ t('aboutPageMenuItem') }} </RouterLink>
 						</li>
 					</ul>
-					<AudioPlayerControls />
 					<div class="menu__actions">
 						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')"
 							:title="t('searchAriaLabel')" class="menu__search-icon"></RouterLink>

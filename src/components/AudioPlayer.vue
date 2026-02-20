@@ -6,18 +6,12 @@ import { useRoute } from "vue-router"
 const audioPlayerRef = useTemplateRef('audio-player')
 const route = useRoute()
 const { currentTrack,
-	playlist,
 	isPlaying,
-	setTrack,
-	setPlaylist,
 	togglePlay,
-	showPlaylist,
 	nextTrack,
-	prevTrack,
 	updateDuration,
 	updateCurrentTime,
-	currentTime,
-	duration } = usePlayer();
+	currentTime } = usePlayer();
 
 watch(currentTrack, async (newTrack) => {
 	if (isPlaying.value) {
@@ -55,19 +49,21 @@ const onTimeUpdate = () => {
 </script>
 
 <template>
-	<audio ref="audio-player" class="audio-player" controls :class="route.meta.playerStyle" @play="togglePlay(true)"
-		@pause="togglePlay(false)" @ended="nextTrack" @loadedmetadata="onMetadataLoaded" @timeupdate="onTimeUpdate"
-		:src="currentTrack?.link">
+	<audio ref="audio-player" aria-hidden="true" tabindex="-1" class="audio-player" :class="route.meta.playerStyle"
+		@play="togglePlay(true)" @pause="togglePlay(false)" @ended="nextTrack" @loadedmetadata="onMetadataLoaded"
+		@timeupdate="onTimeUpdate" :src="currentTrack?.link">
 	</audio>
 </template>
 
 <style lang="scss" scoped>
 .audio-player {
 	position: absolute;
-	// opacity: 0;
-	// visibility: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+	opacity: 0;
+	pointer-events: none;
 }
 
-.dance-page-audio-player {
-}
+.dance-page-audio-player {}
 </style>

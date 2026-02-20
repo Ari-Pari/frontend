@@ -9,16 +9,23 @@ import LiteYouTubeEmbed from 'vue-lite-youtube-embed'
 import 'vue-lite-youtube-embed/style.css'
 import AudioPlayerControls from "@/components/AudioPlayerControls.vue";
 import { usePlayer } from '@/composables/usePlayer';
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import { Navigation, A11y } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import { formatTime } from "@/services/utils";
 import 'swiper/css';
 
-const modules = [Navigation, Pagination, Scrollbar, A11y];
+const modules = [Navigation, A11y];
 const props = defineProps({ id: String })
 const { t, locale } = useI18n()
 const { data: dance, loading, error, execute: fetchDance } = useApi(DanceService.getDance)
 const { copiedField, copyText } = useClipboard()
-const { setPlaylist, showPlaylist } = usePlayer();
+const { currentTrack,
+	isPlaying,
+	handleTrackClick,
+	playlist,
+	setPlaylist,
+	showPlaylist,
+	duration } = usePlayer();
 const fullUrl = ref('')
 
 // Fetch data on loading
@@ -96,13 +103,31 @@ watch(() => props.id, (id) => {
 							</li>
 						</ul>
 					</section>
-					<div class="dance-audio dance-card-template">
+					<div class="dance-audio">
 						<AudioPlayerControls />
+						<div v-if="playlist.length > 0" class="dance-audio__list">
+							<div v-for="track in playlist" :key="track?.id" class="dance-audio__list-item"
+								:class="{ active: currentTrack?.id === track.id }">
+								<button type="button" class="dance-audio__play-button" @click="handleTrackClick(track)">
+									<img v-if="currentTrack?.id === track.id && isPlaying" src="@/assets/icons/pause.svg"
+										alt="Pause icon">
+									<img v-else src="@/assets/icons/play.svg" class="" alt="Play icon">
+								</button>
+								<div class="dance-audio__info">
+									<span class="dance-audio__title">{{ track?.name }}</span>
+									<a class="dance-audio__author" :href="track?.ensembles[0]?.link">{{ track?.ensembles[0]?.name
+									}}</a>
+								</div>
+								<!-- <div class="dance-audio__duration">{{ formatTime(duration) }}</div> -->
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="dance-video">
-					<swiper :modules="modules" :slides-per-view="1" :space-between="20" navigation
-						:pagination="{ clickable: true }">
+					<swiper :modules="modules" :breakpoints="{
+						300: { slidesPerView: 1 },
+						991.98: { slidesPerView: 1.7 }
+					}" :space-between="20" navigation>
 						<swiper-slide class="dance-video__slide">
 							<template v-if="dance?.sourceVideos">
 								<template v-for="sourceVideo in dance?.sourceVideos" :key="sourceVideo?.id">
@@ -160,7 +185,7 @@ watch(() => props.id, (id) => {
 
 	&__inner {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: 1.45fr 1fr;
 		gap: toRem(20);
 
 		@media (max-width:$mobile) {
@@ -252,12 +277,17 @@ watch(() => props.id, (id) => {
 
 	&__image {
 		align-self: center;
-		flex: 0 0 58.5%;
+		flex: 0 0 56.5%;
 		max-height: toRem(294);
 		border-radius: 20px;
 		overflow: hidden;
-		margin-right: -39%;
+		margin-right: -37%;
 		margin-left: 20px;
+
+		@media (max-width:$pc) {
+			margin-right: -39%;
+			flex: 0 0 58.5%;
+		}
 
 		img {
 			width: 100%;
@@ -297,24 +327,25 @@ watch(() => props.id, (id) => {
 
 	&__title {
 		font-weight: 500;
-		font-size: toRem(60);
+		font-size: toRem(50);
 		background: linear-gradient(90deg, #fcb62a 0%, #f26924 100%);
 		background-clip: text;
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
-		margin-bottom: toRem(30);
+		margin-bottom: toRem(25);
+		line-height: 1.2;
 
 		@media (max-width:$tablet) {
-			font-size: toRem(46);
-			margin-bottom: toRem(20);
+			font-size: toRem(40);
+			margin-bottom: toRem(15);
 		}
 
 		@media (max-width:$mobile) {
-			font-size: toRem(36);
+			font-size: toRem(30);
 		}
 
 		@media (max-width:$mobileSmall) {
-			font-size: toRem(26);
+			font-size: toRem(22);
 		}
 	}
 
@@ -363,10 +394,84 @@ watch(() => props.id, (id) => {
 		font-size: toRem(22);
 		color: #1b1919;
 		margin-top: toRem(10);
-		padding-bottom: toRem(30);
 
 		@media (max-width:$mobileSmall) {
 			font-size: toRem(18);
+		}
+	}
+}
+
+.dance-audio {
+	&__list {
+		margin-top: toRem(20);
+		@media (min-width:$mobile) {
+			max-height: toRem(280);
+			overflow-y: auto;
+		}
+	}
+
+	&__list-item {
+		padding: toRem(12);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	&__info {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		margin-left: toRem(10);
+	}
+
+	&__title {
+		font-size: toRem(14);
+		color: #000;
+		line-height: 1.15;
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(14);
+		}
+
+		.active & {
+			color: $orangeColor;
+		}
+	}
+
+	&__author {
+		font-size: toRem(12);
+		color: #989898;
+
+		@media (any-hover: hover) {
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(12);
+		}
+	}
+
+	&__duration {
+		font-size: toRem(12);
+		color: #989898;
+	}
+
+	&__play-button {
+		width: toRem(25);
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+
+		@media (max-width:$mobileSmall) {
+			width: toRem(20);
+
+			img {
+				width: toRem(15);
+				height: toRem(15);
+			}
 		}
 	}
 }
@@ -442,6 +547,10 @@ watch(() => props.id, (id) => {
 	position: static;
 }
 
+.swiper-wrapper {
+	margin-bottom: toRem(50);
+}
+
 .swiper-button-prev {
 	left: 0;
 
@@ -497,26 +606,25 @@ watch(() => props.id, (id) => {
 	}
 }
 
-.swiper-pagination {
-	display: flex;
-	justify-content: center;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: toRem(5);
-	margin-bottom: toRem(15);
-}
+// .swiper-pagination {
+// 	display: flex;
+// 	justify-content: center;
+// 	flex-wrap: wrap;
+// 	align-items: center;
+// 	gap: toRem(5);
+// 	margin-bottom: toRem(15);
+// }
 
-.swiper-pagination-bullet {
-	width: toRem(12);
-	cursor: pointer;
-	height: toRem(12);
-	border-radius: 50%;
-	border: 1px solid $orangeColor;
-	background-color: #fff;
-	transition: all 0.3s;
-}
+// .swiper-pagination-bullet {
+// 	width: toRem(12);
+// 	cursor: pointer;
+// 	height: toRem(12);
+// 	border-radius: 50%;
+// 	border: 1px solid $orangeColor;
+// 	background-color: #fff;
+// 	transition: all 0.3s;
+// }
 
-.swiper-pagination-bullet-active {
-	background-color: $orangeColor;
-}
-</style>
+// .swiper-pagination-bullet-active {
+// 	background-color: $orangeColor;
+// }</style>

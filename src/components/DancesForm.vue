@@ -250,6 +250,11 @@ watch(searchDancesBodyParams, (newParams) => {
 										<span>{{ region?.name }}</span>
 									</label>
 								</template>
+								<div v-else class="skeleton">
+									<div class="skeleton__region-title skeleton-anim"></div>
+									<div class="skeleton__region-title skeleton-anim"></div>
+									<div class="skeleton__region-title skeleton-anim"></div>
+								</div>
 							</div>
 						</details>
 						<details class="dances-filters__checkboxes-group">
@@ -1214,6 +1219,12 @@ watch(searchDancesBodyParams, (newParams) => {
 		@media (max-width:$mobileSmall) {
 			height: 20px;
 		}
+	}
+
+	&__region-title {
+		width: 100%;
+		height: 15px;
+		margin-bottom: toRem(10);
 	}
 
 	&__descr {

@@ -16,8 +16,16 @@ export function usePlayer() {
 	const duration = computed(() => state.duration);
 	const currentTime = computed(() => state.currentTime);
 
-	const setTrack = (song) => {
-		state.currentTrack = song.link
+	const setTrack = (track) => {
+		state.currentTrack = track
+		state.isPlaying = true
+	}
+	const handleTrackClick = (track) => {
+		if (state.currentTrack.id === track.id) {
+			state.isPlaying = !state.isPlaying
+		} else {
+			setTrack(track)
+		}
 	}
 	const setPlaylist = (tracks) => {
 		state.playlist = tracks
@@ -62,6 +70,7 @@ export function usePlayer() {
 		playlist,
 		isPlaying,
 		setTrack,
+		handleTrackClick,
 		setPlaylist,
 		togglePlay,
 		showPlaylist,
@@ -70,7 +79,7 @@ export function usePlayer() {
 		duration,
 		currentTime,
 		seekTime,
-		updateDuration, 
+		updateDuration,
 		updateCurrentTime
 	};
 }
