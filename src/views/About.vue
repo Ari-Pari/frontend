@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from "vue";
 import { useI18n } from "vue-i18n"
-const { t, locale } = useI18n()
 import { useClipboard } from "@/composables/useClipboard"
+
+const { t } = useI18n()
 const { copiedField, copyText } = useClipboard()
 </script>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, nextTick, useTemplateRef, onMounted } from 'vue';
+import { watch, nextTick, useTemplateRef } from 'vue';
 import { usePlayer } from '@/composables/usePlayer';
 import { useRoute } from "vue-router"
 
@@ -13,6 +13,7 @@ const { currentTrack,
 	updateCurrentTime,
 	currentTime } = usePlayer();
 
+// Playing track on change
 watch(currentTrack, async (newTrack) => {
 	if (isPlaying.value) {
 		if (!newTrack) return;
@@ -42,7 +43,6 @@ watch(currentTime, (newTime) => {
 const onMetadataLoaded = () => {
 	updateDuration(audioPlayerRef.value.duration);
 };
-
 const onTimeUpdate = () => {
 	updateCurrentTime(audioPlayerRef.value.currentTime);
 };

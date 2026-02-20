@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, useTemplateRef, onBeforeUnmount, computed, onUnmounted } from "vue"
+import { ref, watch, onMounted, useTemplateRef, onBeforeUnmount, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { DanceService } from "@/services/api"
 import { refDebounced, useInfiniteScroll } from "@vueuse/core"

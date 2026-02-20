@@ -19,7 +19,7 @@ export async function apiRequest(endpoint, options = {}) {
 
 	if (!response.ok) {
 		// const errorData = await response.json().catch(() => ({}))
-		//throw new Error(`API error: ${response.status}`)
+		// throw new Error(`API error: ${response.status}`)
 	}
 
 	return response.json()

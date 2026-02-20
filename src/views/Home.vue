@@ -1,8 +1,8 @@
 <script setup>
 import { useI18n } from "vue-i18n"
 import DancesForm from "@/components/DancesForm.vue"
-import { scrollToBlock } from "@/services/utils";
-const { t, locale } = useI18n()
+
+const { t } = useI18n()
 </script>
 
 <template>
@@ -14,8 +14,7 @@ const { t, locale } = useI18n()
 				</div>
 				<div class="first-screen__descr">{{ t('homeMainText') }}</div>
 			</div>
-			<button type="button" @click="scrollToBlock('dancesBlock')" class="first-screen__button button">{{
-				t('findDance') }}</button>
+			<RouterLink type="button" to="/#dancesBlock" class="first-screen__button button">{{ t('findDance') }}</RouterLink>
 		</div>
 	</section>
 	<div class="quote-block">

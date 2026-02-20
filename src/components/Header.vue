@@ -1,28 +1,18 @@
 <script setup>
-import { ref, watch, onMounted, computed } from "vue"
+import { watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { headerScroll, menuInit, menuClose } from "@/services/utils"
 import AudioPlayerControls from "./AudioPlayerControls.vue"
+
 const route = useRoute()
 const { t, locale } = useI18n()
-
 const currentLang = computed(() => locale.value)
 
-function scrollToDance() {
-	if (route.name == 'home') {
-		requestAnimationFrame(() => {
-			document.getElementById('dancesBlock')
-				?.scrollIntoView({ behavior: 'smooth' })
-		})
-		menuClose()
-	}
-}
-
 onMounted(() => {
+	// Function add class to hide/show header
 	headerScroll()
 })
-
 watch(locale, (newLocale) => {
 	document.documentElement.setAttribute('lang', newLocale)
 	localStorage.setItem('userLanguage', newLocale)
@@ -55,8 +45,8 @@ watch(route, () => {
 						</li>
 					</ul>
 					<div class="menu__actions">
-						<RouterLink @click="scrollToDance" to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')"
-							:title="t('searchAriaLabel')" class="menu__search-icon"></RouterLink>
+						<RouterLink to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')" :title="t('searchAriaLabel')"
+							class="menu__search-icon"></RouterLink>
 						<div class="menu__languages">
 							<input type="radio" id="lang-arm" class="menu__language-input" value="hy" v-model="locale" />
 							<label for="lang-arm" :class="{ active: currentLang === 'hy' }"

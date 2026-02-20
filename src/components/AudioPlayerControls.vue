@@ -1,11 +1,9 @@
 <script setup>
 import { usePlayer } from '@/composables/usePlayer';
 import { useRoute } from 'vue-router';
-import { useI18n } from 'vue-i18n';
 import { formatTime } from '@/services/utils';
-const route = useRoute()
-const { t, locale } = useI18n()
 
+const route = useRoute()
 const { currentTrack,
 	playlist,
 	isPlaying,
