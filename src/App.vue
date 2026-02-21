@@ -1,7 +1,7 @@
 <script setup>
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
-import AudioPlayer from './components/AudioPlayer.vue'
+import AudioPlayer from './components/audioplayer/AudioPlayer.vue'
 </script>
 
 <template>

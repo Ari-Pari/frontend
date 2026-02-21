@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from "vue-i18n"
-import DancesForm from "@/components/DancesForm.vue"
+import DancesForm from "@/components/dances/DancesCards.vue"
 
 const { t } = useI18n()
 </script>
@@ -14,13 +14,14 @@ const { t } = useI18n()
 				</div>
 				<div class="first-screen__descr">{{ t('homeMainText') }}</div>
 			</div>
-			<RouterLink type="button" to="/#dancesBlock" class="first-screen__button button">{{ t('findDance') }}</RouterLink>
+			<RouterLink type="button" to="/#dancesBlock" class="first-screen__button button">{{ t('findDance') }}
+			</RouterLink>
 		</div>
 	</section>
 	<div class="quote-block">
 		<div class="quote-block__container">
 			<div class="quote-block__image">
-				<img src="@/assets/icons/sun.svg" alt="sun icon">
+				<img src="@/assets/icons/sun.svg" alt="">
 			</div>
 			<div class="quote-block__text">{{ t('quoteBlockText') }}</div>
 		</div>

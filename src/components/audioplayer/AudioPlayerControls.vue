@@ -18,7 +18,7 @@ const { currentTrack,
 </script>
 
 <template>
-	<div v-if="playlist.length > 0" class="audio-player-controls" :class="{ dancePage: route.name == 'dance' }">
+	<div v-if="playlist.length > 0" class="audio-player-controls" :title="currentTrack?.name" :class="{ dancePage: route.name == 'dance' }">
 		<div class="audio-player-controls__top">
 			<div class="audio-player-controls__buttons">
 				<button @click="prevTrack" class="audio-player-controls__change-btn">⏮</button>

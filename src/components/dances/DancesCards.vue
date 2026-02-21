@@ -180,7 +180,7 @@ watch(searchDancesBodyParams, (newParams) => {
 							@click="isFilterOpen = !isFilterOpen" :aria-label="t('filterAriaLabel')"
 							:title="t('filterAriaLabel')" :class="{ open: isFilterOpen }" ref="filterButtonRef">
 							<span v-show="filterCount > 0" class="actions-dances__filter-button-counter">{{ filterCount
-							}}</span>
+								}}</span>
 							<svg width="35" height="30" viewBox="0 0 35 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M1 2.52344H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
 								<path d="M1 14.5234H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
@@ -917,6 +917,8 @@ watch(searchDancesBodyParams, (newParams) => {
 		display: flex;
 		flex-direction: column;
 
+
+
 		@media (max-width:$mobile) {
 			border: 1px solid #d9d9d9;
 			border-radius: 10px;
@@ -934,6 +936,12 @@ watch(searchDancesBodyParams, (newParams) => {
 			white-space: nowrap;
 			line-height: 1.5;
 			transition: all 0.3s;
+
+			&:focus-within {
+				border-radius: 14px;
+				outline-offset: 2px;
+				outline: 2px solid #c83f01;
+			}
 
 			&:not(:last-child) {
 				margin-bottom: toRem(5);

@@ -7,7 +7,7 @@ import { useClipboard } from "@/composables/useClipboard";
 import { getYoutubeId } from '@/services/utils'
 import LiteYouTubeEmbed from 'vue-lite-youtube-embed'
 import 'vue-lite-youtube-embed/style.css'
-import AudioPlayerControls from "@/components/AudioPlayerControls.vue";
+import AudioPlayerControls from "@/components/audioplayer/AudioPlayerControls.vue";
 import { usePlayer } from '@/composables/usePlayer';
 import { Navigation, A11y } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/vue';
@@ -404,6 +404,7 @@ watch(() => props.id, (id) => {
 .dance-audio {
 	&__list {
 		margin-top: toRem(20);
+
 		@media (min-width:$mobile) {
 			max-height: toRem(280);
 			overflow-y: auto;

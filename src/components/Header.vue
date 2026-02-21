@@ -3,7 +3,7 @@ import { watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from 'vue-router'
 import { headerScroll, menuInit, menuClose } from "@/services/utils"
-import AudioPlayerControls from "./AudioPlayerControls.vue"
+import AudioPlayerControls from "./audioplayer/AudioPlayerControls.vue"
 
 const route = useRoute()
 const { t, locale } = useI18n()

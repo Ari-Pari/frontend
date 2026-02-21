@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import DancesForm from '../../components/DancesForm.vue';
+import DancesForm from '../../components/dances/DancesCards.vue';
 import { DanceService } from '@/services/api';
 
 // Мокаем API сервис
