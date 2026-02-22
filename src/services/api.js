@@ -1,7 +1,14 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-export const userMainLanguage = localStorage.getItem('userLanguage')
-	|| (navigator.languages && navigator.languages[0])
-	|| navigator.language || 'hy';
+const supportedLocales = ['en', 'ru', 'hy']
+const browserLang =
+	localStorage.getItem('userLanguage')
+	|| navigator.language
+	|| 'hy'
+const normalizedLang = browserLang.split('-')[0]
+export const userMainLanguage =
+	supportedLocales.includes(normalizedLang)
+		? normalizedLang
+		: 'hy'
 
 export async function apiRequest(endpoint, options = {}) {
 	const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`

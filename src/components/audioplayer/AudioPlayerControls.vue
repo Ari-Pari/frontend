@@ -21,12 +21,12 @@ const { currentTrack,
 	<div v-if="playlist.length > 0" class="audio-player-controls" :title="currentTrack?.name" :class="{ dancePage: route.name == 'dance' }">
 		<div class="audio-player-controls__top">
 			<div class="audio-player-controls__buttons">
-				<button @click="prevTrack" class="audio-player-controls__change-btn">⏮</button>
+				<button @click="prevTrack" class="audio-player-controls__change-btn"><img src="@/assets/icons/prev-track.svg" alt="Prev track icon"></button>
 				<button @click="togglePlay(!isPlaying)" class="audio-player-controls__play-btn">
 					<img v-if="isPlaying" src="@/assets/icons/pause.svg" alt="Pause icon">
 					<img v-else src="@/assets/icons/play.svg" class="audio-player-controls__play-btn--play" alt="Play icon">
 				</button>
-				<button @click="nextTrack" class="audio-player-controls__change-btn">⏭</button>
+				<button @click="nextTrack" class="audio-player-controls__change-btn"><img style="transform: rotate(-180deg);" src="@/assets/icons/prev-track.svg" alt="Next track icon"></button>
 			</div>
 			<div class="audio-player-controls__info">
 				<div class="audio-player-controls__title">{{ currentTrack?.name }}</div>
@@ -138,15 +138,14 @@ const { currentTrack,
 		justify-content: center;
 		align-items: center;
 		gap: toRem(10);
-
-		@media (max-width:$mobileSmall) {
-			gap: toRem(5);
-		}
 	}
 
 	&__change-btn {
-		color: $orangeColor;
-		font-size: toRem(20);
+		padding-top: toRem(4);
+		img{
+			width: toRem(11);
+			height: toRem(13);
+		}
 	}
 
 	&__play-btn {

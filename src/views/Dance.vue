@@ -37,7 +37,6 @@ onMounted(() => {
 watch(dance, (newDanceValue) => {
 	if (newDanceValue && newDanceValue.songs) {
 		setPlaylist(newDanceValue.songs)
-		showPlaylist() // console log songs
 	}
 })
 // Fetch data on langyage change

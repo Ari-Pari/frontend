@@ -19,6 +19,12 @@ export function usePlayer() {
 	const setTrack = (track) => {
 		state.currentTrack = track
 		state.isPlaying = true
+		if ('mediaSession' in navigator) {
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: track.name,
+				artist: track.ensembles[0].name
+			})
+		}
 	}
 	const handleTrackClick = (track) => {
 		if (state.currentTrack.id === track.id) {
@@ -32,6 +38,12 @@ export function usePlayer() {
 		//localStorage.setItem('userPlaylist', JSON.stringify(state.playlist))
 		if (tracks.length > 0) {
 			state.currentTrack = tracks[0]
+			if ('mediaSession' in navigator) {
+				navigator.mediaSession.metadata = new MediaMetadata({
+					title: tracks[0].name,
+					artist: tracks[0].ensembles[0].name
+				})
+			}
 		}
 	}
 	const togglePlay = (status) => {
