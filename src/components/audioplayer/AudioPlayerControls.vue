@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue';
 import { usePlayer } from '@/composables/usePlayer';
 import { useRoute } from 'vue-router';
 import { formatTime } from '@/services/utils';
@@ -7,38 +8,44 @@ const route = useRoute()
 const { currentTrack,
 	playlist,
 	isPlaying,
-	setPlaylist,
 	togglePlay,
-	showPlaylist,
 	nextTrack,
 	prevTrack,
 	currentTime,
-	seekTime,
+	updateCurrentTime,
 	duration } = usePlayer();
 </script>
 
 <template>
-	<div v-if="playlist.length > 0" class="audio-player-controls" :title="currentTrack?.name" :class="{ dancePage: route.name == 'dance' }">
+	<div v-if="playlist.length > 0" class="audio-player-controls" :title="currentTrack?.name"
+		:class="{ dancePage: route.name == 'dance' }">
 		<div class="audio-player-controls__top">
 			<div class="audio-player-controls__buttons">
-				<button @click="prevTrack" class="audio-player-controls__change-btn"><img src="@/assets/icons/prev-track.svg" alt="Prev track icon"></button>
+				<button @click="prevTrack" class="audio-player-controls__change-btn"><img
+						src="@/assets/icons/prev-track.svg" alt="Prev track icon"></button>
 				<button @click="togglePlay(!isPlaying)" class="audio-player-controls__play-btn">
 					<img v-if="isPlaying" src="@/assets/icons/pause.svg" alt="Pause icon">
 					<img v-else src="@/assets/icons/play.svg" class="audio-player-controls__play-btn--play" alt="Play icon">
 				</button>
-				<button @click="nextTrack" class="audio-player-controls__change-btn"><img style="transform: rotate(-180deg);" src="@/assets/icons/prev-track.svg" alt="Next track icon"></button>
+				<button @click="nextTrack" class="audio-player-controls__change-btn"><img
+						style="transform: rotate(-180deg);" src="@/assets/icons/prev-track.svg"
+						alt="Next track icon"></button>
 			</div>
 			<div class="audio-player-controls__info">
 				<div class="audio-player-controls__title">{{ currentTrack?.name }}</div>
-				<a :href="currentTrack?.ensembles[0]?.link" target="_blank" class="audio-player-controls__author">{{
-					currentTrack?.ensembles[0]?.name }}</a>
+
+				<div class="audio-player-controls__authors">
+					<a target="_blank" class="audio-player-controls__author" v-for="ensemble in currentTrack?.ensembles"
+						:key="ensemble?.id" :href="ensemble?.link">
+						{{ ensemble?.name }}</a>
+				</div>
 			</div>
 		</div>
 		<div class="audio-player-controls__bottom">
 			<span class="audio-player-controls__duration">{{ formatTime(currentTime) }}</span>
 			<span class="audio-player-controls__duration--slash">/</span>
 			<input class="audio-player-controls__range" type="range" :min="0" :max="duration" :value="currentTime"
-				@input="(e) => seekTime(Number(e.target.value))" />
+				@input="(e) => updateCurrentTime(Number(e.target.value))" />
 			<span class="audio-player-controls__duration">{{ formatTime(duration) }}</span>
 		</div>
 	</div>
@@ -51,9 +58,9 @@ const { currentTrack,
 	padding: toRem(10) toRem(16) toRem(5);
 	background-color: #fff;
 
-	.header &.dancePage {
-		display: none;
-	}
+	// .header &.dancePage {
+	// 	display: none;
+	// }
 
 	.header & {
 		.audio-player-controls__range {
@@ -142,7 +149,8 @@ const { currentTrack,
 
 	&__change-btn {
 		padding-top: toRem(4);
-		img{
+
+		img {
 			width: toRem(11);
 			height: toRem(13);
 		}
@@ -159,6 +167,11 @@ const { currentTrack,
 
 		img.audio-player-controls__play-btn--play {
 			margin-left: 5px;
+		}
+
+		img {
+			width: toRem(19);
+			height: toRem(22);
 		}
 
 		@media (max-width:$mobileSmall) {
@@ -189,6 +202,12 @@ const { currentTrack,
 		@media (max-width:$mobileSmall) {
 			font-size: toRem(14);
 		}
+	}
+
+	&__authors {
+		display: flex;
+		flex-wrap: wrap;
+		gap: toRem(0) toRem(10);
 	}
 
 	&__author {

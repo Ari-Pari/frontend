@@ -1,5 +1,5 @@
 <script setup>
-import { watch, nextTick, useTemplateRef } from 'vue';
+import { watch, nextTick, useTemplateRef, onMounted } from 'vue';
 import { usePlayer } from '@/composables/usePlayer';
 import { useRoute } from "vue-router"
 
@@ -11,7 +11,7 @@ const { currentTrack,
 	nextTrack,
 	updateDuration,
 	updateCurrentTime,
-	currentTime } = usePlayer();
+	currentTime, showPlaylist } = usePlayer();
 
 // Playing track on change
 watch(currentTrack, async (newTrack) => {
@@ -22,7 +22,11 @@ watch(currentTrack, async (newTrack) => {
 			audioPlayerRef.value.play();
 		}
 	}
+	showPlaylist()
 });
+watch(route, () => {
+	showPlaylist()
+})
 watch(isPlaying, (shouldPlay) => {
 	if (!audioPlayerRef.value) return;
 
@@ -64,6 +68,5 @@ const onTimeUpdate = () => {
 	opacity: 0;
 	pointer-events: none;
 }
-
 .dance-page-audio-player {}
 </style>

@@ -14,7 +14,7 @@ const { t } = useI18n()
 				</div>
 				<div class="first-screen__descr">{{ t('homeMainText') }}</div>
 			</div>
-			<RouterLink type="button" to="/#dancesBlock" class="first-screen__button button">{{ t('findDance') }}
+			<RouterLink type="button" to="/#dances" class="first-screen__button button">{{ t('findDance') }}
 			</RouterLink>
 		</div>
 	</section>

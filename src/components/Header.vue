@@ -27,8 +27,8 @@ watch(route, () => {
 		<div class="header__container">
 			<div class="header__menu menu">
 				<div class="menu__left">
-					<RouterLink to="/" class="menu__logo"><img src="@/assets/AriPari_logo.png" alt="logo"></RouterLink>
-					<RouterLink to="/about#supportBlock" class="menu__left-button button">
+					<RouterLink to="/" class="menu__logo"><img src="@/assets/AriPari_logo.png" alt="AriPari logo"></RouterLink>
+					<RouterLink to="/about#support" class="menu__left-button button">
 						{{ t('supportButton') }}
 					</RouterLink>
 					<AudioPlayerControls />
@@ -45,7 +45,7 @@ watch(route, () => {
 						</li>
 					</ul>
 					<div class="menu__actions">
-						<RouterLink to="/#dancesBlock" v-bind:aria-label="t('searchAriaLabel')" :title="t('searchAriaLabel')"
+						<RouterLink to="/#dances" v-bind:aria-label="t('searchAriaLabel')" :title="t('searchAriaLabel')"
 							class="menu__search-icon"></RouterLink>
 						<div class="menu__languages">
 							<input type="radio" id="lang-arm" class="menu__language-input" value="hy" v-model="locale" />
@@ -244,9 +244,13 @@ watch(route, () => {
 
 	&__language-input {
 		appearance: none;
-		visibility: hidden;
+		pointer-events: none;
 		opacity: 0;
-		position: absolute
+		position: absolute;
+
+		&:focus+.menu__language-label {
+			color: #353535;
+		}
 	}
 
 	&__language-label {

@@ -70,9 +70,20 @@ const { copiedField, copyText } = useClipboard()
 			</div>
 			<section class="about-support">
 				<h2 class="about-support__title about-title">{{ t('aboutText15') }}</h2>
-				<div class="about-support__text" v-html="t('aboutText16')"></div>
+				<i18n-t keypath="aboutText16" tag="div" class="about-support__text">
+					<template #instagram>
+						<a href="https://www.instagram.com/aripari.am" target="_blank" rel="noopener">
+							Instagram
+						</a>
+					</template>
+					<template #telegram>
+						<a href="https://t.me/ariparenq" target="_blank" rel="noopener">
+							Telegram
+						</a>
+					</template>
+				</i18n-t>
 			</section>
-			<section id="supportBlock" class="about-support">
+			<section id="support" class="about-support">
 				<h2 class="about-support__title about-title">{{ t('aboutText17') }}</h2>
 				<div class="about-support__descr">{{ t('aboutText18') }}</div>
 				<div class="about-support__text">{{ t('aboutText19') }}</div>

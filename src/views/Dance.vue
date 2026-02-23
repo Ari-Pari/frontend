@@ -11,8 +11,10 @@ import AudioPlayerControls from "@/components/audioplayer/AudioPlayerControls.vu
 import { usePlayer } from '@/composables/usePlayer';
 import { Navigation, A11y } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import { useRouter } from 'vue-router'
 import { formatTime } from "@/services/utils";
 import 'swiper/css';
+import { defaultDancesParams } from "@/services/api";
 
 const modules = [Navigation, A11y];
 const props = defineProps({ id: String })
@@ -28,6 +30,17 @@ const { currentTrack,
 	duration } = usePlayer();
 const fullUrl = ref('')
 
+const router = useRouter()
+function chooseFilter(item) {
+	const saved = sessionStorage.getItem('dancesFilter')
+	const params = saved ? JSON.parse(saved) : defaultDancesParams
+
+	params.regions = [item.id]
+
+	sessionStorage.setItem('dancesFilter', JSON.stringify(params))
+	router.push({ path: '/', hash: '#dances' })
+
+}
 // Fetch data on loading
 onMounted(() => {
 	fetchDance(props.id, locale.value)
@@ -68,9 +81,10 @@ watch(() => props.id, (id) => {
 						<div class="dance-top__left">
 							<div class="dance-top__left-inner">
 								<div v-if="dance?.regions" class="dance-top__categories">
-									<div v-for="region in dance?.regions" :key="region?.id" class="dance-top__category">{{
-										region?.name
-									}}</div>
+									<button type="button" @click="chooseFilter(region)" v-for="region in dance?.regions"
+										:key="region?.id" class="dance-top__category">{{
+											region?.name
+										}}</button>
 								</div>
 								<h1 class="dance-top__title">{{ dance?.name }}</h1>
 								<button @click="copyText(fullUrl, 'share')" class="dance-top__copy-button button">
@@ -114,8 +128,11 @@ watch(() => props.id, (id) => {
 								</button>
 								<div class="dance-audio__info">
 									<span class="dance-audio__title">{{ track?.name }}</span>
-									<a class="dance-audio__author" :href="track?.ensembles[0]?.link">{{ track?.ensembles[0]?.name
-									}}</a>
+									<div class="dance-audio__authors">
+										<a target="_blank" class="dance-audio__author" v-for="ensemble in track?.ensembles"
+											:key="ensemble?.id" :href="ensemble?.link">
+											{{ ensemble?.name }}</a>
+									</div>
 								</div>
 								<!-- <div class="dance-audio__duration">{{ formatTime(duration) }}</div> -->
 							</div>
@@ -410,6 +427,12 @@ watch(() => props.id, (id) => {
 		}
 	}
 
+	&__authors {
+		display: flex;
+		flex-wrap: wrap;
+		gap: toRem(0) toRem(10);
+	}
+
 	&__list-item {
 		padding: toRem(12);
 		display: flex;
@@ -464,6 +487,11 @@ watch(() => props.id, (id) => {
 		display: inline-flex;
 		justify-content: center;
 		align-items: center;
+
+		img {
+			width: toRem(19);
+			height: toRem(22);
+		}
 
 		@media (max-width:$mobileSmall) {
 			width: toRem(20);

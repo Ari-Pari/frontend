@@ -16,34 +16,28 @@ export function usePlayer() {
 	const duration = computed(() => state.duration);
 	const currentTime = computed(() => state.currentTime);
 
-	const setTrack = (track) => {
+	const setTrack = (track, play = true) => {
 		state.currentTrack = track
-		state.isPlaying = true
+		state.isPlaying = play
+		updateCurrentTime(0)
 		if ('mediaSession' in navigator) {
 			navigator.mediaSession.metadata = new MediaMetadata({
-				title: track.name,
-				artist: track.ensembles[0].name
+				title: track?.name,
+				artist: track?.ensembles[0]?.name
 			})
 		}
 	}
 	const handleTrackClick = (track) => {
-		if (state.currentTrack.id === track.id) {
-			state.isPlaying = !state.isPlaying
+		if (state.currentTrack.id === track?.id) {
+			togglePlay(!state.isPlaying)
 		} else {
 			setTrack(track)
 		}
 	}
 	const setPlaylist = (tracks) => {
 		state.playlist = tracks
-		//localStorage.setItem('userPlaylist', JSON.stringify(state.playlist))
 		if (tracks.length > 0) {
-			state.currentTrack = tracks[0]
-			if ('mediaSession' in navigator) {
-				navigator.mediaSession.metadata = new MediaMetadata({
-					title: tracks[0].name,
-					artist: tracks[0].ensembles[0].name
-				})
-			}
+			setTrack(tracks[0], false)
 		}
 	}
 	const togglePlay = (status) => {
@@ -52,24 +46,26 @@ export function usePlayer() {
 	const nextTrack = () => {
 		const currentIndex = state.playlist.indexOf(state.currentTrack)
 		if (currentIndex < state.playlist.length - 1) {
-			state.currentTrack = state.playlist[currentIndex + 1]
+			setTrack(state.playlist[currentIndex + 1], state.isPlaying)
 		} else {
-			state.currentTrack = state.playlist[0]
+			setTrack(state.playlist[0], state.isPlaying)
 		}
-		// state.isPlaying = false
 	}
 	const prevTrack = () => {
 		const currentIndex = state.playlist.indexOf(state.currentTrack);
 		if (currentIndex > 0) {
-			state.currentTrack = state.playlist[currentIndex - 1];
+			setTrack(state.playlist[currentIndex - 1], state.isPlaying)
+		} else if (currentIndex === 0) {
+			setTrack(state.playlist[0], state.isPlaying)
+			updateCurrentTime(0)
 		}
-		//	state.isPlaying = false
 	}
 	const showPlaylist = () => {
 		console.log("Playlist:", state.playlist)
-	}
-	const seekTime = (time) => {
-		state.currentTime = time
+		console.log("Track", state.currentTrack)
+		console.log("IsPlaying", state.isPlaying)
+		console.log("Time", state.currentTime)
+		console.log("Duration", state.duration)
 	}
 	const updateDuration = (time) => {
 		state.duration = time
@@ -90,7 +86,6 @@ export function usePlayer() {
 		prevTrack,
 		duration,
 		currentTime,
-		seekTime,
 		updateDuration,
 		updateCurrentTime
 	};

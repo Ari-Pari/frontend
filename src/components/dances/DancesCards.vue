@@ -5,7 +5,7 @@ import { DanceService } from "@/services/api"
 import { refDebounced, useInfiniteScroll } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 import { spollers } from "@/services/utils"
-
+import { defaultDancesParams } from "@/services/api";
 const { t, locale } = useI18n()
 
 // Filter body opening
@@ -27,17 +27,6 @@ function handleEsc(e) {
 }
 
 // Filtering, sorting and searching
-const defaultDancesParams = {
-	searchText: "",
-	genres: [], // String array
-	regions: [], // String array
-	complexities: [], // Number array
-	genders: [], // String array
-	paces: [], // Number array ([1, 2, 3])
-	handshakes: [], // String array
-	sortedBy: "createdBy", // Other values: "popularity", "alphabet"
-	sortType: "ASC" // Other value: DESC
-}
 const savedDancesParams = sessionStorage.getItem('dancesFilter')
 const searchDancesBodyParams = ref(
 	savedDancesParams ? JSON.parse(savedDancesParams) : defaultDancesParams
@@ -112,7 +101,6 @@ const debouncedSearchText = refDebounced(searchText, 1000)
 watch(debouncedSearchText, (val) => {
 	searchDancesBodyParams.value.searchText = val.trim()
 })
-
 // Fetch data on loading
 onMounted(() => {
 	fetchRegions(locale.value)
@@ -139,7 +127,7 @@ watch(searchDancesBodyParams, (newParams) => {
 </script>
 
 <template>
-	<div id="dancesBlock" class="dances">
+	<div id="dances" class="dances">
 		<div class="dances__container">
 			<div class="dances__actions actions-dances">
 				<h2 class="actions-dances__title"> {{ t('danceEncyclopedia') }}</h2>
@@ -180,7 +168,7 @@ watch(searchDancesBodyParams, (newParams) => {
 							@click="isFilterOpen = !isFilterOpen" :aria-label="t('filterAriaLabel')"
 							:title="t('filterAriaLabel')" :class="{ open: isFilterOpen }" ref="filterButtonRef">
 							<span v-show="filterCount > 0" class="actions-dances__filter-button-counter">{{ filterCount
-								}}</span>
+							}}</span>
 							<svg width="35" height="30" viewBox="0 0 35 30" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M1 2.52344H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
 								<path d="M1 14.5234H33.9773" stroke="#989898" stroke-width="2" stroke-linecap="round" />
@@ -376,8 +364,8 @@ watch(searchDancesBodyParams, (newParams) => {
 								<h3 class="dance-item__title">{{ dance?.name }}</h3>
 							</RouterLink>
 							<div class="dance-item__tags">
-								<span v-for="region in dance.regions" :key="region?.id" class="dance-item__tags-item">{{
-									region?.name }}</span>
+								<span v-for="region in dance.regions" :key="region?.id" class="dance-item__tags-item">
+									{{ region?.name }}</span>
 							</div>
 							<ul class="dance-item__categories">
 								<li class="dance-item__categories-item">{{ t('genre') }}:
@@ -917,8 +905,6 @@ watch(searchDancesBodyParams, (newParams) => {
 		display: flex;
 		flex-direction: column;
 
-
-
 		@media (max-width:$mobile) {
 			border: 1px solid #d9d9d9;
 			border-radius: 10px;
@@ -936,11 +922,10 @@ watch(searchDancesBodyParams, (newParams) => {
 			white-space: nowrap;
 			line-height: 1.5;
 			transition: all 0.3s;
+			border-radius: 14px;
 
 			&:focus-within {
-				border-radius: 14px;
-				outline-offset: 2px;
-				outline: 2px solid #c83f01;
+				color: #c83f01;
 			}
 
 			&:not(:last-child) {

@@ -59,10 +59,13 @@ export function headerScroll() {
 	const headerShow = header.hasAttribute('data-scroll-show');
 	const headerShowTimer = header.dataset.scrollShow ? header.dataset.scrollShow : 500;
 	const startPoint = header.dataset.scroll ? header.dataset.scroll : 1;
+	const scrollThreshold = 50;
 	let scrollDirection = 0;
 	let timer;
 	document.addEventListener("scroll", function (e) {
 		const scrollTop = window.scrollY;
+		const scrollDelta = Math.abs(scrollTop - scrollDirection);
+		if (scrollDelta < scrollThreshold) return;
 		clearTimeout(timer);
 		if (scrollTop >= startPoint) {
 			!header.classList.contains('_header-scroll') ? header.classList.add('_header-scroll') : null;

@@ -9,6 +9,17 @@ export const userMainLanguage =
 	supportedLocales.includes(normalizedLang)
 		? normalizedLang
 		: 'hy'
+export const defaultDancesParams = {
+	searchText: "",
+	genres: [], // String array
+	regions: [], // String array
+	complexities: [], // Number array
+	genders: [], // String array
+	paces: [], // Number array ([1, 2, 3])
+	handshakes: [], // String array
+	sortedBy: "createdBy", // Other values: "popularity", "alphabet"
+	sortType: "ASC" // Other value: DESC
+}
 
 export async function apiRequest(endpoint, options = {}) {
 	const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`

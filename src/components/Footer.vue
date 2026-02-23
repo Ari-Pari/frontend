@@ -7,7 +7,7 @@ const { t } = useI18n()
 <template>
 	<footer class="footer">
 		<div class="footer__container">
-			<div class="footer__logo"><img src="@/assets/AriPari_Logo-footer.png" alt="AriPari logo"></div>
+			<RouterLink to="/" class="footer__logo"><img src="@/assets/AriPari_Logo-footer.png" alt="AriPari logo"></RouterLink>
 			<div class="footer__body">
 				<div class="footer__column">
 					<div class="footer__column-title">{{ t('footerContacts') }}</div>
