@@ -42,11 +42,11 @@ const { currentTrack,
 			</div>
 		</div>
 		<div class="audio-player-controls__bottom">
-			<span class="audio-player-controls__duration">{{ formatTime(currentTime) }}</span>
+			<span class="audio-player-controls__duration">{{ formatTime(currentTime || 0)}}</span>
 			<span class="audio-player-controls__duration--slash">/</span>
 			<input class="audio-player-controls__range" type="range" :min="0" :max="duration" :value="currentTime"
 				@input="(e) => updateCurrentTime(Number(e.target.value))" />
-			<span class="audio-player-controls__duration">{{ formatTime(duration) }}</span>
+			<span class="audio-player-controls__duration">{{ formatTime(duration  || 0) }}</span>
 		</div>
 	</div>
 </template>

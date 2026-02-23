@@ -21,10 +21,15 @@ export function usePlayer() {
 		state.isPlaying = play
 		updateCurrentTime(0)
 		if ('mediaSession' in navigator) {
+			const artistNames = track?.ensembles?.map(ensemble => ensemble.name).join(', ') || 'AriPari';
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: track?.name,
-				artist: track?.ensembles[0]?.name
+				artist: artistNames
 			})
+			navigator.mediaSession.setActionHandler('play', () => togglePlay(true));
+			navigator.mediaSession.setActionHandler('pause', () => togglePlay(false));
+			navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+			navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
 		}
 	}
 	const handleTrackClick = (track) => {

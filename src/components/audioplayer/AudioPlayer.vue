@@ -27,11 +27,16 @@ watch(currentTrack, async (newTrack) => {
 watch(route, () => {
 	showPlaylist()
 })
-watch(isPlaying, (shouldPlay) => {
+watch(isPlaying, async (shouldPlay) => {
 	if (!audioPlayerRef.value) return;
-
+	
 	if (shouldPlay) {
-		audioPlayerRef.value.play();
+		try {
+			await audioPlayerRef.value.play();
+		} catch (error) {
+			console.warn("Autoplay prevented:", error);
+			togglePlay(false);
+		}
 	} else {
 		audioPlayerRef.value.pause();
 	}
@@ -68,5 +73,6 @@ const onTimeUpdate = () => {
 	opacity: 0;
 	pointer-events: none;
 }
+
 .dance-page-audio-player {}
 </style>
