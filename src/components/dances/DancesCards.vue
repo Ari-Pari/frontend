@@ -101,6 +101,7 @@ const debouncedSearchText = refDebounced(searchText, 1000)
 watch(debouncedSearchText, (val) => {
 	searchDancesBodyParams.value.searchText = val.trim()
 })
+
 // Fetch data on loading
 onMounted(() => {
 	fetchRegions(locale.value)
