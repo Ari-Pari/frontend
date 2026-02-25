@@ -33,7 +33,7 @@ export function usePlayer() {
 		}
 	}
 	const handleTrackClick = (track) => {
-		if (state.currentTrack.id === track?.id) {
+		if (state.currentTrack?.id === track?.id) {
 			togglePlay(!state.isPlaying)
 		} else {
 			setTrack(track)

@@ -95,6 +95,10 @@ export default {
 		shareBtn: "Share",
 		shareBtnCopy: "Link copied",
 		danceParametres: "Parameters",
+		playerPrev: 'Previous track',
+		playerPlay: 'Play',
+		playerPause: 'Pause',
+		playerNext: 'Next track',
 	},
 	ru: {
 		homePageMenuItem: "Главная",
@@ -192,6 +196,10 @@ export default {
 		shareBtn: "Поделиться",
 		shareBtnCopy: "Ссылка скопирована",
 		danceParametres: "Параметры",
+		playerPrev: 'Предыдущий трек',
+		playerPlay: 'Воспроизвести',
+		playerPause: 'Пауза',
+		playerNext: 'Следующий трек',
 	},
 	hy: {
 		homePageMenuItem: "Գլխավոր",
@@ -289,5 +297,9 @@ export default {
 		shareBtn: "Կիսվել",
 		shareBtnCopy: "Հղումը պատճենված է",
 		danceParametres: "Հատկանիշներ",
+		playerPrev: 'Նախորդ երգը',
+		playerPlay: 'Նվագարկել',
+		playerPause: 'Դադար',
+		playerNext: 'Հաջորդ երգը',
 	}
 }

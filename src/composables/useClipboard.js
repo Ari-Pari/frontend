@@ -1,5 +1,6 @@
 import { ref } from "vue"
 
+let timeoutId = null;
 export function useClipboard() {
 	const copiedField = ref(null)
 
@@ -21,9 +22,10 @@ export function useClipboard() {
 			}
 
 			copiedField.value = field
-			setTimeout(() => {
-				copiedField.value = null
-			}, 2000)
+			if (timeoutId) clearTimeout(timeoutId);
+			timeoutId = setTimeout(() => {
+				copiedField.value = null;
+			}, 2000);
 
 		} catch (err) {
 			console.error("Copy failed", err)

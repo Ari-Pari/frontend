@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted } from 'vue';
-import { usePlayer } from '@/composables/usePlayer';
+import { useI18n } from "vue-i18n"
 import { useRoute } from 'vue-router';
+import { usePlayer } from '@/composables/usePlayer';
 import { formatTime } from '@/services/utils';
 
+const { t, locale } = useI18n()
 const route = useRoute()
 const { currentTrack,
 	playlist,
@@ -21,32 +23,37 @@ const { currentTrack,
 		:class="{ dancePage: route.name == 'dance' }">
 		<div class="audio-player-controls__top">
 			<div class="audio-player-controls__buttons">
-				<button @click="prevTrack" class="audio-player-controls__change-btn"><img
-						src="@/assets/icons/prev-track.svg" alt="Prev track icon"></button>
-				<button @click="togglePlay(!isPlaying)" class="audio-player-controls__play-btn">
+				<button @click="prevTrack" class="audio-player-controls__change-btn" :aria-label="t('playerPrev')"
+					:title="t('playerPrev')">
+					<img src="@/assets/icons/prev-track.svg" alt="Prev track icon">
+				</button>
+				<button @click="togglePlay(!isPlaying)" class="audio-player-controls__play-btn"
+					:aria-label="isPlaying ? t('playerPause') : t('playerPlay')"
+					:title="isPlaying ? t('playerPause') : t('playerPlay')">
 					<img v-if="isPlaying" src="@/assets/icons/pause.svg" alt="Pause icon">
 					<img v-else src="@/assets/icons/play.svg" class="audio-player-controls__play-btn--play" alt="Play icon">
 				</button>
-				<button @click="nextTrack" class="audio-player-controls__change-btn"><img
-						style="transform: rotate(-180deg);" src="@/assets/icons/prev-track.svg"
-						alt="Next track icon"></button>
+				<button @click="nextTrack" class="audio-player-controls__change-btn" :aria-label="t('playerNext')"
+					:title="t('playerNext')">
+					<img style="transform: rotate(-180deg);" src="@/assets/icons/prev-track.svg" alt="Next track icon">
+				</button>
 			</div>
 			<div class="audio-player-controls__info">
 				<div class="audio-player-controls__title">{{ currentTrack?.name }}</div>
-
 				<div class="audio-player-controls__authors">
 					<a target="_blank" class="audio-player-controls__author" v-for="ensemble in currentTrack?.ensembles"
 						:key="ensemble?.id" :href="ensemble?.link">
-						{{ ensemble?.name }}</a>
+						{{ ensemble?.name }}
+					</a>
 				</div>
 			</div>
 		</div>
 		<div class="audio-player-controls__bottom">
-			<span class="audio-player-controls__duration">{{ formatTime(currentTime || 0)}}</span>
+			<span class="audio-player-controls__duration">{{ formatTime(currentTime || 0) }}</span>
 			<span class="audio-player-controls__duration--slash">/</span>
 			<input class="audio-player-controls__range" type="range" :min="0" :max="duration" :value="currentTime"
 				@input="(e) => updateCurrentTime(Number(e.target.value))" />
-			<span class="audio-player-controls__duration">{{ formatTime(duration  || 0) }}</span>
+			<span class="audio-player-controls__duration">{{ formatTime(duration || 0) }}</span>
 		</div>
 	</div>
 </template>

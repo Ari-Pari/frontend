@@ -24,7 +24,6 @@ describe('api service', () => {
 			})
 		)
 	})
-
 	it('DanceService.getDance calls apiRequest with correct params', async () => {
 		const spy = vi.spyOn(global, 'fetch').mockResolvedValue({ ok: true, json: () => ({}) })
 		await DanceService.getDance(42, 'en')
@@ -33,7 +32,6 @@ describe('api service', () => {
 			expect.any(Object)
 		)
 	})
-
 	it('DanceService.searchDances sends POST with body', async () => {
 		const spy = vi.spyOn(global, 'fetch').mockResolvedValue({ ok: true, json: () => ({}) })
 		const params = {
@@ -51,4 +49,57 @@ describe('api service', () => {
 			})
 		)
 	})
+	it('apiRequest выбрасывает ошибку при неудачном ответе', async () => {
+		const mockResponse = {
+			ok: false,
+			status: 404,
+			json: () => Promise.resolve({ message: 'Resource not found' }),
+			headers: { get: () => 'application/json' },
+		};
+		global.fetch.mockResolvedValue(mockResponse);
+		await expect(apiRequest('/fail')).rejects.toThrow('Resource not found');
+	});
+
+	it('apiRequest корректно обрабатывает текстовый ответ ошибки', async () => {
+		const mockResponse = {
+			ok: false,
+			status: 500,
+			text: () => Promise.resolve('Internal Server Error'),
+			headers: { get: () => 'text/plain' },
+		};
+		global.fetch.mockResolvedValue(mockResponse);
+		await expect(apiRequest('/error')).rejects.toThrow('Internal Server Error');
+	});
+
+	it('apiRequest передаёт signal в fetch', async () => {
+		const controller = new AbortController();
+		const mockResponse = { ok: true, json: () => Promise.resolve({}) };
+		global.fetch.mockResolvedValue(mockResponse);
+		await apiRequest('/test', { signal: controller.signal });
+		expect(global.fetch).toHaveBeenCalledWith(
+			expect.stringContaining('/test'),
+			expect.objectContaining({ signal: controller.signal })
+		);
+	});
+	it('apiRequest выбрасывает ошибку при неудачном ответе', async () => {
+		const mockResponse = {
+			ok: false,
+			status: 404,
+			json: () => Promise.resolve({ message: 'Resource not found' }),
+			headers: { get: () => 'application/json' },
+		};
+		global.fetch.mockResolvedValue(mockResponse);
+		await expect(apiRequest('/fail')).rejects.toThrow('Resource not found');
+	});
+
+	it('apiRequest корректно обрабатывает текстовый ответ ошибки', async () => {
+		const mockResponse = {
+			ok: false,
+			status: 500,
+			text: () => Promise.resolve('Internal Server Error'),
+			headers: { get: () => 'text/plain' },
+		};
+		global.fetch.mockResolvedValue(mockResponse);
+		await expect(apiRequest('/error')).rejects.toThrow('Internal Server Error');
+	});
 })

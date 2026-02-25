@@ -1,20 +1,18 @@
 <script setup>
-import { ref, watch, onMounted } from "vue"
-import { useI18n } from "vue-i18n"
-import { DanceService } from "@/services/api"
-import { useApi } from "@/composables/useApi"
-import { useClipboard } from "@/composables/useClipboard";
-import { getYoutubeId } from '@/services/utils'
+import { ref, watch, onMounted, computed } from "vue"
 import LiteYouTubeEmbed from 'vue-lite-youtube-embed'
 import 'vue-lite-youtube-embed/style.css'
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, A11y } from 'swiper/modules';
+import 'swiper/css';
+import { useI18n } from "vue-i18n"
+import { useRouter } from 'vue-router'
+import { DanceService, defaultDancesParams } from "@/services/api"
+import { useApi } from "@/composables/useApi"
+import { useClipboard } from "@/composables/useClipboard";
+import { getYoutubeId, formatTime } from '@/services/utils'
 import AudioPlayerControls from "@/components/audioplayer/AudioPlayerControls.vue";
 import { usePlayer } from '@/composables/usePlayer';
-import { Navigation, A11y } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { useRouter } from 'vue-router'
-import { formatTime } from "@/services/utils";
-import 'swiper/css';
-import { defaultDancesParams } from "@/services/api";
 
 const modules = [Navigation, A11y];
 const props = defineProps({ id: String })
@@ -29,18 +27,31 @@ const { currentTrack,
 	showPlaylist,
 	duration } = usePlayer();
 const fullUrl = ref('')
-
 const router = useRouter()
-function chooseFilter(item) {
+
+function chooseFilter(region) {
+	if (region?.id == null) return;
 	const saved = sessionStorage.getItem('dancesFilter')
 	const params = saved ? JSON.parse(saved) : defaultDancesParams
-
-	params.regions = [item.id]
-
+	params.regions = [region.id]
 	sessionStorage.setItem('dancesFilter', JSON.stringify(params))
 	router.push({ path: '/', hash: '#dances' })
-
 }
+
+const allVideos = computed(() => {
+	const videos = [];
+	if (dance.value?.sourceVideos) {
+		dance.value.sourceVideos.forEach(v => videos.push({ ...v, category: 'source' }));
+	}
+	if (dance.value?.performanceVideos) {
+		dance.value.performanceVideos.forEach(v => videos.push({ ...v, category: 'performance' }));
+	}
+	if (dance.value?.lessonVideos) {
+		dance.value.lessonVideos.forEach(v => videos.push({ ...v, category: 'lesson' }));
+	}
+	return videos;
+});
+
 // Fetch data on loading
 onMounted(() => {
 	fetchDance(props.id, locale.value)
@@ -59,6 +70,7 @@ watch(locale, (newLocale) => {
 // Fetch data on if dance changed
 watch(() => props.id, (id) => {
 	fetchDance(id, locale.value)
+	fullUrl.value = window.location.href;
 })
 </script>
 
@@ -144,36 +156,11 @@ watch(() => props.id, (id) => {
 						300: { slidesPerView: 1 },
 						991.98: { slidesPerView: 1.7 }
 					}" :space-between="20" navigation>
-						<swiper-slide class="dance-video__slide">
-							<template v-if="dance?.sourceVideos">
-								<template v-for="sourceVideo in dance?.sourceVideos" :key="sourceVideo?.id">
-									<div class="dance-video__iframe">
-										<LiteYouTubeEmbed :id="getYoutubeId(sourceVideo.link)" :title="sourceVideo.name" />
-									</div>
-									<div class="dance-video__title">{{ sourceVideo.name }}</div>
-								</template>
-							</template>
-						</swiper-slide>
-						<swiper-slide class="dance-video__slide">
-							<template v-if="dance?.performanceVideos">
-								<template v-for="performanceVideo in dance?.performanceVideos" :key="performanceVideo?.id">
-									<div class="dance-video__iframe">
-										<LiteYouTubeEmbed :id="getYoutubeId(performanceVideo.link)"
-											:title="performanceVideo.name" />
-									</div>
-									<div class="dance-video__title">{{ performanceVideo.name }}</div>
-								</template>
-							</template>
-						</swiper-slide>
-						<swiper-slide class="dance-video__slide">
-							<template v-if="dance?.lessonVideos">
-								<template v-for="lessonVideo in dance?.lessonVideos" :key="lessonVideo?.id">
-									<div class="dance-video__iframe">
-										<LiteYouTubeEmbed :id="getYoutubeId(lessonVideo.link)" :title="lessonVideo.name" />
-									</div>
-									<div class="dance-video__title">{{ lessonVideo.name }}</div>
-								</template>
-							</template>
+						<swiper-slide v-for="video in allVideos" :key="video.id" class="dance-video__slide">
+							<div class="dance-video__iframe">
+								<LiteYouTubeEmbed :id="getYoutubeId(video.link)" :title="video.name" />
+							</div>
+							<div class="dance-video__title">{{ video.name }}</div>
 						</swiper-slide>
 					</swiper>
 				</div>

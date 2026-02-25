@@ -18,8 +18,8 @@ export function useApi(apiCall) {
 		} catch (e) {
 			if (e.name === 'AbortError') return
 			error.value = e
-			console.error("API Error:", e)
-			//throw e
+			console.error(e)
+			throw e
 		} finally {
 			loading.value = false
 			controller = null

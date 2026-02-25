@@ -11,7 +11,7 @@ const { currentTrack,
 	nextTrack,
 	updateDuration,
 	updateCurrentTime,
-	currentTime, showPlaylist } = usePlayer();
+	currentTime } = usePlayer();
 
 // Playing track on change
 watch(currentTrack, async (newTrack) => {
@@ -22,14 +22,10 @@ watch(currentTrack, async (newTrack) => {
 			audioPlayerRef.value.play();
 		}
 	}
-	showPlaylist()
 });
-watch(route, () => {
-	showPlaylist()
-})
 watch(isPlaying, async (shouldPlay) => {
 	if (!audioPlayerRef.value) return;
-	
+
 	if (shouldPlay) {
 		try {
 			await audioPlayerRef.value.play();

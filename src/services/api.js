@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://aripari.am/api/v1'
 const supportedLocales = ['en', 'ru', 'hy']
 const browserLang =
 	localStorage.getItem('userLanguage')
@@ -34,12 +34,9 @@ export async function apiRequest(endpoint, options = {}) {
 		...restOptions
 	}
 	const response = await fetch(url, defaultOptions)
-
 	if (!response.ok) {
-		// const errorData = await response.json().catch(() => ({}))
-		// throw new Error(`API error: ${response.status}`)
+		throw new Error(response.status)
 	}
-
 	return response.json()
 }
 
