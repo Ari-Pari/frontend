@@ -32,6 +32,5 @@ export function useClipboard() {
 		}
 	}
 
-
 	return { copiedField, copyText }
 }

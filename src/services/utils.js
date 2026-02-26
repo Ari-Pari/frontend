@@ -341,7 +341,7 @@ export function scrollToBlock(scrollToBlockId) {
 	})
 }
 
-export function getYoutubeId(url) {
+export const getYoutubeId = (url) => {
 	const parsed = new URL(url)
 	// youtube.com/watch?v=
 	if (parsed.searchParams.get('v')) {

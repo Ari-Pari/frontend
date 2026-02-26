@@ -6,6 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import postcssSortMediaQueries from 'postcss-sort-media-queries'
 import autoprefixer from 'autoprefixer';
+import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
 	plugins: [
@@ -22,7 +23,12 @@ export default defineConfig({
 				quality: 70,
 			},
 		}),
+		basicSsl()
 	],
+	server: {
+		https: false,
+		host: true
+	},
 	css: {
 		postcss: {
 			plugins: [

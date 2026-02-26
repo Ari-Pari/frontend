@@ -7,6 +7,7 @@ import { Navigation, A11y } from 'swiper/modules';
 import 'swiper/css';
 import { useI18n } from "vue-i18n"
 import { useRouter } from 'vue-router'
+import { useShare } from '@vueuse/core'
 import { DanceService, defaultDancesParams } from "@/services/api"
 import { useApi } from "@/composables/useApi"
 import { useClipboard } from "@/composables/useClipboard";
@@ -28,6 +29,15 @@ const { currentTrack,
 	duration } = usePlayer();
 const fullUrl = ref('')
 const router = useRouter()
+
+const shareOptions = ref({
+	title: dance?.name,
+	url: location.href,
+})
+const { share, isSupported } = useShare(shareOptions)
+function shareDance() {
+	return share().catch(err => err)
+}
 
 function chooseFilter(region) {
 	if (region?.id == null) return;
@@ -99,13 +109,16 @@ watch(() => props.id, (id) => {
 										}}</button>
 								</div>
 								<h1 class="dance-top__title">{{ dance?.name }}</h1>
-								<button @click="copyText(fullUrl, 'share')" class="dance-top__copy-button button">
+								<button v-if="isSupported" @click="shareDance" class="dance-top__copy-button button">
+									{{ t('shareBtn') }}
+								</button>
+								<button v-else @click="copyText(fullUrl, 'share')" class="dance-top__copy-button button">
 									{{ copiedField === 'share' ? t('shareBtnCopy') : t('shareBtn') }}
 								</button>
 							</div>
 						</div>
 						<div class="dance-top__image">
-							<img :src="dance?.photo_link" alt="Dance image">
+							<img :src="dance?.photo_link" alt="" @error="e => e.target.parentElement.style.display = 'none'">
 						</div>
 					</section>
 					<section class="dance-parametres dance-card-template">
@@ -411,6 +424,10 @@ watch(() => props.id, (id) => {
 		@media (min-width:$mobile) {
 			max-height: toRem(280);
 			overflow-y: auto;
+		}
+
+		@media (max-width:$mobile) {
+			margin-top: toRem(10);
 		}
 	}
 

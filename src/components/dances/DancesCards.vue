@@ -357,7 +357,7 @@ watch(searchDancesBodyParams, (newParams) => {
 					</div>
 					<div v-else v-for="dance in allDances" :key="dance.id" class="dance-item">
 						<RouterLink v-if="dance.photo_link" :to="`/dances/${dance.id}`" class="dance-item__image">
-							<img :src="dance.photo_link" alt="Dance image">
+							<img :src="dance.photo_link" alt="" @error="e => e.target.parentElement.style.display = 'none'">
 						</RouterLink>
 						<div class="dance-item__texts">
 							<RouterLink :to="`/dances/${dance.id}`">
@@ -1072,6 +1072,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		overflow: hidden;
 		border-radius: 14px;
 		margin-bottom: toRem(10);
+		background-color: #eee;
 
 		@media (any-hover: hover) {
 			&:hover {

@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from "vue-i18n"
-import DancesForm from "@/components/dances/DancesCards.vue"
+import DancesCards from "@/components/dances/DancesCards.vue"
 
 const { t } = useI18n()
 </script>
@@ -26,7 +26,7 @@ const { t } = useI18n()
 			<div class="quote-block__text">{{ t('quoteBlockText') }}</div>
 		</div>
 	</div>
-	<DancesForm />
+	<DancesCards />
 </template>
 
 <style lang="scss" scoped>
@@ -104,14 +104,14 @@ const { t } = useI18n()
 	&__button {
 		margin-top: toRem(140);
 		width: toRem(420);
-		height: toRem(80);
+		min-height: toRem(80);
 		border-radius: 20px;
 		font-size: toRem(28);
 
 		@media (max-width:$mobileSmall) {
 			width: 100%;
 			max-width: toRem(340);
-			height: toRem(50);
+			min-height: toRem(50);
 			font-size: toRem(20);
 		}
 	}

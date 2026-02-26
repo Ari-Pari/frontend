@@ -27,7 +27,8 @@ watch(route, () => {
 		<div class="header__container">
 			<div class="header__menu menu">
 				<div class="menu__left">
-					<RouterLink to="/" class="menu__logo"><img src="@/assets/AriPari_logo.png" alt="AriPari logo"></RouterLink>
+					<RouterLink to="/" class="menu__logo"><img src="@/assets/AriPari_logo.png" alt="AriPari logo">
+					</RouterLink>
 					<RouterLink to="/about#support" class="menu__left-button button">
 						{{ t('supportButton') }}
 					</RouterLink>
@@ -106,6 +107,7 @@ watch(route, () => {
 	&__left {
 		display: flex;
 		align-items: center;
+		margin-right: toRem(20);
 
 		&-button {
 			@media (max-width:$tablet) {
@@ -114,7 +116,7 @@ watch(route, () => {
 
 			@media (max-width:$mobileSmall) {
 				width: auto;
-				height: toRem(30);
+				min-height: toRem(30);
 				font-size: toRem(12);
 				border-radius: 10px;
 			}
@@ -149,6 +151,7 @@ watch(route, () => {
 			right: -100%;
 			top: 110px;
 			overflow-y: auto;
+			overflow-x: auto;
 			padding: toRem(75) toRem(16) toRem(30);
 			transition: right 0.3s;
 			background-color: #fff;

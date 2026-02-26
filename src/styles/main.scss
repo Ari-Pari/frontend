@@ -158,7 +158,7 @@ body {
 	align-items: center;
 	border-radius: 10px;
 	width: toRem(250);
-	height: toRem(40);
+	min-height: toRem(40);
 	padding: toRem(10) toRem(20);
 	font-size: toRem(20);
 	text-align: center;
