@@ -1,4 +1,4 @@
-import { ref, reactive, computed } from "vue"
+import { reactive, computed } from "vue"
 
 const state = reactive({
 	currentTrack: null,

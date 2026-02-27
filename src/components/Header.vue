@@ -2,17 +2,14 @@
 import { watch, onMounted, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from 'vue-router'
-import { headerScroll, menuInit, menuClose } from "@/services/utils"
+import { headerScroll, menuToggle, menuClose } from "@/services/utils"
 import AudioPlayerControls from "./audioplayer/AudioPlayerControls.vue"
 
 const route = useRoute()
 const { t, locale } = useI18n()
 const currentLang = computed(() => locale.value)
+const { isScrolled, isVisible } = headerScroll();
 
-onMounted(() => {
-	// Function add class to hide/show header
-	headerScroll()
-})
 watch(locale, (newLocale) => {
 	document.documentElement.setAttribute('lang', newLocale)
 	localStorage.setItem('userLanguage', newLocale)
@@ -23,7 +20,10 @@ watch(route, () => {
 </script>
 
 <template>
-	<header data-scroll-show class="header">
+	<header data-scroll-show class="header" :class="{
+		'_header-scroll': isScrolled,
+		'_header-show': isVisible
+	}">
 		<div class="header__container">
 			<div class="header__menu menu">
 				<div class="menu__left">
@@ -35,7 +35,7 @@ watch(route, () => {
 					<AudioPlayerControls />
 				</div>
 				<button type="button" :title="t('menuIconSearchAriaLabel')" :aria-label="t('menuIconSearchAriaLabel')"
-					@click="menuInit" class="menu__icon icon-menu"><span></span></button>
+					@click="menuToggle" class="menu__icon icon-menu"><span></span></button>
 				<nav class="menu__body">
 					<ul class="menu__list">
 						<li class="menu__item">
