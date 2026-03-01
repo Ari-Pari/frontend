@@ -44,7 +44,7 @@ export default defineConfig({
 			}
 		}
 	},
-	base: "/aripari/",
+	// base: "/aripari/",
 	resolve: {
 		alias: {
 			'@': fileURLToPath(new URL('./src', import.meta.url))

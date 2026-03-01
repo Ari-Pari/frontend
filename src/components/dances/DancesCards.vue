@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n"
 import { useMediaQuery, refDebounced, useInfiniteScroll } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 import { DanceService, defaultDancesParams } from "@/services/api";
+
 const { t, locale } = useI18n()
 
 const isDesktop = useMediaQuery('(min-width: 767.98px)')

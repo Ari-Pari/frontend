@@ -24,9 +24,7 @@ const { currentTrack,
 	isPlaying,
 	handleTrackClick,
 	playlist,
-	setPlaylist,
-	showPlaylist,
-	duration } = usePlayer();
+	setPlaylist } = usePlayer();
 const fullUrl = ref('')
 const router = useRouter()
 

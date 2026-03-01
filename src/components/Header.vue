@@ -1,5 +1,5 @@
 <script setup>
-import { watch, onMounted, computed } from "vue"
+import { watch, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from 'vue-router'
 import { headerScroll, menuToggle, menuClose } from "@/services/utils"
