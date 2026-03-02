@@ -11,7 +11,7 @@ import { useShare } from '@vueuse/core'
 import { DanceService, defaultDancesParams } from "@/services/api"
 import { useApi } from "@/composables/useApi"
 import { useClipboard } from "@/composables/useClipboard";
-import { getYoutubeId, formatTime } from '@/services/utils'
+import { getYoutubeId, translateDancesParametres } from '@/services/utils'
 import AudioPlayerControls from "@/components/audioplayer/AudioPlayerControls.vue";
 import { usePlayer } from '@/composables/usePlayer';
 
@@ -85,97 +85,107 @@ watch(() => props.id, (id) => {
 <template>
 	<section class="dance">
 		<div class="dance__container">
-			<div v-if="loading || error" class="skeleton">
+			<div v-if="loading" class="skeleton">
 				<div class="skeleton__image skeleton-anim"></div>
 				<div class="skeleton__videos">
-					<div class="skeleton__video skeleton-anim"></div>
 					<div class="skeleton__video skeleton-anim"></div>
 					<div class="skeleton__video skeleton-anim"></div>
 				</div>
 				<div class="skeleton__title skeleton-anim"></div>
 				<div class="skeleton__descr skeleton-anim"></div>
 			</div>
-			<div class="dance__body" v-else>
-				<div class="dance__inner">
-					<section class="dance-top dance-card-template">
-						<div class="dance-top__left">
-							<div class="dance-top__left-inner">
-								<div v-if="dance?.regions" class="dance-top__categories">
-									<button type="button" @click="chooseFilter(region)" v-for="region in dance?.regions"
-										:key="region?.id" class="dance-top__category">{{
-											region?.name
-										}}</button>
-								</div>
-								<h1 class="dance-top__title">{{ dance?.name }}</h1>
-								<button v-if="isSupported" @click="shareDance" class="dance-top__copy-button button">
-									{{ t('shareBtn') }}
-								</button>
-								<button v-else @click="copyText(fullUrl, 'share')" class="dance-top__copy-button button">
-									{{ copiedField === 'share' ? t('shareBtnCopy') : t('shareBtn') }}
-								</button>
-							</div>
-						</div>
-						<div class="dance-top__image">
-							<img :src="dance?.photo_link" alt="" @error="e => e.target.parentElement.style.display = 'none'">
-						</div>
-					</section>
-					<section class="dance-parametres dance-card-template">
-						<h2 class="dance-parametres__title">{{ t('danceParametres') }}</h2>
-						<ul class="dance-parametres__list">
-							<li class="dance-parametres__item">{{ t('genre') }}:
-								<span>{{ dance?.genres.join(', ').toLowerCase() }}</span>
-							</li>
-							<li class="dance-parametres__item">{{ t('complexity') }}:
-								<span>{{ dance?.complexity.join(', ').toLowerCase() }}</span>
-							</li>
-							<li class="dance-parametres__item">{{ t('tempo') }}:
-								<span>{{ dance?.paces.join(', ').toLowerCase() }}</span>
-							</li>
-							<li class="dance-parametres__item">{{ t('gender') }}:
-								<span>{{ dance?.gender.join(', ').toLowerCase() }}</span>
-							</li>
-							<li class="dance-parametres__item">{{ t('handshakes') }}:
-								<span>{{ dance?.handshakes.join(', ').toLowerCase() }}</span>
-							</li>
-						</ul>
-					</section>
-					<div class="dance-audio">
-						<AudioPlayerControls />
-						<div v-if="playlist.length > 0" class="dance-audio__list">
-							<div v-for="track in playlist" :key="track?.id" class="dance-audio__list-item"
-								:class="{ active: currentTrack?.id === track.id }">
-								<button type="button" class="dance-audio__play-button" @click="handleTrackClick(track)">
-									<img v-if="currentTrack?.id === track.id && isPlaying" src="@/assets/icons/pause.svg"
-										alt="Pause icon">
-									<img v-else src="@/assets/icons/play.svg" class="" alt="Play icon">
-								</button>
-								<div class="dance-audio__info">
-									<span class="dance-audio__title">{{ track?.name }}</span>
-									<div class="dance-audio__authors">
-										<a target="_blank" class="dance-audio__author" v-for="ensemble in track?.ensembles"
-											:key="ensemble?.id" :href="ensemble?.link">
-											{{ ensemble?.name }}</a>
+			<template v-else>
+				<template v-if="dance">
+					<div class="dance__body">
+						<div class="dance__inner">
+							<section class="dance-top dance-card-template">
+								<div class="dance-top__left">
+									<div class="dance-top__left-inner">
+										<div v-if="dance?.regions" class="dance-top__categories">
+											<button type="button" @click="chooseFilter(region)" v-for="region in dance?.regions"
+												:key="region?.id" class="dance-top__category">{{
+													region?.name
+												}}</button>
+										</div>
+										<h1 class="dance-top__title">{{ dance?.name }}</h1>
+										<button v-if="isSupported" @click="shareDance" class="dance-top__copy-button button">
+											{{ t('shareBtn') }}
+										</button>
+										<button v-else @click="copyText(fullUrl, 'share')" class="dance-top__copy-button button">
+											{{ copiedField === 'share' ? t('shareBtnCopy') : t('shareBtn') }}
+										</button>
 									</div>
 								</div>
-								<!-- <div class="dance-audio__duration">{{ formatTime(duration) }}</div> -->
+								<div class="dance-top__image">
+									<img :src="dance?.photo_link" alt=""
+										@error="e => e.target.parentElement.style.display = 'none'">
+								</div>
+							</section>
+							<section class="dance-parametres dance-card-template">
+								<h2 class="dance-parametres__title">{{ t('danceParametres') }}</h2>
+								<ul class="dance-parametres__list">
+									<li class="dance-parametres__item">{{ t('genre') }}:
+										<span>{{ translateDancesParametres(dance?.genres, { t, prefix: 'genres' })
+										}}</span>
+									</li>
+									<li class="dance-parametres__item">{{ t('complexity') }}:
+										<span>{{ translateDancesParametres(dance?.complexity, { t, prefix: 'complexity' })
+										}}</span>
+									</li>
+									<li class="dance-parametres__item">{{ t('tempo') }}:
+										<span>{{ translateDancesParametres(dance?.paces, { t, prefix: 'paces', delimiter: ' → ' })
+										}}</span>
+									</li>
+									<li class="dance-parametres__item">{{ t('gender') }}:
+										<span>{{ translateDancesParametres(dance?.gender, { t, prefix: 'gender' }) }}</span>
+									</li>
+									<li class="dance-parametres__item">{{ t('handshakes') }}:
+										<span>{{ translateDancesParametres(dance?.handshakes, { t, prefix: 'handshakes' }) }}</span>
+									</li>
+								</ul>
+							</section>
+							<div v-if="playlist.length > 0 && (currentTrack?.name != '' || currentTrack?.link != '')" class="dance-audio">
+								<AudioPlayerControls />
+								<div class="dance-audio__list">
+									<div v-for="track in playlist" :key="track?.id" class="dance-audio__list-item"
+										:class="{ active: currentTrack?.id === track.id }">
+										<button type="button" class="dance-audio__play-button" @click="handleTrackClick(track)">
+											<img v-if="currentTrack?.id === track.id && isPlaying" src="@/assets/icons/pause.svg"
+												alt="Pause icon">
+											<img v-else src="@/assets/icons/play.svg" class="" alt="Play icon">
+										</button>
+										<div class="dance-audio__info">
+											<span class="dance-audio__title">{{ track?.name }}</span>
+											<div class="dance-audio__authors">
+												<a target="_blank" class="dance-audio__author" v-for="ensemble in track?.ensembles"
+													:key="ensemble?.id" :href="ensemble?.link">
+													{{ ensemble?.name }}</a>
+											</div>
+										</div>
+										<!-- <div class="dance-audio__duration">{{ formatTime(duration) }}</div> -->
+									</div>
+								</div>
 							</div>
 						</div>
+						<div v-if="allVideos.length > 0" class="dance-video">
+							<swiper :modules="modules" :breakpoints="{
+								300: { slidesPerView: 1 },
+								991.98: { slidesPerView: 1.7 }
+							}" :space-between="20" navigation>
+								<swiper-slide v-for="video in allVideos" :key="video.id" class="dance-video__slide">
+									<div class="dance-video__iframe">
+										<LiteYouTubeEmbed :id="getYoutubeId(video.link)" :title="video.name" />
+									</div>
+									<div class="dance-video__title">{{ video.name }}</div>
+								</swiper-slide>
+							</swiper>
+						</div>
 					</div>
-				</div>
-				<div class="dance-video">
-					<swiper :modules="modules" :breakpoints="{
-						300: { slidesPerView: 1 },
-						991.98: { slidesPerView: 1.7 }
-					}" :space-between="20" navigation>
-						<swiper-slide v-for="video in allVideos" :key="video.id" class="dance-video__slide">
-							<div class="dance-video__iframe">
-								<LiteYouTubeEmbed :id="getYoutubeId(video.link)" :title="video.name" />
-							</div>
-							<div class="dance-video__title">{{ video.name }}</div>
-						</swiper-slide>
-					</swiper>
-				</div>
-			</div>
+				</template>
+				<template v-else>
+					{{ t('notFoundDance') }}
+				</template>
+			</template>
 		</div>
 	</section>
 </template>
@@ -532,7 +542,7 @@ watch(() => props.id, (id) => {
 
 	&__videos {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: 1fr 1fr;
 		gap: toRem(20);
 		margin-bottom: toRem(20);
 	}

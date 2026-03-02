@@ -42,7 +42,7 @@ export async function apiRequest(endpoint, options = {}) {
 
 export const DanceService = {
 	getDance: (id, lang = userMainLanguage, signal) => apiRequest(`/dances/${id}?lang=${lang}`, { signal }),
-	getRegions: (lang = userMainLanguage, signal) => apiRequest(`/regions/?lang=${lang}`, { signal }),
+	getRegions: (lang = userMainLanguage, signal) => apiRequest(`/regions?lang=${lang}`, { signal }),
 	searchDances: (params = {}, signal) => apiRequest(`/dances/search?lang=${params.lang}&page=${params.page}&size=${params.size}`, {
 		method: 'POST',
 		body: JSON.stringify(params.body || {}),

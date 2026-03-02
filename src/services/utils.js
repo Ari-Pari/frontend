@@ -133,3 +133,16 @@ export const formatTime = (seconds) => {
 	const sec = Math.floor(seconds % 60);
 	return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 };
+
+export const translateDancesParametres = (value, { t, prefix = '', delimiter = ', ' }) => {
+	if (value === null || value === undefined || value === '') return '';
+
+	const items = Array.isArray(value) ? value : [value];
+
+	return items
+		.map(item => {
+			const translationKey = prefix ? `${prefix}_${item}` : String(item);
+			return t(translationKey);
+		})
+		.join(delimiter);
+}

@@ -1,9 +1,10 @@
 <script setup>
 import { ref, watch, onMounted, useTemplateRef, onBeforeUnmount, computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { useMediaQuery, refDebounced, useInfiniteScroll } from "@vueuse/core"
+import { useMediaQuery, refDebounced, useInfiniteScroll, useIntersectionObserver } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 import { DanceService, defaultDancesParams } from "@/services/api";
+import { translateDancesParametres } from "@/services/utils";
 
 const { t, locale } = useI18n()
 
@@ -45,9 +46,13 @@ const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegions
 
 // Добавить проверку на ошибки
 const loadDances = async (isFirstPage = false) => {
+	if (dancesLoading.value) return
+
 	if (isFirstPage) {
+		allDances.value = []
 		dancesPage.value = 1
 		isFinished.value = false
+		if (dancesInner.value) dancesInner.value.scrollTop = 0
 	}
 	const result = await fetchDances({
 		lang: locale.value,
@@ -60,6 +65,8 @@ const loadDances = async (isFirstPage = false) => {
 
 	if (result.length < dancesPageSize) {
 		isFinished.value = true
+	} else {
+		dancesPage.value++
 	}
 	if (isFirstPage) {
 		allDances.value = result
@@ -68,16 +75,30 @@ const loadDances = async (isFirstPage = false) => {
 	}
 }
 // Infinite scroll for dance cards
+const loadMoreTrigger = useTemplateRef('loadMoreTrigger')
 const dancesInner = useTemplateRef('dancesInner')
-useInfiniteScroll(dancesInner, () => {
-	if (!dancesLoading.value && !isFinished.value && !dancesError.value) {
-		dancesPage.value++
-		loadDances()
+// useInfiniteScroll(dancesInner, () => {
+// 	if (!dancesLoading.value && !isFinished.value && !dancesError.value) {
+// 		loadDances()
+// 		dancesPage.value++
+// 	}
+// }, {
+// 	distance: 200,
+// 	canLoadMore: () => !isFinished.value
+// })
+useIntersectionObserver(
+	loadMoreTrigger,
+	([{ isIntersecting }]) => {
+		if (isIntersecting && !dancesLoading.value && !isFinished.value) {
+			console.log('Trigger visible, loading more...')
+			loadDances()
+		}
+	},
+	{
+		root: dancesInner,
+		rootMargin: '200px',
 	}
-}, {
-	distance: 50,
-	canLoadMore: () => !isFinished.value
-})
+)
 // Count function for filters number
 const filterCount = computed(() => {
 	let count = 0;
@@ -231,7 +252,7 @@ watch(searchDancesBodyParams, (newParams) => {
 									v-for="genre in ['WAR', 'ROAD', 'CULT', 'LYRICAL', 'REVERSE', 'RITUAL', 'COMMUNITY', 'HUNTING', 'PILGRIMAGE', 'MEMORABLE', 'MEMORIAL', 'FUNERAL', 'FESTIVE', 'WEDDING', 'MATCHMAKERS', 'LABOR', 'AMULET']"
 									:key="genre">
 									<input type="checkbox" :value="genre" v-model="searchDancesBodyParams.genres">
-									<span> {{ t('genre' + genre.charAt(0) + genre.slice(1).toLowerCase()) }}</span>
+									<span> {{ t('genres' + '_' + genre.charAt(0) + genre.slice(1)) }}</span>
 								</label>
 							</div>
 						</details>
@@ -259,23 +280,23 @@ watch(searchDancesBodyParams, (newParams) => {
 							<div class="dances-filters__checkbox">
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="1">
-									<span>{{ t('complexityType1') }}</span>
+									<span>{{ t('complexity_1') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="2">
-									<span>{{ t('complexityType2') }}</span>
+									<span>{{ t('complexity_2') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="3">
-									<span>{{ t('complexityType3') }}</span>
+									<span>{{ t('complexity_3') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="4">
-									<span>{{ t('complexityType4') }}</span>
+									<span>{{ t('complexity_4') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.complexities" :value="5">
-									<span>{{ t('complexityType5') }}</span>
+									<span>{{ t('complexity_5') }}</span>
 								</label>
 							</div>
 						</details>
@@ -284,16 +305,16 @@ watch(searchDancesBodyParams, (newParams) => {
 								t('gender') }}</summary>
 							<div class="dances-filters__checkbox">
 								<label>
-									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="male">
-									<span>{{ t('genderTypeMale') }}</span>
+									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="MALE">
+									<span>{{ t('gender_MALE') }}</span>
 								</label>
 								<label>
-									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="female">
-									<span>{{ t('genderTypeFemale') }}</span>
+									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="FEMALE">
+									<span>{{ t('gender_FEMALE') }}</span>
 								</label>
 								<label>
-									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="multi">
-									<span>{{ t('genderTypeMulti') }}</span>
+									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="MULTI">
+									<span>{{ t('gender_MULTI') }}</span>
 								</label>
 							</div>
 						</details>
@@ -303,15 +324,15 @@ watch(searchDancesBodyParams, (newParams) => {
 							<div class="dances-filters__checkbox">
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.paces" :value="1">
-									<span>{{ t('tempoSlow') }}</span>
+									<span>{{ t('paces_1') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.paces" :value="2">
-									<span>{{ t('tempoMiddle') }}</span>
+									<span>{{ t('paces_2') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.paces" :value="3">
-									<span>{{ t('tempoFast') }}</span>
+									<span>{{ t('paces_3') }}</span>
 								</label>
 							</div>
 						</details>
@@ -322,39 +343,39 @@ watch(searchDancesBodyParams, (newParams) => {
 							<div class="dances-filters__checkbox">
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="FREE">
-									<span>{{ t('handshakesFree') }}</span>
+									<span>{{ t('handshakes_FREE') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="LITTLE_FINGER">
-									<span>{{ t('handshakesPinky') }}</span>
+									<span>{{ t('handshakes_LITTLE_FINGER') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="CROSSED">
-									<span>{{ t('handshakesCrossed') }}</span>
+									<span>{{ t('handshakes_CROSSED') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="PALM">
-									<span>{{ t('handshakesPalm') }}</span>
+									<span>{{ t('handshakes_PALM') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BACK">
-									<span>{{ t('handshakesBack') }}</span>
+									<span>{{ t('handshakes_BACK') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="BELT">
-									<span>{{ t('handshakesBelt') }}</span>
+									<span>{{ t('handshakes_BELT') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="SHOULDER">
-									<span>{{ t('handshakesShoulder') }}</span>
+									<span>{{ t('handshakes_SHOULDER') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="DAGGER">
-									<span>{{ t('handshakesDagger') }}</span>
+									<span>{{ t('handshakes_DAGGER') }}</span>
 								</label>
 								<label>
 									<input type="checkbox" v-model="searchDancesBodyParams.handshakes" value="WHIP">
-									<span>{{ t('handshakesWhip') }}</span>
+									<span>{{ t('handshakes_WHIP') }}</span>
 								</label>
 							</div>
 						</details>
@@ -363,42 +384,58 @@ watch(searchDancesBodyParams, (newParams) => {
 			</div>
 			<div ref="dancesInner" class="dances__inner">
 				<div class="dances__body">
-					<div v-if="dancesLoading || dancesError" v-for="n in 12" :key="n" class="dance-item skeleton">
+					<div v-if="dancesLoading && allDances.length === 0" v-for="n in 12" :key="n" class="dance-item skeleton">
 						<div class="skeleton__image skeleton-anim"></div>
 						<div class="skeleton__title skeleton-anim"></div>
 						<div class="skeleton__descr skeleton-anim"></div>
 					</div>
-					<div v-else v-for="dance in allDances" :key="dance.id" class="dance-item">
-						<RouterLink v-if="dance.photo_link" :to="`/dances/${dance.id}`" class="dance-item__image">
-							<img :src="dance.photo_link" alt="" @error="e => e.target.parentElement.style.display = 'none'">
-						</RouterLink>
-						<div class="dance-item__texts">
-							<RouterLink :to="`/dances/${dance.id}`">
-								<h3 class="dance-item__title">{{ dance?.name }}</h3>
-							</RouterLink>
-							<div class="dance-item__tags">
-								<span v-for="region in dance.regions" :key="region?.id" class="dance-item__tags-item">
-									{{ region?.name }}</span>
+					<template v-else>
+						<template v-if="allDances.length > 0">
+							<div v-for="dance in allDances" :key="dance.id" class="dance-item">
+								<RouterLink v-if="dance.photo_link" :to="`/dances/${dance.id}`" class="dance-item__image">
+									<img :src="dance.photo_link" alt=""
+										@error="e => e.target.parentElement.style.display = 'none'">
+								</RouterLink>
+								<div class="dance-item__texts">
+									<RouterLink :to="`/dances/${dance.id}`">
+										<h3 class="dance-item__title">{{ dance?.name }}</h3>
+									</RouterLink>
+									<div class="dance-item__tags">
+										<span v-for="region in dance.regions" :key="region?.id" class="dance-item__tags-item">
+											{{ region?.name }}</span>
+									</div>
+									<ul class="dance-item__categories">
+										<li class="dance-item__categories-item">{{ t('genre') }}:
+											<span> {{ translateDancesParametres(dance?.genres, { t, prefix: 'genres' }) }}</span>
+										</li>
+										<li class="dance-item__categories-item">{{ t('complexity') }}:
+											<span>{{ translateDancesParametres(dance?.complexity, { t, prefix: 'complexity' })
+											}}</span>
+										</li>
+										<li class="dance-item__categories-item">{{ t('tempo') }}:
+											<span>{{ translateDancesParametres(dance?.paces, {
+												t, prefix: 'paces', delimiter: ' → '
+											}) }}</span>
+										</li>
+										<li class="dance-item__categories-item">{{ t('gender') }}:
+											<span>{{ translateDancesParametres(dance?.gender, { t, prefix: 'gender' }) }}</span>
+										</li>
+										<li class="dance-item__categories-item">{{ t('handshakes') }}:
+											<span>{{ translateDancesParametres(dance?.handshakes, { t, prefix: 'handshakes' })
+											}}</span>
+										</li>
+									</ul>
+								</div>
 							</div>
-							<ul class="dance-item__categories">
-								<li class="dance-item__categories-item">{{ t('genre') }}:
-									<span>{{ dance?.genres.join(', ').toLowerCase() }}</span>
-								</li>
-								<li class="dance-item__categories-item">{{ t('complexity') }}:
-									<span>{{ dance?.complexity.join(', ').toLowerCase() }}</span>
-								</li>
-								<li class="dance-item__categories-item">{{ t('tempo') }}:
-									<span>{{ dance?.paces.join(', ').toLowerCase() }}</span>
-								</li>
-								<li class="dance-item__categories-item">{{ t('gender') }}:
-									<span>{{ dance?.gender.join(', ').toLowerCase() }}</span>
-								</li>
-								<li class="dance-item__categories-item">{{ t('handshakes') }}:
-									<span>{{ dance?.handshakes.join(', ').toLowerCase() }}</span>
-								</li>
-							</ul>
-						</div>
-					</div>
+							<div ref="loadMoreTrigger" class="load-more-trigger"
+								style="width: 100%; height: 10px; margin-top: 20px;"></div>
+						</template>
+						<template v-else>
+							<div class="dances__body-notfound">
+								{{ t('notFoundDance') }}
+							</div>
+						</template>
+					</template>
 				</div>
 			</div>
 		</div>
@@ -427,6 +464,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		padding: 0 toRem(53) toRem(53);
 		display: flex;
 		flex-direction: column;
+		position: relative;
 
 		@media (max-width:$pc) {
 			padding: 0 0 toRem(53);
@@ -459,6 +497,15 @@ watch(searchDancesBodyParams, (newParams) => {
 
 		@media (max-width: toEm(370)) {
 			gap: toRem(30) toRem(10);
+		}
+	}
+
+	&__body-notfound {
+		font-size: toRem(20);
+		grid-column: span 3 / span 3;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(16);
 		}
 	}
 
