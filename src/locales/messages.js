@@ -100,6 +100,9 @@ export default {
 		playerPause: 'Pause',
 		playerNext: 'Next track',
 		notFoundDance: "Nothing found",
+		performanceVideo: "Video clip",
+		sourceVideo: "Source video",
+		lessonVideo: "Lesson video",
 	},
 	ru: {
 		homePageMenuItem: "Главная",
@@ -202,6 +205,9 @@ export default {
 		playerPause: 'Пауза',
 		playerNext: 'Следующий трек',
 		notFoundDance: "Ничего не нашлось",
+		performanceVideo: "Видеоклип",
+		sourceVideo: "Видеоисточник",
+		lessonVideo: "Видеоурок",
 	},
 	hy: {
 		homePageMenuItem: "Գլխավոր",
@@ -304,5 +310,8 @@ export default {
 		playerPause: 'Դադար',
 		playerNext: 'Հաջորդ երգը',
 		notFoundDance: "Ոչինչ չի գտնվել",
+		performanceVideo: "Տեսահոլովակ",
+		sourceVideo: "Վիդեոաղբյուր",
+		lessonVideo: "Վիդեոդաս",
 	}
 }

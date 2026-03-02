@@ -140,11 +140,13 @@ watch(() => props.id, (id) => {
 										<span>{{ translateDancesParametres(dance?.gender, { t, prefix: 'gender' }) }}</span>
 									</li>
 									<li class="dance-parametres__item">{{ t('handshakes') }}:
-										<span>{{ translateDancesParametres(dance?.handshakes, { t, prefix: 'handshakes' }) }}</span>
+										<span>{{ translateDancesParametres(dance?.handshakes, { t, prefix: 'handshakes' })
+										}}</span>
 									</li>
 								</ul>
 							</section>
-							<div v-if="playlist.length > 0 && (currentTrack?.name != '' || currentTrack?.link != '')" class="dance-audio">
+							<div v-if="playlist.length > 0 && (currentTrack?.name != '' || currentTrack?.link != '')"
+								class="dance-audio">
 								<AudioPlayerControls />
 								<div class="dance-audio__list">
 									<div v-for="track in playlist" :key="track?.id" class="dance-audio__list-item"
@@ -176,7 +178,9 @@ watch(() => props.id, (id) => {
 									<div class="dance-video__iframe">
 										<LiteYouTubeEmbed :id="getYoutubeId(video.link)" :title="video.name" />
 									</div>
-									<div class="dance-video__title">{{ video.name }}</div>
+									<div class="dance-video__title"><span>{{ t(`${video.category}Video`) }}</span>{{ video.name
+									}}
+									</div>
 								</swiper-slide>
 							</swiper>
 						</div>
@@ -275,6 +279,11 @@ watch(() => props.id, (id) => {
 		font-size: toRem(12);
 		text-align: center;
 		color: #c83f01;
+
+		@media (max-width:$mobileSmall) {
+			font-size: toRem(10);
+			padding: toRem(6) toRem(12);
+		}
 	}
 
 	&__title {
@@ -418,9 +427,29 @@ watch(() => props.id, (id) => {
 		font-size: toRem(22);
 		color: #1b1919;
 		margin-top: toRem(10);
+		display: flex;
+		align-items: center;
+		gap: toRem(10);
+		flex-wrap: wrap;
 
 		@media (max-width:$mobileSmall) {
 			font-size: toRem(18);
+		}
+
+		span {
+			color: #c83f01;
+			font-size: toRem(12);
+			border-radius: 14px;
+			border: 1px solid #c83f01;
+			padding: toRem(5);
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+
+			@media (max-width:$mobileSmall) {
+				padding: toRem(3);
+				font-size: toRem(10);
+			}
 		}
 	}
 }
@@ -428,11 +457,8 @@ watch(() => props.id, (id) => {
 .dance-audio {
 	&__list {
 		margin-top: toRem(20);
-
-		@media (min-width:$mobile) {
-			max-height: toRem(280);
-			overflow-y: auto;
-		}
+		overflow-y: auto;
+		max-height: toRem(280);
 
 		@media (max-width:$mobile) {
 			margin-top: toRem(10);
