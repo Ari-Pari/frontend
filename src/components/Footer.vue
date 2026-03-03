@@ -13,17 +13,17 @@ const { t } = useI18n()
 					<div class="footer__column-title">{{ t('footerContacts') }}</div>
 					<ul class="footer__links">
 						<li class="footer__link"><img src="@/assets/icons/telegram.svg" alt="Telegram logo"><a
-								href="https://t.me/ariparenq">@ariparenq</a></li>
+								target="_blank" href="https://t.me/ariparenq">@ariparenq</a></li>
 						<li class="footer__link"><img src="@/assets/icons/instagram.svg" alt="Instagram logo"><a
-								href="https://www.instagram.com/aripari.am">@aripari.am</a></li>
+								target="_blank" href="https://www.instagram.com/aripari.am">@aripari.am</a></li>
 						<li class="footer__link"><img src="@/assets/icons/vcard.png" alt="Vcard logo"><a
-								href="https://vcard.am/u328">{{ t('aboutText21') }}</a></li>
+								target="_blank" href="https://vcard.am/u328">{{ t('aboutText21') }}</a></li>
 					</ul>
 				</div>
 				<div class="footer__column">
 					<div class="footer__column-title">{{ t('footerLinks') }}</div>
 					<ul class="footer__links">
-						<li class="footer__link"><a href="https://github.com/Ari-Pari">https://github.com/Ari-Pari</a></li>
+						<li class="footer__link"><a target="_blank" href="https://github.com/Ari-Pari">https://github.com/Ari-Pari</a></li>
 					</ul>
 				</div>
 			</div>
