@@ -1,5 +1,5 @@
 <script setup>
-import { watch, nextTick, useTemplateRef, onMounted } from 'vue';
+import { watch, nextTick, useTemplateRef } from 'vue';
 import { usePlayer } from '@/composables/usePlayer';
 import { useRoute } from "vue-router"
 
@@ -9,6 +9,7 @@ const { currentTrack,
 	isPlaying,
 	togglePlay,
 	nextTrack,
+	handleError,
 	updateDuration,
 	updateCurrentTime,
 	currentTime } = usePlayer();
@@ -28,6 +29,10 @@ watch(isPlaying, async (shouldPlay) => {
 
 	if (shouldPlay) {
 		try {
+			if (!currentTrack.value?.link) {
+				togglePlay(false);
+				return;
+			}
 			await audioPlayerRef.value.play();
 		} catch (error) {
 			console.warn("Autoplay prevented:", error);
@@ -55,8 +60,8 @@ const onTimeUpdate = () => {
 
 <template>
 	<audio ref="audio-player" aria-hidden="true" tabindex="-1" class="audio-player" :class="route.meta.playerStyle"
-		@play="togglePlay(true)" @pause="togglePlay(false)" @ended="nextTrack" @loadedmetadata="onMetadataLoaded"
-		@timeupdate="onTimeUpdate" :src="currentTrack?.link">
+		@ended="nextTrack" @error="handleError" @loadedmetadata="onMetadataLoaded" @timeupdate="onTimeUpdate"
+		:src="currentTrack?.link">
 	</audio>
 </template>
 

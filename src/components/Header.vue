@@ -44,6 +44,11 @@ watch(route, () => {
 						<li class="menu__item">
 							<RouterLink class="menu__link" to="/about"> {{ t('aboutPageMenuItem') }} </RouterLink>
 						</li>
+						<li class="menu__item">
+							<a class="menu__link" target="_blank" href="https://t.me/ariparenq">
+								<img src="@/assets/icons/telegram-white.svg" alt="Image">
+								{{ t('upcomingEventsMenuItem') }} </a>
+						</li>
 					</ul>
 					<div class="menu__actions">
 						<RouterLink to="/#dances" v-bind:aria-label="t('searchAriaLabel')" :title="t('searchAriaLabel')"
@@ -104,6 +109,36 @@ watch(route, () => {
 	border-radius: 60px;
 	padding-right: toRem(24);
 
+	&__audio-player-btn {
+		width: toRem(40);
+		height: toRem(40);
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		border: 2px solid $orangeColor;
+		border-radius: 50%;
+		margin-left: toRem(10);
+
+		img.menu__audio-player-btn--play {
+			margin-left: 5px;
+		}
+
+		img {
+			width: toRem(19);
+			height: toRem(22);
+		}
+
+		@media (max-width:$mobileSmall) {
+			width: toRem(30);
+			height: toRem(30);
+
+			img {
+				width: toRem(15);
+				height: toRem(15);
+			}
+		}
+	}
+
 	&__left {
 		display: flex;
 		align-items: center;
@@ -112,6 +147,11 @@ watch(route, () => {
 		&-button {
 			@media (max-width:$tablet) {
 				width: toRem(200);
+			}
+
+			@media (max-width:$mobile) {
+				width: auto;
+				max-width: toRem(160);
 			}
 
 			@media (max-width:$mobileSmall) {
@@ -181,6 +221,7 @@ watch(route, () => {
 		flex-wrap: wrap;
 		align-items: center;
 		gap: toRem(20);
+		row-gap: toRem(10);
 		margin-right: toRem(30);
 
 		@media (max-width:$tablet) {
@@ -202,6 +243,15 @@ watch(route, () => {
 		transition: all 0.3s;
 		font-size: toRem(20);
 		color: #353535;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: toRem(4);
+
+		img {
+			width: toRem(25);
+			height: toRem(25);
+		}
 
 		@media (max-width:$tablet) {
 			font-size: toRem(24);

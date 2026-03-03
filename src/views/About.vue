@@ -23,20 +23,8 @@ const { copiedField, copyText } = useClipboard()
 	<section class="about-history">
 		<div class="about-history__container">
 			<h2 class="about-history__title about-title">{{ t('aboutText2') }}</h2>
-			<div class="about-history__cards">
-				<div class="about-history__card">
-					<div class="about-history__card-number">01</div>
-					<div class="about-history__card-text">{{ t('aboutText3') }}</div>
-				</div>
-				<div class="about-history__card">
-					<div class="about-history__card-number">02</div>
-					<div class="about-history__card-text">{{ t('aboutText4') }}</div>
-				</div>
-				<div class="about-history__card">
-					<div class="about-history__card-number">03</div>
-					<div class="about-history__card-text">{{ t('aboutText5') }}</div>
-				</div>
-			</div>
+			<div class="about-history__text">{{ t('aboutText3') }}</div>
+			<div class="about-history__text">{{ t('aboutText4') }}</div>
 			<div class="about-history__text">{{ t('aboutText6') }}</div>
 		</div>
 	</section>
@@ -54,20 +42,6 @@ const { copiedField, copyText } = useClipboard()
 	</section>
 	<div class="about-info">
 		<div class="about-info__container">
-			<div class="about-founder">
-				<div class="about-founder__body">
-					<div class="about-founder__top">
-						<div class="about-founder__image">
-							<img src="@/assets/about/avatar-hamazasp.png" alt="Founder image">
-						</div>
-						<div class="about-founder__texts">
-							<div class="about-founder__name">{{ t('aboutText21') }}</div>
-							<div class="about-founder__status">{{ t('aboutText13') }}</div>
-						</div>
-					</div>
-					<div class="about-founder__text">{{ t('aboutText14') }}</div>
-				</div>
-			</div>
 			<section class="about-support">
 				<h2 class="about-support__title about-title">{{ t('aboutText15') }}</h2>
 				<i18n-t keypath="aboutText16" tag="div" class="about-support__text">
@@ -232,95 +206,6 @@ const { copiedField, copyText } = useClipboard()
 
 	&__title {}
 
-	&__cards {
-		margin-bottom: toRem(58);
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		gap: toRem(71);
-
-		@media (max-width: toEm(1300)) {
-			gap: toRem(30);
-		}
-
-		@media (max-width: toEm(1150)) {
-			gap: toRem(20);
-		}
-
-		@media (max-width: toEm(600)) {
-			grid-template-columns: 1fr;
-			margin-bottom: toRem(30);
-		}
-	}
-
-	&__card {
-		background: #fff;
-		border-radius: 20px;
-		border: 1px solid $orangeColor;
-		display: flex;
-		align-items: center;
-		padding: toRem(45) toRem(37);
-
-		@media (max-width: toEm(1300)) {
-			padding: toRem(30);
-		}
-
-		@media (max-width: toEm(1150)) {
-			padding: toRem(30) toRem(20);
-		}
-
-		@media (max-width:$tablet) {
-			flex-direction: column;
-			align-items: start;
-		}
-
-		@media (max-width: toEm(600)) {
-			flex-direction: row;
-			align-items: center;
-			padding: toRem(20) toRem(15);
-		}
-	}
-
-	&__card-number {
-		font-weight: 600;
-		font-size: toRem(99);
-		line-height: 108%;
-		letter-spacing: -0.02em;
-		background: linear-gradient(180deg, #fc860a 0%, #fcb62a 100%);
-		background-clip: text;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		margin-right: toRem(28);
-
-		@media (max-width: toEm(1150)) {
-			margin-right: toRem(20);
-			font-size: toRem(70);
-		}
-
-		@media (max-width:$tablet) {
-			margin: toRem(0) toRem(0) toRem(10) toRem(0);
-		}
-
-		@media (max-width: toEm(600)) {
-			margin: toRem(0) toRem(20) toRem(0) toRem(0);
-			font-size: toRem(50);
-		}
-	}
-
-	&__card-text {
-		font-size: toRem(20);
-		line-height: 114%;
-		letter-spacing: -0.02em;
-		color: #1a1a1a;
-
-		@media (max-width:$mobile) {
-			font-size: toRem(18);
-		}
-
-		@media (max-width: toEm(600)) {
-			font-size: toRem(16);
-		}
-	}
-
 	&__text {
 		font-size: toRem(26);
 		line-height: 114%;
@@ -328,6 +213,14 @@ const { copiedField, copyText } = useClipboard()
 		color: #1a1a1a;
 		max-width: toRem(505);
 		white-space: pre-line;
+
+		&:not(:last-child) {
+			margin-bottom: toRem(20);
+		}
+
+		&:last-child {
+			margin-top: toRem(40);
+		}
 
 		@media (max-width:$mobile) {
 			font-size: toRem(20);
@@ -467,98 +360,16 @@ const { copiedField, copyText } = useClipboard()
 	&__container {}
 }
 
-.about-founder {
-	padding: toRem(153) 0 toRem(78);
-
-	@media (max-width:$mobile) {
-		padding: toRem(100) 0 toRem(60);
-	}
-
-	&__body {
-		border-radius: 20px;
-		background-color: #fff;
-		border: 1px solid $orangeColor;
-		max-width: toRem(903);
-		margin: 0 auto;
-		padding: 0 toRem(35) toRem(53);
-
-		@media (max-width:$mobileSmall) {
-			padding: 0 toRem(16) toRem(30);
-		}
-	}
-
-	&__top {
-		margin-bottom: toRem(30);
-		display: flex;
-		align-items: flex-end;
-		margin-top: toRem(-75);
-
-		@media (max-width:$mobile) {
-			margin-top: toRem(-40);
-		}
-	}
-
-	&__image {
-		margin-right: toRem(18);
-
-		img {
-			width: toRem(136);
-			height: toRem(136);
-
-			@media (max-width:$mobile) {
-				width: toRem(80);
-				height: toRem(80);
-			}
-		}
-	}
-
-	&__texts {
-		padding-bottom: toRem(20);
-
-		@media (max-width:$mobile) {
-			padding: 0;
-		}
-	}
-
-	&__name {
-		font-size: toRem(20);
-		line-height: 114%;
-		letter-spacing: -0.02em;
-		color: #1a1a1a;
-		line-height: 1.3;
-
-		@media (max-width:$mobile) {
-			font-size: toRem(18);
-		}
-
-		@media (max-width: toEm(350)) {
-			font-size: toRem(15);
-		}
-	}
-
-	&__status {
-		font-size: toRem(11);
-		color: rgba(0, 0, 0, 0.5);
-	}
-
-	&__text {
-		font-size: toRem(20);
-		line-height: 114%;
-		letter-spacing: -0.02em;
-		color: #1a1a1a;
-		line-height: 1.3;
-
-		@media (max-width:$mobile) {
-			font-size: toRem(18);
-		}
-
-		@media (max-width:$mobileSmall) {
-			font-size: toRem(16);
-		}
-	}
-}
 
 .about-support {
+	&:first-child {
+		padding-top: toRem(80);
+
+		@media (max-width:$mobile) {
+			padding-top: toRem(60);
+		}
+	}
+
 	padding-bottom: toRem(80);
 
 	@media (max-width:$mobile) {

@@ -18,8 +18,8 @@ const { currentTrack,
 </script>
 
 <template>
-	<div v-if="playlist.length > 0 && (currentTrack?.name != '' || currentTrack?.link != '')" class="audio-player-controls" :title="currentTrack?.name"
-		:class="{ dancePage: route.name == 'dance' }">
+	<div v-if="playlist.length > 0 && (currentTrack?.name != '' || currentTrack?.link != '')"
+		class="audio-player-controls" :title="currentTrack?.name" :class="{ dancePage: route.name == 'dance' }">
 		<div class="audio-player-controls__top">
 			<div class="audio-player-controls__buttons">
 				<button @click="prevTrack" class="audio-player-controls__change-btn" :aria-label="t('playerPrev')"
@@ -46,13 +46,18 @@ const { currentTrack,
 					</a>
 				</div>
 			</div>
+			<a v-if="currentTrack?.link" :href="currentTrack.link" :download="`${currentTrack.name}.mp3`" target="_blank"
+				class="audio-player-controls__download">
+				<img src="@/assets/icons/download.svg" alt="Download icon">
+			</a>
 		</div>
 		<div class="audio-player-controls__bottom">
 			<span class="audio-player-controls__duration">{{ formatTime(currentTime || 0) }}</span>
 			<span class="audio-player-controls__duration--slash">/</span>
 			<input class="audio-player-controls__range" type="range" :min="0" :max="duration" :value="currentTime"
 				@input="(e) => updateCurrentTime(Number(e.target.value))" />
-			<span class="audio-player-controls__duration">{{ formatTime(duration || 0) }}</span>
+			<span class="audio-player-controls__duration audio-player-controls__duration--right">{{ formatTime(duration ||
+				0) }}</span>
 		</div>
 	</div>
 </template>
@@ -64,8 +69,21 @@ const { currentTrack,
 	padding: toRem(10) toRem(16) toRem(5);
 	background-color: #fff;
 
-	// .header &.dancePage {
-	// 	display: none;
+	.header &.dancePage {
+		display: none;
+	}
+
+	// .header & {
+	// 	position: absolute;
+	// 	top: 0;
+	// 	opacity: 0;
+	// 	visibility: hidden;
+	// 	transition: all 0.3s;
+	// }
+	// .header &.header-active {
+	// 	top: calc(100% + 10px);
+	// 	opacity: 1;
+	// 	visibility: visible;
 	// }
 
 	.header & {
@@ -92,6 +110,10 @@ const { currentTrack,
 			&:last-child {
 				display: none;
 			}
+		}
+
+		.audio-player-controls__download {
+			display: none;
 		}
 
 		padding: toRem(0);
@@ -138,6 +160,10 @@ const { currentTrack,
 		font-size: toRem(12);
 		flex: 0 0 toRem(40);
 		color: #989898;
+
+		&--right {
+			text-align: right;
+		}
 
 		&--slash {
 			color: #989898;
@@ -228,6 +254,14 @@ const { currentTrack,
 			&:hover {
 				text-decoration: underline;
 			}
+		}
+	}
+
+	&__download {
+		margin-left: toRem(15);
+		img{
+			width: toRem(24);
+			height: toRem(24);
 		}
 	}
 }

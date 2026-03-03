@@ -24,7 +24,8 @@ const { currentTrack,
 	isPlaying,
 	handleTrackClick,
 	playlist,
-	setPlaylist } = usePlayer();
+	setPlaylist,
+	togglePlay } = usePlayer();
 const fullUrl = ref('')
 const router = useRouter()
 
@@ -171,11 +172,11 @@ watch(() => props.id, (id) => {
 						</div>
 						<div v-if="allVideos.length > 0" class="dance-video">
 							<swiper :modules="modules" :breakpoints="{
-								300: { slidesPerView: 1 },
+								300: { slidesPerView: 1, autoHeight: true, },
 								991.98: { slidesPerView: 1.7 }
 							}" :space-between="20" navigation>
 								<swiper-slide v-for="video in allVideos" :key="video.id" class="dance-video__slide">
-									<div class="dance-video__iframe">
+									<div @click.capture="togglePlay(false)" class="dance-video__iframe">
 										<LiteYouTubeEmbed :id="getYoutubeId(video.link)" :title="video.name" />
 									</div>
 									<div class="dance-video__title"><span>{{ t(`${video.category}Video`) }}</span>{{ video.name
@@ -250,6 +251,7 @@ watch(() => props.id, (id) => {
 
 		@media (max-width:$mobile) {
 			max-width: 100%;
+			gap: toRem(20);
 		}
 	}
 
@@ -263,8 +265,9 @@ watch(() => props.id, (id) => {
 			margin-bottom: toRem(30);
 		}
 
-		@media (max-width:$mobileSmall) {
-			margin-bottom: toRem(20);
+		@media (max-width:$mobile) {
+			margin: 0;
+			gap: toRem(10);
 		}
 	}
 
@@ -300,11 +303,11 @@ watch(() => props.id, (id) => {
 
 		@media (max-width:$mobile) {
 			font-size: toRem(40);
+			margin: 0;
 		}
 
 		@media (max-width:$mobileSmall) {
 			font-size: toRem(30);
-			margin-bottom: toRem(20);
 		}
 	}
 
@@ -316,6 +319,9 @@ watch(() => props.id, (id) => {
 		overflow: hidden;
 		margin-right: -37%;
 		margin-left: 20px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 
 		@media (max-width:$pc) {
 			margin-right: -39%;
@@ -347,8 +353,20 @@ watch(() => props.id, (id) => {
 		width: auto;
 		min-width: toRem(250);
 
+		@media (max-width:$mobile) {
+			width: toRem(200);
+			min-width: toRem(200);
+			min-height: toRem(30);
+			font-size: toRem(14);
+		}
+
 		@media (max-width:$mobileSmall) {
-			font-size: toRem(16);
+			padding: toRem(6) toRem(12);
+			font-size: toRem(12);
+			max-width: toRem(110);
+			min-width: auto;
+			height: toRem(24);
+			min-height: toRem(24);
 		}
 	}
 }
@@ -413,6 +431,10 @@ watch(() => props.id, (id) => {
 	margin-top: toRem(50);
 	padding: 0;
 
+	@media (max-width:$mobile) {
+		margin-top: toRem(20);
+	}
+
 	&__slide {
 		display: flex;
 		flex-direction: column;
@@ -455,10 +477,24 @@ watch(() => props.id, (id) => {
 }
 
 .dance-audio {
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 60px;
+		background: linear-gradient(transparent, #fff);
+		pointer-events: none;
+	}
+
 	&__list {
 		margin-top: toRem(20);
 		overflow-y: auto;
 		max-height: toRem(280);
+		padding-bottom: toRem(30);
 
 		@media (max-width:$mobile) {
 			margin-top: toRem(10);
@@ -670,6 +706,10 @@ watch(() => props.id, (id) => {
 			background-color: $orangeColor;
 		}
 	}
+}
+
+.swiper-button-lock {
+	display: none;
 }
 
 // .swiper-pagination {

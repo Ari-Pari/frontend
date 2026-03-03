@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted, useTemplateRef, onBeforeUnmount, computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { useMediaQuery, refDebounced, useInfiniteScroll, useIntersectionObserver } from "@vueuse/core"
+import { useMediaQuery, refDebounced, useIntersectionObserver } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 import { DanceService, defaultDancesParams } from "@/services/api";
 import { translateDancesParametres } from "@/services/utils";
@@ -77,20 +77,10 @@ const loadDances = async (isFirstPage = false) => {
 // Infinite scroll for dance cards
 const loadMoreTrigger = useTemplateRef('loadMoreTrigger')
 const dancesInner = useTemplateRef('dancesInner')
-// useInfiniteScroll(dancesInner, () => {
-// 	if (!dancesLoading.value && !isFinished.value && !dancesError.value) {
-// 		loadDances()
-// 		dancesPage.value++
-// 	}
-// }, {
-// 	distance: 200,
-// 	canLoadMore: () => !isFinished.value
-// })
 useIntersectionObserver(
 	loadMoreTrigger,
 	([{ isIntersecting }]) => {
 		if (isIntersecting && !dancesLoading.value && !isFinished.value) {
-			console.log('Trigger visible, loading more...')
 			loadDances()
 		}
 	},
@@ -159,16 +149,6 @@ watch(searchDancesBodyParams, (newParams) => {
 				<h2 class="actions-dances__title"> {{ t('danceEncyclopedia') }}</h2>
 				<div class="actions-dances__bottom">
 					<div class="actions-dances__sorting">
-						<!-- <div class="actions-dances__select">
-							<select class="actions-dances__select-item">
-								<option disabled value="" selected>{{ t('cardViewText') }}</option>
-								<option value="base-view">{{ t('cardViewBase') }}</option>
-								<option value="list-view">{{ t('cardViewList') }}</option>
-							</select>
-							<span>
-								<img src="@/assets/icons/arrow-down.svg" alt="Arrow down icon">
-							</span>
-						</div> -->
 						<div class="actions-dances__select">
 							<select class="actions-dances__select-item" v-model="searchDancesBodyParams.sortedBy">
 								<option value="createdBy">{{ t('sortCreated') }}</option>
@@ -301,7 +281,7 @@ watch(searchDancesBodyParams, (newParams) => {
 							</div>
 						</details>
 						<details class="dances-filters__checkboxes-group" :open="isDesktop">
-							<summary class="dances-filters__checkboxes-title " @click="toggleDetails">{{
+							<summary class="dances-filters__checkboxes-title" @click="toggleDetails">{{
 								t('gender') }}</summary>
 							<div class="dances-filters__checkbox">
 								<label>
@@ -313,8 +293,8 @@ watch(searchDancesBodyParams, (newParams) => {
 									<span>{{ t('gender_FEMALE') }}</span>
 								</label>
 								<label>
-									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="MULTI">
-									<span>{{ t('gender_MULTI') }}</span>
+									<input type="checkbox" v-model="searchDancesBodyParams.genders" value="MULTY">
+									<span>{{ t('gender_MULTY') }}</span>
 								</label>
 							</div>
 						</details>

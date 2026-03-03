@@ -7,12 +7,14 @@ const state = reactive({
 	isPlaying: false,
 	duration: 0,
 	currentTime: 0,
+	isExpanded: false,
 })
 
 export function usePlayer() {
 	const currentTrack = computed(() => state.currentTrack)
 	const playlist = computed(() => state.playlist)
 	const isPlaying = computed(() => state.isPlaying)
+	const isExpanded = computed(() => state.isExpanded)
 	const duration = computed(() => state.duration);
 	const currentTime = computed(() => state.currentTime);
 
@@ -48,6 +50,13 @@ export function usePlayer() {
 	const togglePlay = (status) => {
 		state.isPlaying = status;
 	}
+	const handleError = () => {
+		console.error("Audio error:", e);
+		togglePlay(false);
+	}
+	const toggleExpand = (val) => {
+		state.isExpanded = typeof val === 'boolean' ? val : !state.isExpanded
+	}
 	const nextTrack = () => {
 		const currentIndex = state.playlist.indexOf(state.currentTrack)
 		if (currentIndex < state.playlist.length - 1) {
@@ -80,6 +89,7 @@ export function usePlayer() {
 	}
 	return {
 		currentTrack,
+		handleError,
 		playlist,
 		isPlaying,
 		setTrack,
@@ -89,6 +99,8 @@ export function usePlayer() {
 		showPlaylist,
 		nextTrack,
 		prevTrack,
+		isExpanded,
+		toggleExpand,
 		duration,
 		currentTime,
 		updateDuration,
