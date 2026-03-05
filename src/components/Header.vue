@@ -220,6 +220,7 @@ watch(route, () => {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
+		justify-content: flex-end;
 		gap: toRem(20);
 		row-gap: toRem(10);
 		margin-right: toRem(30);
@@ -229,11 +230,14 @@ watch(route, () => {
 			margin-bottom: toRem(40);
 			margin-right: 0;
 			gap: toRem(30);
+			justify-content: flex-start;
 			align-items: flex-start;
 		}
 	}
 
 	&__item {
+		display: flex;
+
 		.router-link-exact-active {
 			color: $orangeColor;
 		}

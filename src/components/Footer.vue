@@ -35,7 +35,7 @@ const { t } = useI18n()
 .footer {
 	padding: toRem(30) 0 toRem(80);
 	background-color: #17181A;
-	color: #ffffd5;
+	color: #fff;
 
 	&__container {}
 
@@ -74,9 +74,9 @@ const { t } = useI18n()
 
 	&__column-title {
 		font-size: toRem(32);
-		color: #ffffd5;
+		color: #fff;
 		padding-bottom: toRem(5);
-		border-bottom: 1px solid #ffffd5;
+		border-bottom: 1px solid #fff;
 		margin-bottom: toRem(18);
 		line-height: 1.2;
 
@@ -118,7 +118,7 @@ const { t } = useI18n()
 
 		a {
 			font-size: toRem(18);
-			color: #ffffd5;
+			color: #fff;
 
 			@media (max-width:$mobile) {
 				font-size: toRem(16);

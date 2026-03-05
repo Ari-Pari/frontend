@@ -105,8 +105,7 @@ watch(() => props.id, (id) => {
 										<div v-if="dance?.regions" class="dance-top__categories">
 											<button type="button" @click="chooseFilter(region)" v-for="region in dance?.regions"
 												:key="region?.id" class="dance-top__category">{{
-													region?.name
-												}}</button>
+													region?.name}}</button>
 										</div>
 										<h1 class="dance-top__title">{{ dance?.name }}</h1>
 										<button v-if="isSupported" @click="shareDance" class="dance-top__copy-button button">
