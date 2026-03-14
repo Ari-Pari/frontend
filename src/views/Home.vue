@@ -23,7 +23,7 @@ const { t } = useI18n()
 			<div class="quote-block__image">
 				<img src="@/assets/icons/sun.svg" alt="">
 			</div>
-			<div class="quote-block__text">{{ t('quoteBlockText') }}</div>
+			<h1 class="quote-block__text">{{ t('quoteBlockText') }}</h1>
 		</div>
 	</div>
 	<DancesCards />

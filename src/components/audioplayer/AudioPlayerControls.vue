@@ -66,7 +66,7 @@ const { currentTrack,
 .audio-player-controls {
 	border-radius: 20px;
 	border: 2px solid $orangeColor;
-	padding: toRem(10) toRem(16) toRem(5);
+	padding: toRem(10) toRem(16);
 	background-color: #fff;
 
 	.header &.dancePage {

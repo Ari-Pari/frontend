@@ -105,7 +105,7 @@ watch(() => props.id, (id) => {
 										<div v-if="dance?.regions" class="dance-top__categories">
 											<button type="button" @click="chooseFilter(region)" v-for="region in dance?.regions"
 												:key="region?.id" class="dance-top__category">{{
-													region?.name}}</button>
+													region?.name }}</button>
 										</div>
 										<h1 class="dance-top__title">{{ dance?.name }}</h1>
 										<button v-if="isSupported" @click="shareDance" class="dance-top__copy-button button">
@@ -209,6 +209,10 @@ watch(() => props.id, (id) => {
 .dance {
 	padding: toRem(137) 0 toRem(80);
 
+	@media (max-width:$mobileSmall) {
+		padding-bottom: toRem(40);
+	}
+
 	&__body {}
 
 	&__inner {
@@ -294,6 +298,7 @@ watch(() => props.id, (id) => {
 		line-height: 105%;
 		color: #1a1a1a;
 		margin-bottom: toRem(40);
+		word-break: break-word;
 
 		@media (max-width:$tablet) {
 			font-size: toRem(50);
@@ -558,7 +563,7 @@ watch(() => props.id, (id) => {
 	&__play-button {
 		width: toRem(25);
 		display: inline-flex;
-		justify-content: center;
+		justify-content: flex-start;
 		align-items: center;
 
 		img {

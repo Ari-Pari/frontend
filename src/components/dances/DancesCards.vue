@@ -52,7 +52,6 @@ const loadDances = async (isFirstPage = false) => {
 		allDances.value = []
 		dancesPage.value = 1
 		isFinished.value = false
-		if (dancesInner.value) dancesInner.value.scrollTop = 0
 	}
 	const result = await fetchDances({
 		lang: locale.value,
@@ -85,8 +84,7 @@ useIntersectionObserver(
 		}
 	},
 	{
-		root: dancesInner,
-		rootMargin: '200px',
+		rootMargin: '500px',
 	}
 )
 // Count function for filters number
@@ -409,6 +407,9 @@ watch(searchDancesBodyParams, (newParams) => {
 							</div>
 							<div ref="loadMoreTrigger" class="load-more-trigger"
 								style="width: 100%; height: 10px; margin-top: 20px;"></div>
+							<div v-if="dancesLoading" class='dances__load-more-icon'>
+								<svg width="60" height="60" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#353535" stroke-width="3" stroke-linecap="round" stroke-dasharray="60 120"><animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"></animateTransform></circle></svg>
+							</div>
 						</template>
 						<template v-else>
 							<div class="dances__body-notfound">
@@ -427,7 +428,6 @@ watch(searchDancesBodyParams, (newParams) => {
 	scroll-margin-top: 70px;
 	padding-top: toRem(53);
 	background: #fff;
-
 	@media (max-width:$mobile) {
 		padding-top: toRem(50);
 	}
@@ -438,22 +438,13 @@ watch(searchDancesBodyParams, (newParams) => {
 	}
 
 	&__inner {
-		//max-height: toRem(1291);
-		max-height: 1500px;
-		overflow-y: auto;
-		padding: 0 toRem(53) toRem(53);
+		padding: 0 toRem(53) toRem(80);
 		display: flex;
 		flex-direction: column;
 		position: relative;
 
 		@media (max-width:$pc) {
-			padding: 0 0 toRem(53);
-		}
-
-		@media (max-width:toEm(530)) {
-			max-height: 1300px;
-			//max-height: toRem(750);
-			padding: 0 0 toRem(25);
+			padding: 0 0 toRem(55);
 		}
 	}
 
@@ -466,16 +457,16 @@ watch(searchDancesBodyParams, (newParams) => {
 			gap: toRem(30);
 		}
 
-		@media (max-width: toEm(805)) {
+		@media (max-width: toEm(870)) {
 			grid-template-columns: 1fr 1fr;
 			gap: toRem(30) toRem(25);
 		}
 
-		@media (max-width:toEm(530)) {
+		@media (max-width:toEm(570)) {
 			gap: toRem(30) toRem(19);
 		}
 
-		@media (max-width: toEm(370)) {
+		@media (max-width:$mobileSmall) {
 			gap: toRem(30) toRem(10);
 		}
 	}
@@ -488,18 +479,16 @@ watch(searchDancesBodyParams, (newParams) => {
 			font-size: toRem(16);
 		}
 	}
-
-	// &__showmore-button {
-	// 	margin-top: toRem(50);
-	// 	align-self: center;
-
-	// 	@media (max-width:$mobileSmall) {
-	// 		margin-top: toRem(20);
-	// 		font-size: toRem(16);
-	// 		height: toRem(30);
-	// 		width: toRem(200);
-	// 	}
-	// }
+	&__load-more-icon{
+		position: absolute;
+		bottom: 12px;
+		left: 50%;
+		transform: translate(-50%,0px);
+		svg {
+			width: toRem(30);
+			height: toRem(30);
+		}
+	}
 }
 
 .actions-dances {
@@ -1090,11 +1079,13 @@ watch(searchDancesBodyParams, (newParams) => {
 .dance-item {
 	display: flex;
 	flex-direction: column;
+	max-width: 100%;
+	overflow: hidden;
 	// border: 1px solid #d9d9d9;
 	// border-radius: 14px;
 	// background-color: #fff;
 
-	@media (max-width:toEm(530)) {
+	@media (max-width:toEm(570)) {
 		border-radius: 6px;
 	}
 
@@ -1121,7 +1112,7 @@ watch(searchDancesBodyParams, (newParams) => {
 			object-fit: cover;
 		}
 
-		@media (max-width:toEm(530)) {
+		@media (max-width:toEm(570)) {
 			border-radius: 6px;
 		}
 	}
@@ -1143,8 +1134,9 @@ watch(searchDancesBodyParams, (newParams) => {
 		transition: all 0.3s;
 		margin-bottom: toRem(9);
 		line-height: 1.3;
+		word-break: break-word;
 
-		@media (max-width:toEm(530)) {
+		@media (max-width:toEm(570)) {
 			font-size: toRem(16);
 			margin-bottom: toRem(5);
 		}
@@ -1161,8 +1153,10 @@ watch(searchDancesBodyParams, (newParams) => {
 		display: flex;
 		flex-wrap: wrap;
 		gap: toRem(10);
+		max-width: 100%;
 
-		@media (max-width:toEm(530)) {
+		@media (max-width:toEm(570)) {
+			gap: toRem(5);
 			margin-bottom: toRem(5);
 		}
 	}
@@ -1179,7 +1173,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		text-align: center;
 		color: #c83f01;
 
-		@media (max-width:toEm(530)) {
+		@media (max-width:toEm(570)) {
 			min-height: toRem(16);
 			font-size: toRem(10);
 			padding: 0 toRem(9.5);
@@ -1191,7 +1185,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		grid-template-columns: 1fr 1fr;
 		gap: toRem(5) toRem(20);
 
-		@media (max-width: toEm(370)) {
+		@media (max-width: toEm(390)) {
 			grid-template-columns: 1fr;
 		}
 	}
@@ -1202,7 +1196,7 @@ watch(searchDancesBodyParams, (newParams) => {
 		font-weight: 700;
 		line-height: 1.3;
 
-		@media (max-width:toEm(530)) {
+		@media (max-width:toEm(570)) {
 			font-size: toRem(10);
 		}
 

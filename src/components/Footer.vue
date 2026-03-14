@@ -7,23 +7,39 @@ const { t } = useI18n()
 <template>
 	<footer class="footer">
 		<div class="footer__container">
-			<RouterLink to="/" class="footer__logo"><img src="@/assets/AriPari_Logo-footer.png" alt="AriPari logo"></RouterLink>
+			<RouterLink to="/" class="footer__logo"><img src="@/assets/AriPari_Logo-footer.png" alt="AriPari logo">
+			</RouterLink>
 			<div class="footer__body">
 				<div class="footer__column">
 					<div class="footer__column-title">{{ t('footerContacts') }}</div>
-					<ul class="footer__links">
-						<li class="footer__link"><img src="@/assets/icons/telegram.svg" alt="Telegram logo"><a
-								target="_blank" href="https://t.me/ariparenq">@ariparenq</a></li>
-						<li class="footer__link"><img src="@/assets/icons/instagram.svg" alt="Instagram logo"><a
-								target="_blank" href="https://www.instagram.com/aripari.am">@aripari.am</a></li>
-						<li class="footer__link"><img src="@/assets/icons/vcard.png" alt="Vcard logo"><a
-								target="_blank" href="https://vcard.am/u328">{{ t('aboutText21') }}</a></li>
+					<ul class="footer__items">
+						<li class="footer__item">
+							<a class="footer__link" target="_blank" href="https://t.me/ariparenq">
+								<img src="@/assets/icons/telegram.svg" alt="Telegram logo"> @ariparenq
+							</a>
+						</li>
+						<li class="footer__item">
+							<a class="footer__link" target="_blank" href="https://www.instagram.com/aripari.am">
+								<img src="@/assets/icons/instagram.svg" alt="Instagram logo">
+								@aripari.am</a>
+						</li>
+						<li class="footer__item">
+							<a class="footer__link" target="_blank" href="https://vcard.am/u328">
+								<img src="@/assets/icons/vcard.png" alt="Vcard logo">
+								{{ t('aboutText21') }}
+							</a>
+						</li>
 					</ul>
 				</div>
 				<div class="footer__column">
 					<div class="footer__column-title">{{ t('footerLinks') }}</div>
-					<ul class="footer__links">
-						<li class="footer__link"><a target="_blank" href="https://github.com/Ari-Pari">https://github.com/Ari-Pari</a></li>
+					<ul class="footer__items">
+						<li class="footer__item footer__item--flex">
+							<a target="_blank" class="footer__link"
+								href="https://github.com/Ari-Pari">https://github.com/Ari-Pari</a>
+							<span class="footer__link-developer">Developed by
+								<a href="https://www.instagram.com/armenian.club/">Armenian Club</a></span>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -90,16 +106,30 @@ const { t } = useI18n()
 		}
 	}
 
-	&__links {}
+	&__link-developer {
+		color: #999;
+		font-size: toRem(14);
+
+		a {
+			text-decoration: underline;
+			@media (any-hover: hover){
+				&:hover{
+					text-decoration: none;
+				}
+			}
+		}
+	}
 
 	&__link {
-		&:not(:last-child) {
-			margin-bottom: toRem(10);
-		}
-
+		font-size: toRem(18);
+		color: #fff;
+		transition: all 0.3s;
 		display: flex;
 		align-items: center;
-		transition: all 0.3s;
+
+		@media (max-width:$mobile) {
+			font-size: toRem(16);
+		}
 
 		@media (any-hover: hover) {
 			&:hover {
@@ -115,14 +145,18 @@ const { t } = useI18n()
 				max-width: toRem(25);
 			}
 		}
+	}
 
-		a {
-			font-size: toRem(18);
-			color: #fff;
+	&__item {
+		&:not(:last-child) {
+			margin-bottom: toRem(10);
+		}
 
-			@media (max-width:$mobile) {
-				font-size: toRem(16);
-			}
+		&--flex {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: toRem(5);
 		}
 	}
 }
