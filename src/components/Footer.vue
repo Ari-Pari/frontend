@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n"
 
 const { t } = useI18n()
@@ -53,8 +53,6 @@ const { t } = useI18n()
 	background-color: #17181A;
 	color: #fff;
 
-	&__container {}
-
 	&__logo {
 		img {
 			width: toRem(220);
@@ -85,8 +83,6 @@ const { t } = useI18n()
 			gap: toRem(30);
 		}
 	}
-
-	&__column {}
 
 	&__column-title {
 		font-size: toRem(32);

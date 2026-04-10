@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
+// @ts-ignore
 import postcssSortMediaQueries from 'postcss-sort-media-queries'
 import autoprefixer from 'autoprefixer';
 import basicSsl from '@vitejs/plugin-basic-ssl'
@@ -25,6 +26,7 @@ export default defineConfig({
 		basicSsl()
 	],
 	server: {
+		// @ts-ignore
 		https: false,
 		host: true
 	},

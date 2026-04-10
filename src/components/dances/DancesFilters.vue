@@ -1,30 +1,32 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, onBeforeUnmount, useTemplateRef } from "vue"
 import { useI18n } from "vue-i18n"
 import { useMediaQuery } from "@vueuse/core"
 import { useFilter } from '@/composables/useFilter'
 
 const { t } = useI18n()
-const params = defineModel('params')
+const params = defineModel<any>('params')
 const isOpen = defineModel('isOpen')
 const { filterCount, resetFilters } = useFilter(params)
 
-const props = defineProps({
-	regions: Array,
-	filterButtonRef: Object
-})
+const props = defineProps<{
+	regions?: any[],
+	filterButtonRef?: HTMLElement | null
+}>()
 
 // Filter closing
-const filterBlockRef = useTemplateRef('filterBlockRef')
-function handleClickOutside(e) {
+const filterBlockRef = useTemplateRef<HTMLElement>('filterBlockRef')
+function handleClickOutside(e: MouseEvent) {
 	if (!isOpen.value) return
-	const clickedInsideBlock = filterBlockRef.value?.contains(e.target)
-	const clickedInsideButton = props.filterButtonRef?.contains(e.target)
+	const target = e.target as Node;
+
+	const clickedInsideBlock = filterBlockRef.value?.contains(target)
+	const clickedInsideButton = props.filterButtonRef?.contains(target)
 	if (!clickedInsideBlock && !clickedInsideButton) {
 		isOpen.value = false
 	}
 }
-function handleEsc(e) {
+function handleEsc(e: KeyboardEvent) {
 	if (e.key === "Escape") {
 		isOpen.value = false
 	}
@@ -32,7 +34,7 @@ function handleEsc(e) {
 
 // Transform to spollers on mobile
 const isDesktop = useMediaQuery('(min-width: 767.98px)')
-const toggleDetails = (event) => {
+const toggleDetails = (event: Event) => {
 	if (isDesktop.value) {
 		event.preventDefault()
 	}
@@ -340,8 +342,6 @@ onBeforeUnmount(() => {
 			grid-template-columns: 1fr;
 		}
 	}
-
-	&__checkboxes-group {}
 
 	&__checkboxes-title {
 		font-size: toRem(18);

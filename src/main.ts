@@ -4,7 +4,7 @@ import { createI18n } from 'vue-i18n'
 import './styles/main.scss'
 import App from './App.vue'
 import router from './router'
-import messages from './locales/messages'
+import { messages } from './locales/messages'
 import { userMainLanguage } from './services/api'
 
 document.documentElement.setAttribute('lang', userMainLanguage)

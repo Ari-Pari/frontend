@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n"
 import { translateDancesParametres } from "@/services/utils";
 
@@ -14,7 +14,7 @@ defineProps({
 <template>
 	<div class="dance-item">
 		<RouterLink v-if="dance.photo_link" :to="`/dances/${dance.id}`" class="dance-item__image">
-			<img :src="dance.photo_link" alt="" @error="e => e.target.parentElement.style.display = 'none'">
+			<img :src="dance.photo_link" alt="" @error="(e) => (e.target as HTMLElement).parentElement!.style.display = 'none'">
 		</RouterLink>
 		<div class="dance-item__texts">
 			<RouterLink :to="`/dances/${dance.id}`">

@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, useTemplateRef } from "vue"
 import { useI18n } from "vue-i18n"
 import { refDebounced, useIntersectionObserver } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 import { useFilter } from '@/composables/useFilter'
-import { DanceService, defaultDancesParams } from "@/services/api";
+import { DanceService, defaultDancesParams, type SupportedLocale } from "@/services/api";
 import DanceCard from '@/components/dances/DanceCard.vue'
 import DancesFilters from '@/components/dances/DancesFilters.vue'
 
@@ -14,12 +14,12 @@ const { t, locale } = useI18n()
 const savedDancesParams = sessionStorage.getItem('dancesFilter')
 const searchDancesBodyParams = ref(savedDancesParams ? JSON.parse(savedDancesParams) : defaultDancesParams)
 
-const allDances = ref([])
+const allDances = ref<any[]>([])
 const dancesPage = ref(1)
 const dancesPageSize = 12
 const isFinished = ref(false)
-const { data: dances, loading: dancesLoading, error: dancesError, execute: fetchDances } = useApi(DanceService.searchDances)
-const { data: dancesRegions, loading: dancesRegionsLoading, error: dancesRegionsError, execute: fetchRegions } = useApi(DanceService.getRegions)
+const { loading: dancesLoading, execute: fetchDances } = useApi(DanceService.searchDances)
+const { data: dancesRegions, execute: fetchRegions } = useApi(DanceService.getRegions)
 
 const loadDances = async (isFirstPage = false) => {
 	if (dancesLoading.value) return
@@ -30,7 +30,7 @@ const loadDances = async (isFirstPage = false) => {
 		isFinished.value = false
 	}
 	const result = await fetchDances({
-		lang: locale.value,
+		lang: locale.value as SupportedLocale,
 		page: dancesPage.value,
 		size: dancesPageSize,
 		body: searchDancesBodyParams.value
@@ -76,12 +76,12 @@ const filterButtonRef = useTemplateRef('filterButtonRef')
 
 // Fetch data on loading
 onMounted(() => {
-	fetchRegions(locale.value)
+	fetchRegions(locale.value as SupportedLocale)
 	loadDances(true)
 })
 // Fetch data on language change
 watch(locale, (newLocale) => {
-	fetchRegions(newLocale)
+	fetchRegions(newLocale as SupportedLocale)
 	loadDances(true)
 })
 // Fetch data on params change (filtering, sorting and searching)

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { watch, computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { useRoute } from 'vue-router'
@@ -95,8 +95,6 @@ watch(route, () => {
 	&._header-show {
 		top: 16px;
 	}
-
-	&__container {}
 }
 
 .menu {
@@ -376,10 +374,6 @@ watch(route, () => {
 			span {
 				width: 0;
 			}
-
-			&::before,
-			&::after {}
-
 			&::before {
 				top: calc(50% - toRem(1));
 				transform: rotate(-45deg);

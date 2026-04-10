@@ -1,19 +1,19 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
-export let bodyLockStatus = true
-export let bodyLockToggle = (delay = 500) => {
+export let bodyLockStatus: boolean = true
+export let bodyLockToggle = (delay: number = 500) => {
 	if (document.documentElement.classList.contains('lock')) {
 		bodyUnlock(delay)
 	} else {
 		bodyLock(delay)
 	}
 }
-export let bodyUnlock = (delay = 500) => {
+export let bodyUnlock = (delay: number = 500) => {
 	if (bodyLockStatus) {
 		const lockPaddingElements = document.querySelectorAll("[data-lp]");
 		setTimeout(() => {
 			lockPaddingElements.forEach(lockPaddingElement => {
-				lockPaddingElement.style.paddingRight = ''
+				(lockPaddingElement as HTMLElement).style.paddingRight = ''
 			});
 			document.body.style.paddingRight = ''
 			document.documentElement.classList.remove("lock")
@@ -24,12 +24,12 @@ export let bodyUnlock = (delay = 500) => {
 		}, delay)
 	}
 }
-export let bodyLock = (delay = 500) => {
+export let bodyLock = (delay: number = 500) => {
 	if (bodyLockStatus) {
 		const lockPaddingElements = document.querySelectorAll("[data-lp]")
 		const lockPaddingValue = window.innerWidth - document.body.offsetWidth + 'px'
 		lockPaddingElements.forEach(lockPaddingElement => {
-			lockPaddingElement.style.paddingRight = lockPaddingValue
+			(lockPaddingElement as HTMLElement).style.paddingRight = lockPaddingValue
 		});
 
 		document.body.style.paddingRight = lockPaddingValue
@@ -41,7 +41,7 @@ export let bodyLock = (delay = 500) => {
 		}, delay)
 	}
 }
-export function menuToggle(e) {
+export function menuToggle() {
 	if (bodyLockStatus) {
 		bodyLockToggle();
 		document.documentElement.classList.toggle("menu-open");
@@ -61,15 +61,15 @@ export function headerScroll() {
 	const headerShowTimer = 500;
 	const scrollThreshold = 50;
 
-	const isScrolled = ref(false);
-	const isVisible = ref(false);
+	const isScrolled = ref<boolean>(false);
+	const isVisible = ref<boolean>(false);
 
 	let scrollDirection = 0;
-	let timer = null;
+	let timer: ReturnType<typeof setTimeout>;
 
 	const onScroll = () => {
-		const scrollTop = window.scrollY;
-		const scrollDelta = Math.abs(scrollTop - scrollDirection);
+		const scrollTop: number = window.scrollY;
+		const scrollDelta: number = Math.abs(scrollTop - scrollDirection);
 		if (scrollDelta < scrollThreshold && scrollTop > startPoint) return;
 		clearTimeout(timer);
 
@@ -103,19 +103,21 @@ export function headerScroll() {
 	return { isScrolled, isVisible };
 }
 
-export function scrollToBlock(scrollToBlockId) {
+export function scrollToBlock(scrollToBlockId: string) {
 	requestAnimationFrame(() => {
 		document.getElementById(scrollToBlockId)
 			?.scrollIntoView({ behavior: 'smooth' })
 	})
 }
 
-export const getYoutubeId = (url) => {
+export const getYoutubeId = (url: string): string => {
+	if (!url) return ''
+
 	const parsed = new URL(url)
 	// youtube.com/watch?v=
-	if (parsed.searchParams.get('v')) {
-		return parsed.searchParams.get('v')
-	}
+	const videoId = parsed.searchParams.get('v');
+	if (videoId) return videoId;
+	
 	// youtu.be/ID
 	if (parsed.hostname === 'youtu.be') {
 		return parsed.pathname.slice(1)
@@ -124,17 +126,22 @@ export const getYoutubeId = (url) => {
 	if (parsed.pathname.includes('/embed/')) {
 		return parsed.pathname.split('/embed/')[1]
 	}
-	return null
+	return ''
 }
 
-export const formatTime = (seconds) => {
+export const formatTime = (seconds: number): string => {
 	if (!seconds) return '00:00';
 	const min = Math.floor(seconds / 60);
 	const sec = Math.floor(seconds % 60);
 	return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 };
 
-export const translateDancesParametres = (value, { t, prefix = '', delimiter = ', ' }) => {
+interface ITranslateOptions {
+	t: (key: string) => string;
+	prefix?: string | number;
+	delimiter?: string;
+}
+export const translateDancesParametres = (value: string | string[] | null | undefined, { t, prefix = '', delimiter = ', ' }: ITranslateOptions) => {
 	if (value === null || value === undefined || value === '') return '';
 
 	const items = Array.isArray(value) ? value : [value];

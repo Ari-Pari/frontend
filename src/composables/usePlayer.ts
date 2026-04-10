@@ -1,6 +1,26 @@
 import { reactive, computed } from "vue"
 
-const state = reactive({
+interface IEnsemble {
+	id: number | string;
+	name: string;
+	link: string;
+}
+interface ITrack {
+	id: number | string;
+	name: string;
+	link: string;
+	ensembles?: IEnsemble[];
+}
+interface IPlayerState {
+	currentTrack: ITrack | null;
+	playlist: ITrack[];
+	globalPlaylist: ITrack[];
+	isPlaying: boolean;
+	isExpanded: boolean;
+	duration: number;
+	currentTime: number;
+}
+const state: IPlayerState = reactive({
 	currentTrack: null,
 	playlist: [],
 	globalPlaylist: [],
@@ -18,7 +38,7 @@ export function usePlayer() {
 	const duration = computed(() => state.duration);
 	const currentTime = computed(() => state.currentTime);
 
-	const setTrack = (track, play = true) => {
+	const setTrack = (track: ITrack | null, play: boolean = true) => {
 		state.currentTrack = track
 		state.isPlaying = play
 		updateCurrentTime(0)
@@ -34,31 +54,31 @@ export function usePlayer() {
 			navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
 		}
 	}
-	const handleTrackClick = (track) => {
+	const handleTrackClick = (track: ITrack | null) => {
 		if (state.currentTrack?.id === track?.id) {
 			togglePlay(!state.isPlaying)
 		} else {
 			setTrack(track)
 		}
 	}
-	const setPlaylist = (tracks) => {
+	const setPlaylist = (tracks: ITrack[]) => {
 		state.playlist = tracks
 		if (tracks.length > 0) {
 			setTrack(tracks[0], false)
 		}
 	}
-	const togglePlay = (status) => {
+	const togglePlay = (status: boolean) => {
 		state.isPlaying = status;
 	}
-	const handleError = (e) => {
+	const handleError = (e: Event | string) => {
 		console.error("Audio error:", e);
 		togglePlay(false);
 	}
-	const toggleExpand = (val) => {
+	const toggleExpand = (val?: boolean) => {
 		state.isExpanded = typeof val === 'boolean' ? val : !state.isExpanded
 	}
 	const nextTrack = () => {
-		const currentIndex = state.playlist.indexOf(state.currentTrack)
+		const currentIndex = state.playlist.findIndex(t => t.id === state.currentTrack?.id)
 		if (currentIndex < state.playlist.length - 1) {
 			setTrack(state.playlist[currentIndex + 1], state.isPlaying)
 		} else {
@@ -66,7 +86,7 @@ export function usePlayer() {
 		}
 	}
 	const prevTrack = () => {
-		const currentIndex = state.playlist.indexOf(state.currentTrack);
+		const currentIndex = state.playlist.findIndex(t => t.id === state.currentTrack?.id)
 		if (currentIndex > 0) {
 			setTrack(state.playlist[currentIndex - 1], state.isPlaying)
 		} else if (currentIndex === 0) {
@@ -81,10 +101,10 @@ export function usePlayer() {
 		console.log("Time", state.currentTime)
 		console.log("Duration", state.duration)
 	}
-	const updateDuration = (time) => {
+	const updateDuration = (time: number) => {
 		state.duration = time
 	}
-	const updateCurrentTime = (time) => {
+	const updateCurrentTime = (time: number) => {
 		state.currentTime = time
 	}
 	return {

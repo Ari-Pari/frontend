@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useI18n } from "vue-i18n"
 import { useRoute } from 'vue-router';
 import { usePlayer } from '@/composables/usePlayer';
@@ -54,10 +54,15 @@ const { currentTrack,
 		<div class="audio-player-controls__bottom">
 			<span class="audio-player-controls__duration">{{ formatTime(currentTime || 0) }}</span>
 			<span class="audio-player-controls__duration--slash">/</span>
-			<input class="audio-player-controls__range" type="range" :min="0" :max="duration" :value="currentTime"
-				@input="(e) => updateCurrentTime(Number(e.target.value))" />
-			<span class="audio-player-controls__duration audio-player-controls__duration--right">{{ formatTime(duration ||
-				0) }}</span>
+			<input class="audio-player-controls__range" 
+				type="range" 
+				:min="0" :max="duration" 
+				:value="currentTime"
+				@input="(e) => updateCurrentTime(Number((e.target as HTMLInputElement).value))" 
+			/>
+			<span class="audio-player-controls__duration audio-player-controls__duration--right">
+				{{ formatTime(duration || 0) }}
+			</span>
 		</div>
 	</div>
 </template>
@@ -72,20 +77,6 @@ const { currentTrack,
 	.header &.dancePage {
 		display: none;
 	}
-
-	// .header & {
-	// 	position: absolute;
-	// 	top: 0;
-	// 	opacity: 0;
-	// 	visibility: hidden;
-	// 	transition: all 0.3s;
-	// }
-	// .header &.header-active {
-	// 	top: calc(100% + 10px);
-	// 	opacity: 1;
-	// 	visibility: visible;
-	// }
-
 	.header & {
 		.audio-player-controls__range {
 			display: none;

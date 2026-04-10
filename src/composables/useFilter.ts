@@ -1,8 +1,9 @@
-import { computed } from "vue"
+import { computed, type Ref } from "vue"
+import type { IDancesParams } from "@/services/api"
 
-export const FILTER_KEYS = ['genres', 'regions', 'complexities', 'genders', 'paces', 'handshakes'];
+export const FILTER_KEYS = ['genres', 'regions', 'complexities', 'genders', 'paces', 'handshakes'] as const;
 
-export function useFilter(params) {
+export function useFilter(params: Ref<IDancesParams>) {
 	// Count function for filters number
 	const filterCount = computed(() => {
 		if (!params.value) return 0

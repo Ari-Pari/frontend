@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { watch, nextTick, useTemplateRef } from 'vue';
 import { usePlayer } from '@/composables/usePlayer';
 import { useRoute } from "vue-router"
 
-const audioPlayerRef = useTemplateRef('audio-player')
+const audioPlayerRef = useTemplateRef<HTMLAudioElement>('audio-player')
 const route = useRoute()
 const { currentTrack,
 	isPlaying,
@@ -51,10 +51,10 @@ watch(currentTime, (newTime) => {
 	}
 });
 const onMetadataLoaded = () => {
-	updateDuration(audioPlayerRef.value.duration);
+	if (audioPlayerRef.value) updateDuration(audioPlayerRef.value.duration);
 };
 const onTimeUpdate = () => {
-	updateCurrentTime(audioPlayerRef.value.currentTime);
+	if (audioPlayerRef.value) updateCurrentTime(audioPlayerRef.value.currentTime);
 };
 </script>
 
@@ -74,6 +74,4 @@ const onTimeUpdate = () => {
 	opacity: 0;
 	pointer-events: none;
 }
-
-.dance-page-audio-player {}
 </style>

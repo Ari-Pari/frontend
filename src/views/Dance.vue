@@ -1,24 +1,26 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, computed } from "vue"
 import LiteYouTubeEmbed from 'vue-lite-youtube-embed'
 import 'vue-lite-youtube-embed/style.css'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, A11y } from 'swiper/modules';
+// @ts-ignore
 import 'swiper/css';
 import { useI18n } from "vue-i18n"
 import { useRouter } from 'vue-router'
 import { useShare } from '@vueuse/core'
-import { DanceService, defaultDancesParams } from "@/services/api"
 import { useApi } from "@/composables/useApi"
 import { useClipboard } from "@/composables/useClipboard";
-import { getYoutubeId, translateDancesParametres } from '@/services/utils'
-import AudioPlayerControls from "@/components/audioplayer/AudioPlayerControls.vue";
 import { usePlayer } from '@/composables/usePlayer';
+import { getYoutubeId, translateDancesParametres } from '@/services/utils'
+import { DanceService, defaultDancesParams } from "@/services/api"
+import AudioPlayerControls from "@/components/audioplayer/AudioPlayerControls.vue";
+import type { SupportedLocale } from "@/services/api";
 
 const modules = [Navigation, A11y];
-const props = defineProps({ id: String })
+const props = defineProps<{ id: string }>()
 const { t, locale } = useI18n()
-const { data: dance, loading, error, execute: fetchDance } = useApi(DanceService.getDance)
+const { data: dance, loading, execute: fetchDance } = useApi(DanceService.getDance)
 const { copiedField, copyText } = useClipboard()
 const { currentTrack,
 	isPlaying,
@@ -26,19 +28,50 @@ const { currentTrack,
 	playlist,
 	setPlaylist,
 	togglePlay } = usePlayer();
-const fullUrl = ref('')
+const fullUrl = ref<string>('')
 const router = useRouter()
 
+interface IVideo {
+	id: number | string;
+	name: string;
+	link: string;
+	category?: string;
+}
+interface IRegion {
+	id: number | string;
+	name: string
+}
+// interface IDance {
+// 	id: string | number;
+// 	name: string;
+// 	photo_link: string;
+// 	regions: IRegion[];
+// 	songs: any[];
+// 	genres: any[];
+// 	complexity: number;
+// 	paces: any;
+// 	gender: any;
+// 	handshakes: any;
+// 	sourceVideos?: IVideo[];
+// 	performanceVideos?: IVideo[];
+// 	lessonVideos?: IVideo[];
+// }
+
 const shareOptions = ref({
-	title: dance?.name,
-	url: location.href,
+	title: dance.value?.name || '',
+	url: typeof window !== 'undefined' ? window.location.href : '',
 })
 const { share, isSupported } = useShare(shareOptions)
-function shareDance() {
-	return share().catch(err => err)
+
+async function shareDance(): Promise<void> {
+	try {
+		await share();
+	} catch (err) {
+		console.error(err);
+	}
 }
 
-function chooseFilter(region) {
+function chooseFilter(region: IRegion | null): void {
 	if (region?.id == null) return;
 	const saved = sessionStorage.getItem('dancesFilter')
 	const params = saved ? JSON.parse(saved) : defaultDancesParams
@@ -48,22 +81,25 @@ function chooseFilter(region) {
 }
 
 const allVideos = computed(() => {
-	const videos = [];
-	if (dance.value?.sourceVideos) {
-		dance.value.sourceVideos.forEach(v => videos.push({ ...v, category: 'source' }));
+	const videos: IVideo[] = [];
+
+	const addVideos = (list: IVideo[] | undefined, category: string) => {
+		if (list) {
+			list.forEach(v => videos.push({ ...v, category }))
+		}
 	}
-	if (dance.value?.performanceVideos) {
-		dance.value.performanceVideos.forEach(v => videos.push({ ...v, category: 'performance' }));
-	}
-	if (dance.value?.lessonVideos) {
-		dance.value.lessonVideos.forEach(v => videos.push({ ...v, category: 'lesson' }));
-	}
+	addVideos(dance.value?.sourceVideos, 'source');
+	addVideos(dance.value?.performanceVideos, 'performance');
+	addVideos(dance.value?.lessonVideos, 'lesson');
+
 	return videos;
 });
 
 // Fetch data on loading
 onMounted(() => {
-	fetchDance(props.id, locale.value)
+	if (props.id) {
+		fetchDance(props.id, locale.value as SupportedLocale)
+	}
 	fullUrl.value = window.location.href
 })
 // Set tracks to store while get or change dance data
@@ -72,14 +108,18 @@ watch(dance, (newDanceValue) => {
 		setPlaylist(newDanceValue.songs)
 	}
 })
-// Fetch data on langyage change
+// Fetch data on language change
 watch(locale, (newLocale) => {
-	fetchDance(props.id, newLocale)
+	if (props.id) {
+		fetchDance(props.id, newLocale as SupportedLocale)
+	}
 })
 // Fetch data on if dance changed
 watch(() => props.id, (id) => {
-	fetchDance(id, locale.value)
-	fullUrl.value = window.location.href;
+	if (id) {
+		fetchDance(id, locale.value as SupportedLocale)
+		fullUrl.value = window.location.href;
+	}
 })
 </script>
 
@@ -104,8 +144,9 @@ watch(() => props.id, (id) => {
 									<div class="dance-top__left-inner">
 										<div v-if="dance?.regions" class="dance-top__categories">
 											<button type="button" @click="chooseFilter(region)" v-for="region in dance?.regions"
-												:key="region?.id" class="dance-top__category">{{
-													region?.name }}</button>
+												:key="region?.id" class="dance-top__category">
+												{{ region?.name }}
+											</button>
 										</div>
 										<h1 class="dance-top__title">{{ dance?.name }}</h1>
 										<button v-if="isSupported" @click="shareDance" class="dance-top__copy-button button">
@@ -118,15 +159,14 @@ watch(() => props.id, (id) => {
 								</div>
 								<div class="dance-top__image">
 									<img :src="dance?.photo_link" alt=""
-										@error="e => e.target.parentElement.style.display = 'none'">
+										@error="e => (e.target as HTMLElement).parentElement!.style.display = 'none'">
 								</div>
 							</section>
 							<section class="dance-parametres dance-card-template">
 								<h2 class="dance-parametres__title">{{ t('danceParametres') }}</h2>
 								<ul class="dance-parametres__list">
 									<li class="dance-parametres__item">{{ t('genre') }}:
-										<span>{{ translateDancesParametres(dance?.genres, { t, prefix: 'genres' })
-										}}</span>
+										<span>{{ translateDancesParametres(dance?.genres, { t, prefix: 'genres' }) }}</span>
 									</li>
 									<li class="dance-parametres__item">{{ t('complexity') }}:
 										<span>{{ translateDancesParametres(dance?.complexity, { t, prefix: 'complexity' })
@@ -141,7 +181,7 @@ watch(() => props.id, (id) => {
 									</li>
 									<li class="dance-parametres__item">{{ t('handshakes') }}:
 										<span>{{ translateDancesParametres(dance?.handshakes, { t, prefix: 'handshakes' })
-										}}</span>
+											}}</span>
 									</li>
 								</ul>
 							</section>
@@ -161,10 +201,10 @@ watch(() => props.id, (id) => {
 											<div class="dance-audio__authors">
 												<a target="_blank" class="dance-audio__author" v-for="ensemble in track?.ensembles"
 													:key="ensemble?.id" :href="ensemble?.link">
-													{{ ensemble?.name }}</a>
+													{{ ensemble?.name }}
+												</a>
 											</div>
 										</div>
-										<!-- <div class="dance-audio__duration">{{ formatTime(duration) }}</div> -->
 									</div>
 								</div>
 							</div>
@@ -178,8 +218,9 @@ watch(() => props.id, (id) => {
 									<div @click.capture="togglePlay(false)" class="dance-video__iframe">
 										<LiteYouTubeEmbed :id="getYoutubeId(video.link)" :title="video.name" />
 									</div>
-									<div class="dance-video__title"><span>{{ t(`${video.category}Video`) }}</span>{{ video.name
-									}}
+									<div class="dance-video__title">
+										<span>{{ t(`${video.category}Video`) }}</span>
+										{{ video.name }}
 									</div>
 								</swiper-slide>
 							</swiper>
@@ -212,8 +253,6 @@ watch(() => props.id, (id) => {
 	@media (max-width:$mobileSmall) {
 		padding-bottom: toRem(40);
 	}
-
-	&__body {}
 
 	&__inner {
 		display: grid;
@@ -379,6 +418,7 @@ watch(() => props.id, (id) => {
 	padding: toRem(16) toRem(32);
 	min-height: toRem(300);
 	background: url('@/assets/dance/decor-1.svg') center/cover no-repeat, #fff;
+	max-height: toRem(382);
 
 	&__title {
 		font-weight: 500;
@@ -482,6 +522,8 @@ watch(() => props.id, (id) => {
 
 .dance-audio {
 	position: relative;
+	max-height: toRem(382);
+	overflow: hidden;
 
 	&::after {
 		content: '';
