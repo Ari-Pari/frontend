@@ -50,7 +50,7 @@ export function usePlayer() {
 	const togglePlay = (status) => {
 		state.isPlaying = status;
 	}
-	const handleError = () => {
+	const handleError = (e) => {
 		console.error("Audio error:", e);
 		togglePlay(false);
 	}

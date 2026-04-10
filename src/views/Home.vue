@@ -1,6 +1,6 @@
 <script setup>
 import { useI18n } from "vue-i18n"
-import DancesCards from "@/components/dances/DancesCards.vue"
+import DancesSection from "@/components/dances/DancesSection.vue"
 
 const { t } = useI18n()
 </script>
@@ -26,7 +26,7 @@ const { t } = useI18n()
 			<h1 class="quote-block__text">{{ t('quoteBlockText') }}</h1>
 		</div>
 	</div>
-	<DancesCards />
+	<DancesSection />
 </template>
 
 <style lang="scss" scoped>

@@ -37,7 +37,7 @@ const { t } = useI18n()
 						<li class="footer__item footer__item--flex">
 							<a target="_blank" class="footer__link"
 								href="https://github.com/Ari-Pari">https://github.com/Ari-Pari</a>
-							<span class="footer__link-developer">Developed by
+							<span class="footer__link-developer">developed by
 								<a href="https://www.instagram.com/armenian.club/">Armenian Club</a></span>
 						</li>
 					</ul>
