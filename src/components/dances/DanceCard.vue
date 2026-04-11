@@ -2,7 +2,7 @@
 import { useI18n } from "vue-i18n"
 import { translateDancesParametres } from "@/services/utils";
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 defineProps({
 	dance: {
 		type: Object,
@@ -13,16 +13,17 @@ defineProps({
 
 <template>
 	<div class="dance-item">
-		<RouterLink v-if="dance.photo_link" :to="`/dances/${dance.id}`" class="dance-item__image">
-			<img :src="dance.photo_link" alt="" @error="(e) => (e.target as HTMLElement).parentElement!.style.display = 'none'">
+		<RouterLink v-if="dance.photo_link" :to="{ name: 'dance', params: { locale, id: dance.id }}" class="dance-item__image">
+			<img :src="dance.photo_link" alt=""
+				@error="(e) => (e.target as HTMLElement).parentElement!.style.display = 'none'">
 		</RouterLink>
 		<div class="dance-item__texts">
-			<RouterLink :to="`/dances/${dance.id}`">
+			<RouterLink :to="{ name: 'dance', params: { locale, id: dance.id }}">
 				<h3 class="dance-item__title">{{ dance?.name }}</h3>
 			</RouterLink>
 			<div class="dance-item__tags">
 				<span v-for="region in dance.regions" :key="region?.id" class="dance-item__tags-item">
-					{{ region?.name}}
+					{{ region?.name }}
 				</span>
 			</div>
 			<ul class="dance-item__categories">

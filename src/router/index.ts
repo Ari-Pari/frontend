@@ -1,15 +1,40 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouterView } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import { supportedLocales, userMainLanguage } from '@/services/lang'
 
-import Home from '../views/Home.vue'
-const About = () => import('../views/About.vue')
-const Dance = () => import('../views/Dance.vue')
+import Home from '@/views/Home.vue'
+const About = () => import('@/views/About.vue')
+const Dance = () => import('@/views/Dance.vue')
 
 const routes: RouteRecordRaw[] = [
-	{ path: '/', name: "home", component: Home },
-	{ path: '/about', name: "about", component: About },
-	{ path: '/dances/:id', name: 'dance', component: Dance, props: true, meta: { playerStyle: "dance-page-audio-player" } },
-	{ path: '/:pathMatch(.*)*', redirect: { name: 'home' } }
+	{
+		path: `/:locale(${supportedLocales.join('|')})`,
+		component: RouterView,
+		children: [
+			{ path: '', name: "home", component: Home },
+			{ path: 'about', name: "about", component: About },
+			{
+				path: 'dances/:id',
+				name: 'dance',
+				component: Dance,
+				props: true,
+				meta: { playerStyle: "dance-page-audio-player" }
+			},
+			{
+				path: ':pathMatch(.*)*',
+				redirect: to => ({ name: 'home', params: { locale: to.params.locale } })
+			}
+		]
+	},
+	{
+		path: '/:pathMatch(.*)*',
+		redirect: _to => {
+			return {
+				name: 'home',
+				params: { locale: userMainLanguage }
+			}
+		}
+	}
 ]
 
 const router = createRouter({

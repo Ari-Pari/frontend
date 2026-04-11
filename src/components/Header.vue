@@ -1,19 +1,28 @@
 <script setup lang="ts">
 import { watch, computed } from "vue"
 import { useI18n } from "vue-i18n"
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { headerScroll, menuToggle, menuClose } from "@/services/utils"
 import AudioPlayerControls from "./audioplayer/AudioPlayerControls.vue"
 
 const route = useRoute()
+const router = useRouter()
 const { t, locale } = useI18n()
-const currentLang = computed(() => locale.value)
+
+const currentLang = computed({
+	get: () => locale.value,
+	set: (newLocale) => {
+		router.push({
+			name: route.name || 'home',
+			params: { ...route.params, locale: newLocale },
+			query: route.query,
+			hash: route.hash
+		})
+	}
+})
+
 const { isScrolled, isVisible } = headerScroll();
 
-watch(locale, (newLocale) => {
-	document.documentElement.setAttribute('lang', newLocale)
-	localStorage.setItem('userLanguage', newLocale)
-})
 watch(route, () => {
 	menuClose()
 })
@@ -27,9 +36,10 @@ watch(route, () => {
 		<div class="header__container">
 			<div class="header__menu menu">
 				<div class="menu__left">
-					<RouterLink to="/" class="menu__logo"><img src="@/assets/AriPari_logo.png" alt="AriPari logo">
+					<RouterLink :to="{ name: 'home', params: { locale: currentLang } }" class="menu__logo">
+						<img src="@/assets/AriPari_logo.png" alt="AriPari logo">
 					</RouterLink>
-					<RouterLink to="/about#support" class="menu__left-button button">
+					<RouterLink :to="{ name: 'about', params: { locale: currentLang }, hash: '#support' }" class="menu__left-button button">
 						{{ t('supportButton') }}
 					</RouterLink>
 					<AudioPlayerControls />
@@ -39,10 +49,10 @@ watch(route, () => {
 				<nav class="menu__body">
 					<ul class="menu__list">
 						<li class="menu__item">
-							<RouterLink class="menu__link" to="/"> {{ t('homePageMenuItem') }}</RouterLink>
+							<RouterLink class="menu__link" :to="{ name: 'home', params: { locale: currentLang } }"> {{ t('homePageMenuItem') }}</RouterLink>
 						</li>
 						<li class="menu__item">
-							<RouterLink class="menu__link" to="/about"> {{ t('aboutPageMenuItem') }} </RouterLink>
+							<RouterLink class="menu__link" :to="{ name: 'about', params: { locale: currentLang } }"> {{ t('aboutPageMenuItem') }} </RouterLink>
 						</li>
 						<li class="menu__item">
 							<a class="menu__link" target="_blank" href="https://t.me/ariparenq">
@@ -51,16 +61,16 @@ watch(route, () => {
 						</li>
 					</ul>
 					<div class="menu__actions">
-						<RouterLink to="/#dances" v-bind:aria-label="t('findDance')" :title="t('findDance')"
+						<RouterLink :to="{ name: 'home', params: { locale: currentLang }, hash: '#dances' }" v-bind:aria-label="t('findDance')" :title="t('findDance')"
 							class="menu__search-icon"></RouterLink>
 						<div class="menu__languages">
-							<input type="radio" id="lang-arm" class="menu__language-input" value="hy" v-model="locale" />
+							<input type="radio" id="lang-arm" class="menu__language-input" value="hy" v-model="currentLang" />
 							<label for="lang-arm" :class="{ active: currentLang === 'hy' }"
 								class="menu__language-label">հայ</label>
-							<input type="radio" id="lang-eng" class="menu__language-input" value="en" v-model="locale" />
+							<input type="radio" id="lang-eng" class="menu__language-input" value="en" v-model="currentLang" />
 							<label for="lang-eng" :class="{ active: currentLang === 'en' }"
 								class="menu__language-label">eng</label>
-							<input type="radio" id="lang-rus" class="menu__language-input" value="ru" v-model="locale" />
+							<input type="radio" id="lang-rus" class="menu__language-input" value="ru" v-model="currentLang" />
 							<label for="lang-rus" :class="{ active: currentLang === 'ru' }"
 								class="menu__language-label">рус</label>
 						</div>
@@ -374,6 +384,7 @@ watch(route, () => {
 			span {
 				width: 0;
 			}
+
 			&::before {
 				top: calc(50% - toRem(1));
 				transform: rotate(-45deg);

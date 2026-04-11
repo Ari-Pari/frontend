@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 </script>
 
 <template>
 	<footer class="footer">
 		<div class="footer__container">
-			<RouterLink to="/" class="footer__logo"><img src="@/assets/AriPari_Logo-footer.png" alt="AriPari logo">
+			<RouterLink :to="{ name: 'home', params: { locale } }" class="footer__logo">
+				<img src="@/assets/AriPari_Logo-footer.png" alt="AriPari logo">
 			</RouterLink>
 			<div class="footer__body">
 				<div class="footer__column">

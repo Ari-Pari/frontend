@@ -15,7 +15,7 @@ import { usePlayer } from '@/composables/usePlayer';
 import { getYoutubeId, translateDancesParametres } from '@/services/utils'
 import { DanceService, defaultDancesParams } from "@/services/api"
 import AudioPlayerControls from "@/components/audioplayer/AudioPlayerControls.vue";
-import type { SupportedLocale } from "@/services/api";
+import type { SupportedLocale } from "@/services/lang";
 
 const modules = [Navigation, A11y];
 const props = defineProps<{ id: string }>()
@@ -77,7 +77,7 @@ function chooseFilter(region: IRegion | null): void {
 	const params = saved ? JSON.parse(saved) : defaultDancesParams
 	params.regions = [region.id]
 	sessionStorage.setItem('dancesFilter', JSON.stringify(params))
-	router.push({ path: '/', hash: '#dances' })
+	router.push({ name: 'home', hash: '#dances' })
 }
 
 const allVideos = computed(() => {

@@ -2,7 +2,7 @@
 import { useI18n } from "vue-i18n"
 import DancesSection from "@/components/dances/DancesSection.vue"
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 </script>
 
 <template>
@@ -14,7 +14,7 @@ const { t } = useI18n()
 				</div>
 				<div class="first-screen__descr">{{ t('homeMainText') }}</div>
 			</div>
-			<RouterLink type="button" to="/#dances" class="first-screen__button button">{{ t('findDance') }}</RouterLink>
+			<RouterLink type="button" :to="{ name: 'home', params: { locale }, hash: '#dances'  }" class="first-screen__button button">{{ t('findDance') }}</RouterLink>
 		</div>
 	</section>
 	<div class="quote-block">
