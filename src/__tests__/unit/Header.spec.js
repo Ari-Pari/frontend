@@ -1,73 +1,91 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
-import Header from '@/components/Header.vue';
-import { createRouter, createWebHistory } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { ref } from 'vue'
+import Header from '@/components/Header.vue'
 
-const { menuInitMock } = vi.hoisted(() => ({
-	menuInitMock: vi.fn(),
-}));
+const { headerScrollMock, menuToggleMock, menuCloseMock } = vi.hoisted(() => ({
+	headerScrollMock: vi.fn(),
+	menuToggleMock: vi.fn(),
+	menuCloseMock: vi.fn(),
+}))
+const localeRef = ref('hy')
 
 vi.mock('@/services/utils', () => ({
-	headerScroll: vi.fn(),
-	menuInit: menuInitMock,
-	menuClose: vi.fn(),
-	bodyLock: vi.fn(),
-	bodyUnlock: vi.fn(),
-}));
+	headerScroll: headerScrollMock,
+	menuToggle: menuToggleMock,
+	menuClose: menuCloseMock,
+}))
 
 vi.mock('vue-i18n', () => ({
-	useI18n: vi.fn(() => ({
+	useI18n: () => ({
 		t: (key) => key,
-		locale: { value: 'hy' },
-	})),
-}));
-
-const router = createRouter({
-	history: createWebHistory(),
-	routes: [
-		{ path: '/', name: 'home', component: { template: '<div>Home</div>' } },
-		{ path: '/about', name: 'about', component: { template: '<div>About</div>' } },
-	],
-});
+		locale: localeRef,
+	}),
+}))
 
 describe('Header.vue', () => {
-	beforeEach(() => {
-		localStorage.clear();
-	});
+	let router
 
-	it('рендерит логотип и меню', () => {
+	beforeEach(async () => {
+		headerScrollMock.mockReturnValue({
+			isScrolled: ref(false),
+			isVisible: ref(true),
+		})
+
+		router = createRouter({
+			history: createMemoryHistory(),
+			routes: [
+				{ path: '/:locale', name: 'home', component: { template: '<div>Home</div>' } },
+				{ path: '/:locale/about', name: 'about', component: { template: '<div>About</div>' } },
+			],
+		})
+		await router.push('/hy')
+		await router.isReady()
+	})
+
+	it('рендерит логотип, меню и контролы языка', () => {
 		const wrapper = mount(Header, {
 			global: {
 				plugins: [router],
-				stubs: ['RouterLink'],
+				stubs: { AudioPlayerControls: true },
 			},
-		});
-		expect(wrapper.find('.menu__logo').exists()).toBe(true);
-		expect(wrapper.find('.menu__list').exists()).toBe(true);
-	});
+		})
 
-	it('меняет язык при клике на радио-кнопку', async () => {
+		expect(wrapper.find('.menu__logo').exists()).toBe(true)
+		expect(wrapper.find('.menu__list').exists()).toBe(true)
+		expect(wrapper.findAll('.menu__language-input')).toHaveLength(3)
+	})
+
+	it('при смене языка пушит новый locale в роут', async () => {
+		const pushSpy = vi.spyOn(router, 'push')
 		const wrapper = mount(Header, {
 			global: {
 				plugins: [router],
+				stubs: { AudioPlayerControls: true },
 			},
-		});
+		})
 
-		const { locale } = useI18n();
-		expect(locale.value).toBe('hy');
+		await wrapper.find('input[value="en"]').setValue(true)
 
-		const engInput = wrapper.find('input[value="en"]');
-		await engInput.setValue(true);
+		expect(pushSpy).toHaveBeenCalledWith({
+			name: 'home',
+			params: { locale: 'en' },
+			query: {},
+			hash: '',
+		})
+	})
 
-		expect(locale.value).toBe('en');
-		expect(localStorage.getItem('userLanguage')).toBe('en');
-	});
+	it('по клику на бургер вызывает menuToggle', async () => {
+		const wrapper = mount(Header, {
+			global: {
+				plugins: [router],
+				stubs: { AudioPlayerControls: true },
+			},
+		})
 
-	it('вызывает menuInit при клике на бургер-меню', async () => {
-		const wrapper = mount(Header, { global: { plugins: [router] } });
-		const burgerButton = wrapper.find('.icon-menu');
-		await burgerButton.trigger('click');
-		expect(menuInitMock).toHaveBeenCalled();
-	});
-});
+		await wrapper.find('.icon-menu').trigger('click')
+
+		expect(menuToggleMock).toHaveBeenCalled()
+	})
+})

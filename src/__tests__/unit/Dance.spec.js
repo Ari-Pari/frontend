@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, flushPromises } from '@vue/test-utils';
-import { createRouter, createWebHistory } from 'vue-router';
-import Dance from '@/views/Dance.vue';
-import { DanceService } from '@/services/api';
-import { usePlayer } from '@/composables/usePlayer';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { mount, flushPromises } from '@vue/test-utils'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { ref } from 'vue'
+import Dance from '@/views/Dance.vue'
+import { DanceService } from '@/services/api'
+import { usePlayer } from '@/composables/usePlayer'
 
 vi.mock('@/services/api', () => ({
 	DanceService: {
@@ -20,45 +21,66 @@ vi.mock('@/services/api', () => ({
 		sortedBy: 'createdBy',
 		sortType: 'ASC',
 	},
-}));
+}))
 
 vi.mock('@/composables/usePlayer', () => ({
 	usePlayer: vi.fn(),
-}));
+}))
+
+vi.mock('@/composables/useClipboard', () => ({
+	useClipboard: () => ({
+		copiedField: ref(null),
+		copyText: vi.fn(),
+	}),
+}))
+
+vi.mock('@vueuse/core', () => ({
+	useShare: () => ({
+		share: vi.fn(),
+		isSupported: ref(false),
+	}),
+}))
 
 vi.mock('vue-i18n', () => ({
-	useI18n: () => ({ t: (key) => key, locale: { value: 'en' } }),
-}));
+	useI18n: () => ({ t: (key) => key, locale: ref('en') }),
+}))
 
-// Мок для LiteYouTubeEmbed
 vi.mock('vue-lite-youtube-embed', () => ({
-	default: { template: '<div></div>' },
-}));
+	default: { template: '<div class="youtube-embed" />' },
+}))
 
-// Мок для swiper
 vi.mock('swiper/vue', () => ({
-	Swiper: { template: '<div><slot /></div>' },
-	SwiperSlide: { template: '<div><slot /></div>' },
-}));
-
-const router = createRouter({
-	history: createWebHistory(),
-	routes: [{ path: '/', name: 'home' }],
-});
+	Swiper: { template: '<div class="swiper"><slot /></div>' },
+	SwiperSlide: { template: '<div class="swiper-slide"><slot /></div>' },
+}))
 
 describe('Dance.vue', () => {
-	let wrapper;
-	let mockPlayer;
+	let router
+	let mockPlayer
 
-	beforeEach(() => {
+	beforeEach(async () => {
+		router = createRouter({
+			history: createMemoryHistory(),
+			routes: [
+				{ path: '/:locale', name: 'home', component: { template: '<div>Home</div>' } },
+				{ path: '/:locale/dances/:id', name: 'dance', component: { template: '<div>Dance</div>' } },
+			],
+		})
+		await router.push('/en')
+		await router.isReady()
+
 		mockPlayer = {
-			currentTrack: { value: null },
-			isPlaying: { value: false },
+			currentTrack: ref(null),
+			isPlaying: ref(false),
 			handleTrackClick: vi.fn(),
-			playlist: { value: [] },
-			setPlaylist: vi.fn(),
-		};
-		usePlayer.mockReturnValue(mockPlayer);
+			playlist: ref([]),
+			setPlaylist: vi.fn((tracks) => {
+				mockPlayer.playlist.value = tracks
+				mockPlayer.currentTrack.value = tracks[0] || null
+			}),
+			togglePlay: vi.fn(),
+		}
+		usePlayer.mockReturnValue(mockPlayer)
 
 		DanceService.getDance.mockResolvedValue({
 			id: 1,
@@ -67,63 +89,76 @@ describe('Dance.vue', () => {
 			genres: ['WAR'],
 			complexity: [2],
 			paces: [2],
-			gender: ['multi'],
+			gender: ['MULTY'],
 			handshakes: ['FREE'],
 			photo_link: 'photo.jpg',
-			songs: [{ id: 1, name: 'Song', ensembles: [] }],
+			songs: [{ id: 1, name: 'Song', link: 'song.mp3', ensembles: [] }],
 			sourceVideos: [{ id: 1, name: 'Source', link: 'https://youtu.be/abc' }],
 			performanceVideos: [],
 			lessonVideos: [],
-		});
-	});
+		})
+		sessionStorage.clear()
+	})
 
 	it('загружает данные танца при монтировании', async () => {
-		wrapper = mount(Dance, {
+		const wrapper = mount(Dance, {
 			props: { id: '1' },
 			global: {
 				plugins: [router],
-				stubs: ['RouterLink'],
+				stubs: { AudioPlayerControls: true },
 			},
-		});
+		})
 
-		expect(DanceService.getDance).toHaveBeenCalledWith('1', 'en');
-		await flushPromises();
+		await flushPromises()
 
-		expect(wrapper.find('.dance-top__title').text()).toBe('Kochari');
-	});
+		expect(DanceService.getDance).toHaveBeenCalledWith('1', 'en', expect.any(AbortSignal))
+		expect(wrapper.find('.dance-top__title').text()).toBe('Kochari')
+	})
 
 	it('устанавливает плейлист из songs после загрузки', async () => {
-		wrapper = mount(Dance, {
+		mount(Dance, {
 			props: { id: '1' },
-			global: { plugins: [router], stubs: ['RouterLink'] },
-		});
-		await flushPromises();
-		expect(mockPlayer.setPlaylist).toHaveBeenCalledWith([{ id: 1, name: 'Song', ensembles: [] }]);
-	});
+			global: {
+				plugins: [router],
+				stubs: { AudioPlayerControls: true },
+			},
+		})
 
-	it('при клике на регион вызывает chooseFilter и редиректит', async () => {
-		const push = vi.spyOn(router, 'push');
-		wrapper = mount(Dance, {
+		await flushPromises()
+
+		expect(mockPlayer.setPlaylist).toHaveBeenCalledWith([{ id: 1, name: 'Song', link: 'song.mp3', ensembles: [] }])
+	})
+
+	it('по клику на регион сохраняет фильтр и редиректит на главную', async () => {
+		const pushSpy = vi.spyOn(router, 'push')
+		const wrapper = mount(Dance, {
 			props: { id: '1' },
-			global: { plugins: [router], stubs: ['RouterLink'] },
-		});
-		await flushPromises();
+			global: {
+				plugins: [router],
+				stubs: { AudioPlayerControls: true },
+			},
+		})
 
-		await wrapper.find('.dance-top__category').trigger('click');
-		await wrapper.vm.$nextTick();
+		await flushPromises()
+		await wrapper.find('.dance-top__category').trigger('click')
 
-		expect(push).toHaveBeenCalledWith({ path: '/', hash: '#dances' });
-	});
+		expect(JSON.parse(sessionStorage.getItem('dancesFilter'))).toMatchObject({ regions: [1] })
+		expect(pushSpy).toHaveBeenCalledWith({ name: 'home', hash: '#dances' })
+	})
 
-	it('отображает видео слайды', async () => {
-		wrapper = mount(Dance, {
+	it('собирает все видео в единый список', async () => {
+		const wrapper = mount(Dance, {
 			props: { id: '1' },
-			global: { plugins: [router], stubs: ['RouterLink'] },
-		});
-		await flushPromises();
+			global: {
+				plugins: [router],
+				stubs: { AudioPlayerControls: true },
+			},
+		})
+
+		await flushPromises()
 
 		expect(wrapper.vm.allVideos).toEqual([
 			{ id: 1, name: 'Source', link: 'https://youtu.be/abc', category: 'source' },
-		]);
-	});
-});
+		])
+	})
+})

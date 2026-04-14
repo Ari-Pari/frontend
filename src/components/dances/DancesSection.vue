@@ -4,7 +4,8 @@ import { useI18n } from "vue-i18n"
 import { refDebounced, useIntersectionObserver } from "@vueuse/core"
 import { useApi } from "@/composables/useApi"
 import { useFilter } from '@/composables/useFilter'
-import { DanceService, defaultDancesParams, type SupportedLocale } from "@/services/api";
+import { DanceService, defaultDancesParams } from "@/services/api";
+import type { SupportedLocale } from "@/services/lang"
 import DanceCard from '@/components/dances/DanceCard.vue'
 import DancesFilters from '@/components/dances/DancesFilters.vue'
 

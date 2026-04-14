@@ -3,8 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
 	testDir: './src/__tests__/e2e',
 	fullyParallel: true,
+	timeout: 30000,
 	use: {
-		baseURL: 'http://localhost:5173', // Адрес, где запущен твой Vite dev server
+		baseURL: 'http://127.0.0.1:5173',
 		trace: 'on-first-retry',
 	},
 	projects: [
@@ -14,8 +15,8 @@ export default defineConfig({
 		},
 	],
 	webServer: {
-		command: 'npm run dev', // Команда запуска сервера
-		url: 'http://localhost:5173',
+		command: 'npm run dev -- --host 127.0.0.1',
+		url: 'http://127.0.0.1:5173',
 		reuseExistingServer: !process.env.CI,
 	},
 });
